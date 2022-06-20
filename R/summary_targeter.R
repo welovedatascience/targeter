@@ -1,3 +1,8 @@
+
+
+#' @method summary targeter
+#' @export
+
 summary.targeter <- function(x,
                              extra_stats=FALSE,
                              criteria=c( "IV","index.max.index","chisquare", "pvalue", "index.max.count", "index.max.props"),...){
