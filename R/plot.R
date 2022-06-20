@@ -21,7 +21,7 @@
 #' The label will be used for the title and the x-axis of the graph.
 #' @param print_NA boolean - By default, the value is TRUE. If FALSE, the missing values of the variable are not printed.
 #' @param target_NA boolean - By default, the value is TRUE. If FALSE, the missing values of the target are not printed.
-#' @param only_TRUE boolean - By default, the value is FALSE. If TRUE, only print the values for the target TRUE.
+#' @param only_target_level boolean - By default, the value is FALSE. If TRUE, only print the values for the target TRUE.
 #' @param lim_y  boolean - By default, the value is TRUE. The axis y for the proportion is limited between 0 and 100.
 #' @param ... other parameters
 #'
@@ -39,7 +39,7 @@
 #' t <- crossvar(adult,target="ABOVE50K", var="AGE",)
 #' plot(t,"counts")
 #' plot(t,"counts",type="line")
-#' plot(t,"props",print_NA = FALSE, only_TRUE = TRUE)
+#' plot(t,"props",print_NA = FALSE, only_target_level = TRUE)
 #' @method plot crossvar
 #' @export
 #'
@@ -216,7 +216,7 @@ plot.crossvar_categorical <- function(x,
                           metadata = NULL,
                           print_NA = TRUE,
                           target_NA = TRUE,
-                          only_TRUE = FALSE,
+                          only_target_level = FALSE,
                           lim_y = TRUE,
                           numvar_as=c("bin","value"),
                           ...){
@@ -224,7 +224,7 @@ plot.crossvar_categorical <- function(x,
   ##option type allows to select the geometry of the graph
   ##option print_NA : if it's equal to false, the values where the variable is NA is not printed
   ##option target_NA: if it's equal to false, the category NA of the target is not printed
-  ##option only_TRUE : if it's equal to true, we print only the values "TRUE"
+  ##option only_target_level : if it's equal to true, we print only the values "TRUE"
 
   ##test
   assertthat::assert_that(inherits(x,"crossvar"), msg = "the parameter x must to be an object of class crossvar")
@@ -233,7 +233,7 @@ plot.crossvar_categorical <- function(x,
   assertthat::assert_that(inherits(metadata,"data.frame")| is.null(metadata), msg = "The parameter metadata must be either NULL (no metadata) or a data.frame")
   assertthat::assert_that(inherits(print_NA,"logical"),msg = "The parameter print_NA must to be boolean (TRUE/FALSE)")
   assertthat::assert_that(inherits(target_NA,"logical"),msg = "The parameter target_NA must to be boolean (TRUE/FALSE)")
-  assertthat::assert_that(inherits(only_TRUE,"logical"),msg = "The parameter only_TRUE must to be boolean (TRUE/FALSE)")
+  assertthat::assert_that(inherits(only_target_level,"logical"),msg = "The parameter only_target_level must to be boolean (TRUE/FALSE)")
   assertthat::assert_that(inherits(lim_y,"logical"),msg = "The parameter lim_y must to be boolean (TRUE/FALSE)")
 
   options(scipen = 999) ## remove scientifical notation in numbers
@@ -260,9 +260,11 @@ plot.crossvar_categorical <- function(x,
   if (x$target_type == 'binary') {
     target_stats <- x$target_stats
     target_values <- target_stats[['value']]
-    target_ref <- as.character(x$target_reference_level)
   }
-
+  if (x$target_type %in% c('binary','categorical')){
+    target_ref <- as.character(x$target_reference_level)
+    if (is.na(target_ref)) target_ref<-'NA'
+  }
 
   ## selection of the appropriate tables
   df <- as.data.frame.matrix(x[[show]])
@@ -280,7 +282,7 @@ plot.crossvar_categorical <- function(x,
 
 
   ## we suppress the first value possible for the target if it's binary
-  if(only_TRUE == TRUE & x$target_type == 'binary'){
+  if(only_target_level == TRUE){
     # df <- df[-2]
     df <- df[, c('level', target_ref)]
     lim_y = FALSE}
@@ -322,10 +324,19 @@ plot.crossvar_categorical <- function(x,
     vbreaks <- unique(c(dfm[[2]], '[Missing]'))
     # print(vbreaks)
     vlabels <- vbreaks
-    vcolors <- c('cornflowerblue','firebrick1','black')
-    nontarget <- vbreaks[!vbreaks %in% c(target_ref, '[Missing]')]
-    names(vcolors) <- c(nontarget, target_ref, '[Missing]')
-    if (!target_NA){
+    if (only_target_level){
+      vbreaks <- c(target_ref, '[Missing]')
+      vcolors <- c('firebrick1','black')
+      # print(vbreaks)
+      vlabels <- vbreaks
+      names(vcolors) <- c(target_ref, '[Missing]')
+
+    } else {
+      vcolors <- c('cornflowerblue','firebrick1','black')
+      nontarget <- vbreaks[!vbreaks %in% c(target_ref, '[Missing]')]
+      names(vcolors) <- c(nontarget, target_ref, '[Missing]')
+    }
+      if (!target_NA){
       ## remove option for NA for target
       vbreaks <- vbreaks[vbreaks!='[Missing]']
       vlabels <- vbreaks
