@@ -1,3 +1,6 @@
+
+#' @method summary crossvar
+#' @export
 summary.crossvar <- function(x, extra_stats=FALSE, which_minmax=as.character(x$target_reference_level),...){
   assertthat::assert_that(inherits(x,c("crossvar")),msg="x must be a crosscall object from profile package")
   assertthat::assert_that(inherits(extra_stats,c("logical")),msg="extra_stats  must be a logical")
@@ -5,6 +8,7 @@ summary.crossvar <- function(x, extra_stats=FALSE, which_minmax=as.character(x$t
   if (is.null(x)) return(data.frame())
 
   if (x$target_type %in% c("binary","categorical")){
+    if (is.na(which_minmax)) which_minmax <- "NA"
     if (is.character(which_minmax)){
       which_minmax <- which(names(x$counts)==which_minmax)
     }
