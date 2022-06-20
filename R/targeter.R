@@ -162,10 +162,10 @@ targeter <- function(data,
   useNA <- match.arg(useNA,c("ifany","no"),several.ok=FALSE)
 
   binning_method <- match.arg(binning_method,c("quantile","clustering","tree"),several.ok = FALSE)
-  if (binning_method=="clustering") assertthat::assert_that(requireNamespace(Ckmeans.1d.dp, quietly = TRUE), msg = 'Ckmeans.1d.dp package required for clustering method.')
+  if (binning_method=="clustering") assertthat::assert_that(requireNamespace('Ckmeans.1d.dp', quietly = TRUE), msg = 'Ckmeans.1d.dp package required for clustering method.')
   if (woe_post_cluster) {
-    assertthat::assert_that(requireNamespace(Ckmeans.1d.dp, quietly = TRUE), msg = 'Ckmeans.1d.dp package required for WOE post clustering.')
-    assertthat::assert_that(requireNamespace(clustering.sc.dp, quietly = TRUE), msg = 'clustering.sc.dp package required for WOE post clustering.')
+    assertthat::assert_that(requireNamespace('Ckmeans.1d.dp', quietly = TRUE), msg = 'Ckmeans.1d.dp package required for WOE post clustering.')
+    assertthat::assert_that(requireNamespace('clustering.sc.dp', quietly = TRUE), msg = 'clustering.sc.dp package required for WOE post clustering.')
 
   }
   ## By default the variable order_label is equal to auto
