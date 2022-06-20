@@ -27,7 +27,7 @@
 #' \item \code{\link{summary.targeter}}
 #' }
 #'
-#' @export top
+#' @export focus
 #'
 #' @examples
 #' data(adult)
@@ -80,7 +80,7 @@ focus <- function(x,
                      ifelse(criteria %in% c("pvalue"), FALSE, TRUE)),]
 
   ## retrieve top n records corresponding variable names
-  varnames <- head(tmp[["varname"]],n)
+  varnames <- utils::head(tmp[["varname"]],n)
 
   # add forced variables
   varnames <- unique(c(force_vars,varnames ))

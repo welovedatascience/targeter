@@ -36,24 +36,31 @@
 #' @importFrom  ggplot2 ggplot
 #'
 #' @examples
-#' t <- crossvar(adult,"AGE","ABOVE50K")
+#' t <- crossvar(adult,target="ABOVE50K", var="AGE",)
 #' plot(t,"counts")
-#' plot(t,"counts","line")
+#' plot(t,"counts",type="line")
 #' plot(t,"props",print_NA = FALSE, only_TRUE = TRUE)
-#' @export plot.crossvar
 #' @method plot crossvar
+#' @export
 #'
 #'
 #'
 plot.crossvar <- function(x,...){
-  NextMethod("plot",x)
+  if (x$target_type %in% c('binary','categorical')){
+    plot.crossvar_categorical(x,...)
+  }  else if (x$target_type %in% ('numeric')){
+    plot.crossvar_numeric(x,...)
+  }
+
 }
 
+#' @method plot crossvar_binary
 plot.crossvar_binary <- function(x,...){
   plot.crossvar_categorical(x,...)
 }
 
 
+#' @method plot crossvar_numeric
 plot.crossvar_numeric <- function(x,
                                   show=c("boxplot","median", "avg","woe"),
                                   type= c("auto","bars","line"),
@@ -61,7 +68,7 @@ plot.crossvar_numeric <- function(x,
                                   metadata = NULL,
                                   print_NA =  TRUE,
                                   ...){
-  assertthat::assert_that(inherits(x,"crossvar"), msg = "the parameter x must to be an object of class crossvar")
+    assertthat::assert_that(inherits(x,"crossvar"), msg = "the parameter x must to be an object of class crossvar")
   assertthat::assert_that(inherits(show,"character"), msg = "the parameter show must to be a character")
   assertthat::assert_that(inherits(type,"character"), msg = "the parameter type must to be a character")
   assertthat::assert_that(inherits(metadata,"data.frame")| is.null(metadata), msg = "The parameter metadata must be either NULL (no metadata) or a data.frame")
@@ -185,28 +192,24 @@ plot.crossvar_numeric <- function(x,
   } else{
     str_title <- paste(label(x$targetname, metadata))
   }
-  invisible(allplots <- plotValues(dfm)) # Begin with non-NA values
+  allplots <- plotValues(dfm) # Begin with non-NA values
 
   if (existmissing_var & print_NA==TRUE){
     plotNA <- plotValues(dfm.NA,forNA=TRUE)
     allplots <-   gridExtra::grid.arrange(allplots, plotNA, widths = c(8,2), nrow=1, top=str_title)
-    invisible(allplots) ## to avoid to print the associated table
-
   } else {
-
     # Only main plot
-
     allplots <- allplots+ggplot2::ggtitle(str_title)
-    invisible(allplots)
-
   }
+  print(allplots)
+  invisible(allplots)
 
 }
 
 
 
 
-
+#' @method plot crossvar_categorical
 plot.crossvar_categorical <- function(x,
                           show = c("counts","props","index","woe"),
                           type = c("auto","bars","line"),
@@ -432,9 +435,6 @@ plot.crossvar_categorical <- function(x,
     } else if(any(c(0,1) %in% unique(dfm[,1]))){
       p1 = p1 + ggplot2::scale_x_discrete(breaks=c(0,1,"[Missing]") ,labels=c("FALSE", "TRUE","MISSING"))
     }
-
-
-
     invisible(p1)
   }
 
@@ -444,25 +444,49 @@ plot.crossvar_categorical <- function(x,
   } else{
     str_title <- paste(label(x$targetname, metadata))
   }
-  invisible(allplots <- plotValues(dfm)) # Begin with non-NA values
+  allplots <- plotValues(dfm) # Begin with non-NA values
 
   if (existmissing_var & print_NA==TRUE){
     plotNA <- plotValues(dfm.NA,forNA=TRUE)
     allplots <-   gridExtra::grid.arrange(allplots, plotNA, widths = c(8,2), nrow=1, top=str_title)
-    invisible(allplots) ## to avoid to print the associated table
 
   } else {
-
     # Only main plot
-
     allplots <- allplots+ggplot2::ggtitle(str_title)
-    invisible(allplots)
-
   }
-
+  print(allplots)
+  invisible(allplots)
 }
 
-
+#' @title WOE graph for binary/continuous targets
+#' @description For binary/continuous targets, WOE (Weight of Evidence) statistics are computed.
+#' This function plots a WOE barplot (or lines) for an explanatory variable, based on a crossvar object.
+#' @param x a crossvar object, as found in profiles slot of a targeter object.
+#' @param metadata data.frame - if metadata is  loaded in R environment, label of the variables can be used. Default value (NULL) corresponds to no metadata available.
+#' The label will be used for the title and the x-axis of the graph.
+#' @param print_NA boolean. Should we display WOE for NA values of the explanatory variable. Default: TRUE
+#' @param numvar_as character. How should continuous explanatorey variables be displayed:
+#' #'\itemize{
+#'\item bin (default) - display WOE for adjacent binning without respecting variable raw values
+#'\item value - plot WOE using centers of binning classes, thus respecting variable raw values
+#'}
+#' @param ... extra parameters (not used currently)
+#' @return plot a graph and returns its ggplot2 object
+#' @examples
+#' \dontrun{
+#' if(interactive()){
+#'  t <- crossvar(adult, target='ABOVE50K', var='AGE')
+#'  plot_woe(t)
+#'  plot_woe(t, numvar_as='value')
+#'  }
+#' }
+#' @seealso
+#'  \code{\link[crossvar]{crossvar}}
+#' @rdname plot_woe
+#' @export
+#' @importFrom ggplot2 ggplot aes theme_bw geom_bar theme element_blank scale_y_continuous ylim xlab element_text ggtitle
+#' @importFrom scales number
+#' @importFrom gridExtra grid.arrange
 plot_woe <- function(x,metadata = NULL,
                      print_NA = TRUE,
                      numvar_as=c("bin","value"),
@@ -500,7 +524,7 @@ plot_woe <- function(x,metadata = NULL,
 
     ## p1: graph for non missing
     ##add order + theme to graphics
-    if (x$woe_cluster){
+    if (x$woe_cluster & !forNA){
       p1 <- ggplot2::ggplot(
         dfm,
         ggplot2::aes(x=level,y = WOE, fill=as.factor(cluster)))
@@ -544,35 +568,32 @@ plot_woe <- function(x,metadata = NULL,
 
   ## title for the graphics
   if(is.null(metadata)){
-    str_title <- paste(x$targetname)
+    str_title <- paste(x$targetname, 'explained by', x$varname)
   } else{
-    str_title <- paste(label(x$targetname, metadata))
+    str_title <- paste(label(x$targetname, metadata), 'explained by', label(x$varname, metadata))
   }
   invisible(allplots <- plotValues(dfm)) # Begin with non-NA values
 
   if (existmissing_var & print_NA==TRUE){
     plotNA <- plotValues(dfm.NA,forNA=TRUE)
+    # print(str_title)
     allplots <-   gridExtra::grid.arrange(allplots, plotNA, widths = c(8,2), nrow=1, top=str_title)
-
   } else {
-
     # Only main plot
-
     allplots <- allplots+ggplot2::ggtitle(str_title)
 
   }
-
+  print(allplots)
   invisible(allplots)
-
 }
 
 
 
 
 
-#' Function quadrant_plot.crossvar
+#' Function quadrant_plot
 #'
-#'This function allows to generate a dial graphic on the object of class "crossvar".
+#'This function allows to generate a quandrant graphic on an object of class "crossvar".
 #' @param x object of class "crossvar"
 #' @param metadata data.frame - if metadata is  loaded in R environment, label of the variables can be used. Default value (NULL) corresponds to no metadata available.
 #' The label will be used for the title and the x-axis of the graph.
@@ -586,11 +607,15 @@ plot_woe <- function(x,metadata = NULL,
 #' \item \code{\link{plot.crossvar}}
 #' }
 #' @examples
-#' t <- crossvar(adult,"AGE","ABOVE50K")
-#' print(quadrant_plot.c)
-#' @export quadrant_plot.crossvar
-#' @method quadrant_plot crossvar
-quadrant_plot.crossvar <- function(x,metadata=NULL, max_ncat=15, print_NA=TRUE){
+#' t <- crossvar(adult,"ABOVE50K","WORKCLASS")
+#' quadrant_plot(t)
+#' @export quadrant_plot
+#' @importFrom assertthat assert_that
+#' @importFrom data.table setorder
+#' @importFrom ggplot2 ggplot aes geom_point scale_color_manual theme_bw geom_hline geom_text ggtitle xlab ylab theme element_text scale_x_continuous
+#' @importFrom ggrepel geom_text_repel
+#' @importFrom scales label_comma
+quadrant_plot <- function(x,metadata=NULL, max_ncat=15, print_NA=TRUE){
 
   ##test
   assertthat::assert_that(inherits(x,"crossvar"), msg = "the parameter x must to be an object of class crossvar")
@@ -606,7 +631,7 @@ quadrant_plot.crossvar <- function(x,metadata=NULL, max_ncat=15, print_NA=TRUE){
   ##recover needed data
 
   if (x$target_type == 'binary'){
-    target_level <- as.character(x$binary_target_level)
+    target_level <- as.character(x$target_reference_level)
 
     count <- x$counts[,target_level,drop=FALSE]
     colnames(count) <- "N"

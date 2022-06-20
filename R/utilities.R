@@ -11,7 +11,9 @@
 #' @export label
 #'
 #' @examples
-#' label(adult$EDUCATIONNUM, metadata)
+#' \dontrun{
+#' label(adult$EDUCATIONNUM, metadata=mymetadata) # assumes mymetadata file exists
+#' }
 label <- function(var, metadata, var_field="var", label_field="LABEL",lang=NULL){
   ##test
   assertthat::assert_that(inherits(metadata,"data.frame"), msg = "The parameter metadata must be a data.frame or data.table")

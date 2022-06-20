@@ -1,8 +1,8 @@
 #' Function targeter()
 #'
 #'For each variable, the function crosses two variables: a target to be explained and an explanatory variable.
-#'For this purpose, these variables are converted in categorical variables and a contingency table,
-#'a proportion table and an index table are generated
+#'For this purpose, these variables are converted in categorical variables by a binning process and the statistics
+#'are derived.
 #'\itemize{
 #'\item The contingency table gives the counts of each class of the explanatory variable for each modality of the target.
 #'\item A proportion is calculated as the count of profiles per class and target modality is divided by the sum of profiles by class (=count/sum of row counts).
@@ -14,23 +14,34 @@
 #'\item If the value of the index is less than 1, it implies that
 #'for this subpopulation is subrepresented for this variable.
 #'}
+#'\item Weight of Evidence and Information Value are derived for binary and continuous targets.
 #'}
+#'
 #' @param data data - data.table or data.frame.
 #' @param description_data text on the description of data.
 #' @param target character - name of the variable to explain.
+#' @param target_type charater: type of target - one of 'autoguess' (default), 'binary','categorical' (>2 modalities) or 'numeric'.
+#' ExpParameter expansion if applied so that one could also use 'a'or 'b','c' or 'n'
+#' @param target_reference_level character or numeric. For categorical or (espcially) binary targets, level / value of special
+# interest. If `NULL``default` one will try to infer from target content. Typically, this would be values such as
+#' TRUE or 1 or 'bad' for binary targets.
+#' that
 #' @param description_target text on the description of target.
-#' @param target_binary boolean - By default, TRUE. Target is a boolean value (TRUE/FALSE or 1/0).
 #' @param analysis_name  name of the analysis.
 #' @param analysis_date date of the analysis. By default, the system date.
 #' @param select_vars  a list of explanatory variables. By default, NULL and all columns are considered.
 #' @param exclude_vars  a list of variables to exclude from the analysis.
 #' @param naming_conventions boolean - by default TRUE. It means that a certain naming convention is respected.
 #' @param nbins The nbins is by default 10. It is the number of quantiles to be considered.
+#' @param binning_method character, one of 'quantile' (default) or 'clustering' (parameter expansion usable).
+#' Method used to derive the `nbins` buckets for the continuous explanatatory variables.
 #' @param useNA Two values are possible : "ifany" and "no". By default, the package option is "ifany".
 #' \itemize{
 #' \item The value "ifany" takes in consideration the missing values if there are any.
 #' \item The value "no" doesn't take in consideration the missing values in any case.
 #' }
+#' @param verbose - boolean (default FALSE). If TRUE some more information is displayed in console. COuld be usefull
+#' when using package on big data.
 #' @param dec - integer : the number of decimal for numeric variable. By default, the value is 2.
 #' @param order_label character - this option output an order used for the plot function. The parameter can only take the following values:
 #' \itemize{
@@ -40,6 +51,21 @@
 #' \item "props : order decreasing by the proportion of the second value of the target
 #' \item "means : order decreasing by the target mean (continuous target)
 #' }
+#' @param cont_target_trim numeric (default 0.01). For continuous targets, it is desirable to trim
+#' extrem values before computing WOE. This is the trimming factor in percentage (between 0: no trim and <1).
+#' @param bxp_factor (default) 1.5 for continuous target, coefficient to be used to compute boxplot whiskers.
+#' @param num_as_categorical_nval (default: 5). If a variable has less than num_as_categorical_nval distinct values,
+#' it will be considered and used as categorical and not numeric.
+#' @param autoguess_nrows - integer (default 1000). Numbers of rows to be used to guess the variables types.
+#' Special value 0 could be provided and then all rows be be used.
+#' @param woe_alternate_version character. Specify in which context WOE alternate definition will be used
+#' See vignette on  methodology. Possible values are 'if_continuous' (default) or 'always'.
+#' @param woe_shift numeric (default) 0.01. Shifting value in WOE computation to prevent issues when one bucket
+#' contains 0\% or 100\% of target. For binary target, some people also propose to use 0.5.
+#' @param woe_post_cluster boolean (default FALSE). Once WOE are computed, on could cluster values to see if this
+#'  this could be adequate to group together some modalities/buckets. Clusters would be used in graphics. See vignette on methodology.
+#' @param woe_post_cluster_n integer (default: 6). If woe_post_cluster is TRUE, number of clusters to be used.
+
 
 #'
 #'
@@ -53,33 +79,17 @@
 #' \item description_target text about the description of target
 #' \item analysis - name of the analysis.
 #' \item date - date of the analysis.
-#' \item profiles : list of elements containing the result of the function crossvar per variable.
-#' \itemize{
-#' \item .\code{varname} contains the name of the variable put in argument.
-#' \item .\code{targetname} contains the name of the target variable put in argument.
-#' \item .\code{levels} contains the name of the different classes.
-#' \item .\code{counts} contains the contingency table.
-#' \item .\code{props} contains the proportions table.
-#' \item .\code{index} contains the index table.
-#' \item .\code{orderlabel} contains the order of label in function of the parameter order_label.
-#' \item .\code{comptage_cible} table - contains the number of profile for each value of the target.
-#' \item .\code{pourcentage_cible} table - contains the pourcentage of profile for each value of the target.
-#' \item .\code{target_binary} boolean - Target is a boolean value (TRUE/FALSE or 1/0).
-#' \item .\code{cont_target_trim} numeric: for continuous target, trim values (lower/upper). trimming proportion.
-#' }
+#' \item profiles : list of elements containing the result the individual crossing per variable.
+#' See crossvar class documentation.
 #' }
 #'
 #' @export
 #' @seealso
 #' \itemize{
-#' \item \code{\link{crossvar}}
+#' \item \code{\link{summary.targeter}}
 #' \item \code{\link{plot.crossvar}}
 #' \item \code{\link{summary.crossvar}}
-#' \item \code{\link{callCrossvar}}
-#' \item \code{\link{summary.callCrossvar}}
-#' \item \code{\link{plot.callCrossvar}}
-#' \item \code{\link{top}}
-#' \item \code{\link{bottom}}
+#' \item \code{\link{report}}
 #' }
 #' @examples
 #' targeter(adult,target ="ABOVE50K")
@@ -88,13 +98,12 @@ targeter <- function(data,
                         description_data =NULL,
                         target,
                         target_type = c("autoguess","binary","categorical","numeric"),
-                        target_reference_level=NULL, # NULL: auto will check for 1, TRUE, 'bad'
+                        target_reference_level=NULL, # NULL: auto will check for 1, TRUE
                         description_target = NULL,
                         analysis_name=NULL,
                         select_vars=NULL,
                         exclude_vars=NULL,
-                        nbins=20,
-
+                        nbins=12,
                         binning_method=c("quantile","clustering","tree"), # todo
                         naming_conventions=getOption("profile.use_naming_conventions"),
                         useNA = getOption("profile.useNA"), #option package by default
@@ -103,13 +112,12 @@ targeter <- function(data,
                         order_label = c("auto","alpha","count","props","means"),
                         cont_target_trim=0.01,
                         bxp_factor=1.5,
-                        num_as_nominal_nval = 5,
+                        num_as_categorical_nval = 5,
                         autoguess_nrows = 1000, # 0: use all rows
-                        woe_alternate_version = c("if_continuous","always","never"),
+                        woe_alternate_version = c("if_continuous","always"),
                         woe_shift=0.01,
-                        woe_post_clusters=TRUE,
-                        woe_post_clusters_n=8
-
+                        woe_post_cluster=FALSE,
+                        woe_post_cluster_n=6
                         ){
 
   ##test
@@ -142,7 +150,7 @@ targeter <- function(data,
     target <- "...target"
   }
   target_type <- match.arg(target_type, c("autoguess","binary","categorical","numeric"), several.ok = FALSE)
-  woe_alternate_version <- match.arg(woe_alternate_version,c("if_continuous","always","never"), several.ok = FALSE)
+  woe_alternate_version <- match.arg(woe_alternate_version,c("if_continuous","always"), several.ok = FALSE)
 
   ##analysis name
   if (is.null(analysis_name)) analysis_name <- paste("Analysis of ", target, "on data:", dataname)
@@ -154,8 +162,12 @@ targeter <- function(data,
   useNA <- match.arg(useNA,c("ifany","no"),several.ok=FALSE)
 
   binning_method <- match.arg(binning_method,c("quantile","clustering","tree"),several.ok = FALSE)
-  if (binning_method=="clustering") assertthat::assert_that(require(Ckmeans.1d.dp), msg = 'Ckmeans.1d.dp package required for clustering method')
+  if (binning_method=="clustering") assertthat::assert_that(requireNamespace(Ckmeans.1d.dp, quietly = TRUE), msg = 'Ckmeans.1d.dp package required for clustering method.')
+  if (woe_post_cluster) {
+    assertthat::assert_that(requireNamespace(Ckmeans.1d.dp, quietly = TRUE), msg = 'Ckmeans.1d.dp package required for WOE post clustering.')
+    assertthat::assert_that(requireNamespace(clustering.sc.dp, quietly = TRUE), msg = 'clustering.sc.dp package required for WOE post clustering.')
 
+  }
   ## By default the variable order_label is equal to auto
   order_label <- order_label[1]
   ## the variable order_lable can only accept this following values
@@ -204,7 +216,7 @@ targeter <- function(data,
 
   ## target type
   if (target_type == "autoguess"){
-    target_type <- dt_vartype_autoguess_onevar(data, target, num_as_nominal_nval)
+    target_type <- dt_vartype_autoguess_onevar(data, target, num_as_categorical_nval)
     if (target_type=="unimode") {
       msg <- c(msg, list(ERROR="target has a unique value"))
       ## display messages and stop
@@ -228,13 +240,17 @@ targeter <- function(data,
 
     } else if (cl %in% c('numeric','integer')) {
       target_reference_level <- 1
-      msg <- c(msg, list(INFO=paste("target is numeric, automatic chosen level: 1; override using `target_reference_level`")))
+      msg <- c(msg, list(INFO=paste("binary target contains number, automatic chosen level: 1; override using `target_reference_level`")))
 
     } else if (cl %in% c('factor','character')){
       target_reference_level <- data[1, ][[target]]
       msg <- c(msg, list(INFO=paste("target is character/factor, automatic chosen level: ", target_reference_level,"; override using `target_reference_level`")))
 
     }
+  }
+  if (target_type=='categorical' & is.null(target_reference_level)){
+    target_reference_level <- data[[target]][1] # totally arbitrary
+    msg <- c(msg, list(INFO=paste("target is categorical. As no target_reference_level was provided, one value is taken arbitrary:",target_reference_level," override using `target_reference_level`")))
   }
 
 
@@ -246,7 +262,7 @@ targeter <- function(data,
   } else {
     if (autoguess_nrows==0) autoguess_nrows <- nrow(data)
     autoguess_nrows <- min(autoguess_nrows, nrow(data))
-    data_types <- dt_vartype_autoguess(data[1:autoguess_nrows,..select_vars], num_as_nominal_nval)
+    data_types <- dt_vartype_autoguess(data[1:autoguess_nrows,..select_vars], num_as_categorical_nval)
     num_vars <- names(data_types)[data_types == "numeric"]
 
   }
@@ -284,7 +300,7 @@ targeter <- function(data,
     ## values of the quantiles for the variables
     cutpoints_list[[variable]] <<- cutpoints
     ## find the interval containing each element of x in cutpoints
-    findInterval(x,cutpoints, right=TRUE)
+    findInterval(x,cutpoints, rightmost.closed=TRUE)
   }
 
   ## binning > clustering ----
@@ -295,7 +311,7 @@ targeter <- function(data,
     cutpoints <- sort(unique(c(cl_centers[-length(cl_centers)]+diff(cl_centers/2), range(x, na.rm=TRUE))))
     cutpoints_list[[variable]] <<- cutpoints
     ## find the interval containing each element of x in cutpoints
-    findInterval(x,cutpoints, right=TRUE)
+    findInterval(x,cutpoints, rightmost.closed=TRUE)
 
   }
 
@@ -449,20 +465,20 @@ targeter <- function(data,
         cp <- prettyNum(cutpoints_list[[variable]],digits=dec)
         nbi <- length(cp)-1 ## number of intervals
         if (nbi>0){
-          labels <- data.table(
+          labels <- data.table::data.table(
             val=1:nbi,
             ...label=paste0('[',letters[1:nbi],'] from ', cp[1:(length(cp)-1)], ' to ',cp[2:length(cp)] )
           )
 
         } else {
-          labels <- data.table(
+          labels <- data.table::data.table(
             val=0,
             ...label=paste0('===', cp[1])
           )
 
         }
-        label_NA <- data.table(val=NA, ...label='[Missing]')
-        labels <- rbindlist(list(label_NA, labels))
+        label_NA <- data.table::data.table(val=NA, ...label='[Missing]')
+        labels <- data.table::rbindlist(list(label_NA, labels))
         tab <- merge(tab, labels, by.x='variable', by.y='val', all.x=TRUE)
         tab <- as.data.frame(tab)
         rownames(tab) <- tab$...label
@@ -545,9 +561,7 @@ targeter <- function(data,
 
       alternate_version <- ifelse(
         woe_alternate_version=="always", TRUE,    ## ALWAYS: alternate: TRUE
-        ifelse (woe_alternate_version=="never",
-          FALSE,                                  ## NEVER: alternate: TRUE
-          (target_type == "numeric")))              ## IF_CONTINUOUS: alternate: if target is numeric
+          (target_type == "numeric"))             ## IF_CONTINUOUS: alternate: if target is numeric
 
 
 
@@ -569,19 +583,19 @@ targeter <- function(data,
 
       IV <- woe_iv$IV
 
-      if (woe_post_clusters){
+      if (woe_post_cluster){
         var_nvalues <- dataCut[!is.na(get(variable)),uniqueN(get(variable))]
-        if (woe_post_clusters_n < var_nvalues){
+        if (woe_post_cluster_n < var_nvalues){
           X <<- WOE[rownames(WOE)!='[Missing]',,drop=FALSE]
 
           if (variable %in% num_vars){
             # numeric variable, use sequentially constrained clustering with package clustering.sc.dp
             # cat("\nvar:", variable)
-            cl <- clustering.sc.dp::clustering.sc.dp(as.matrix(X), k=woe_post_clusters_n)$cluster
+            cl <- clustering.sc.dp::clustering.sc.dp(as.matrix(X), k=woe_post_cluster_n)$cluster
           } else {
             # cat var: use "normal" clustering
 
-            cl <- Ckmeans.1d.dp::Ckmeans.1d.dp(X$WOE, k=woe_post_clusters_n)$cluster
+            cl <- Ckmeans.1d.dp::Ckmeans.1d.dp(X$WOE, k=woe_post_cluster_n)$cluster
           }
           WOE[rownames(WOE)!='[Missing]','cluster'] <- cl
           WOE[rownames(WOE)=='[Missing]','cluster'] <- 0
@@ -596,9 +610,6 @@ targeter <- function(data,
       WOE=NULL
       IV <- NULL
     }
-
-
-
 
 
     if (target_type %in% c("binary","categorical")){
@@ -633,17 +644,15 @@ targeter <- function(data,
       }
 
 
-
       cross$counts = tab
       cross$props = p
       cross$index = ind
 
-      if (target_type == 'binary') cross$target_reference_level <-target_reference_level
+      if (target_type %in% c('binary','categorical')) cross$target_reference_level <-target_reference_level
 
       class(cross) <- c("crossvar",paste("crossvar", target_type, sep="_"), class(cross))
     } else {
         # continuous / ordinal target
-
       ##creation of the vector order
       t1 <- rownames(tab)
 
@@ -655,24 +664,18 @@ targeter <- function(data,
       {
         orderlabel <- t1[order(-tab[,'avg'])] # note: categorical: arbitrary ordered by second column
       }
-
       cross$stats <- tab
       class(cross) <- c("crossvar",paste("crossvar", target_type, sep="_"), class(cross))
-
     }
 
-
     ## common slots
-    cross$orderlabel = orderlabel   ## in this case: force/use: "auto"
+    cross$orderlabel = orderlabel
     cross$levels = rownames(tab)
-    cross$target_stats = as.data.frame(target_stats) ## <20220615> changed (breaking change)
+    cross$target_stats = as.data.frame(target_stats)
     cross$target_type <- target_type
-    #cross$target_binary = (target_type == "binary") ## <20220616> removed (breaking change)
+
     cross$IV <- IV
     cross$woe = WOE
-
-
-
 
     crossvars[[variable]] <- cross
   }
@@ -683,27 +686,27 @@ targeter <- function(data,
     description_data = description_data,
     description_target = description_target,
     target_type = target_type,
+    target_stats = as.data.frame(target_stats) ,
     analysis = analysis_name,
     date = Sys.Date(),
     profiles = crossvars
   )
-  if (target_type=='binary'){
+  if (target_type %in% c('binary','categorical')){
     out$target_reference_level <- target_reference_level
   }
-
+  ## assign class
   class(out) <- c("targeter",class(out))
 
   ## display messages
   cat("\n")
   cat(paste(names(msg),msg, sep=":" , collapse = "\n"))
   cat("\n")
+  ## return object
   return(out)
-
-
-  ##end function
 }
 
-
+#' @method print targeter
+#' @export
 print.targeter <- function(x,...){
   cat("\nTarget profiling object with following properties:")
   cat(paste0("\n\tTarget:"), x$target, " of type:", x$target_type)

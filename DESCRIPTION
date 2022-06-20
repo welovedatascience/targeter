@@ -9,11 +9,23 @@ Description: Describes a target (binary/nominal/continuous) by crossing
     allowing to prioritize inspection, such as Information Value.
     We also provide plot method and a report generation engine.
     Package is aimed at exloring big data, both in terms of records or variables.
-License: GPL (>= 3)
+License: file LICENSE
 Encoding: UTF-8
 LazyData: true
-Depends: data.table
-Suggests: Ckmeans.1d.dp
+Depends: 
+     R (>= 3.5),
+     data.table
 RoxygenNote: 7.2.0
 NeedsCompilation: no
 Packaged: 2018-12-04 13:57:40 UTC; elej
+Imports:
+     assertthat,
+     ggplot2,
+     gridExtra,
+     scales,
+     ggrepel,
+     knitr,
+     rmarkdown
+Suggests:
+     clustering.sc.dp,
+     Ckmeans.1d.dp
