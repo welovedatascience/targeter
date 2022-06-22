@@ -169,10 +169,10 @@ targeter <- function(data,
 
   }
   ## By default the variable order_label is equal to auto
-  order_label <- order_label[1]
+  # order_label <- order_label[1]
   ## the variable order_lable can only accept this following values
   order_label <- match.arg(order_label,c("auto","alpha","count","props","means"),several.ok = FALSE)
-
+# cat("\n",order_label ,"\n")
 
   ## list all variables to cross with
 
@@ -535,14 +535,15 @@ targeter <- function(data,
 
     tab <- treat_tab_labels(tab, variable, is_numeric=(variable %in% num_vars),cutpoints_list)
 
-
-
+    order_label_ivar <- order_label
     if(order_label == "auto"){
       if(variable %in% num_vars){
-        order_label <- "alpha"
-      }else{order_label <- "count"}
-
+        order_label_ivar <- "alpha"
+      }else{
+        # cat("\ny:",order_label)
+        order_label_ivar <- "props"}
     }
+
 
     if (variable %in% num_vars){
       cross$variable_type <- 'numeric'
@@ -611,7 +612,6 @@ targeter <- function(data,
       IV <- NULL
     }
 
-
     if (target_type %in% c("binary","categorical")){
       # tot <- rowSums(tab)
 
@@ -629,19 +629,30 @@ targeter <- function(data,
       rownames(ind) <- rownames(p)
 
       ##creation of the vector order
-      if(order_label == "alpha"){
+      if(order_label_ivar == "alpha"){
         t1 <- rownames(tab)
         orderlabel <- t1[order(t1)]
-      }else if (order_label == "count" ) {
+      }else if (order_label_ivar == "count" ) {
         t1 <- tab
         t1 <- cbind(t1,rowSums(t1))
         colnames(t1)[ncol(t1)] <- "total"
-        orderlabel <- names(t1[,"total"][order(-t1[,"total"])])
-      }else if (order_label %in% c("props","means"))
+        orderlabel <- colnames(t1[,"total"][order(-t1[,"total"])])
+      }else if (order_label_ivar %in% c("props","means"))
       {
+
         t1 <- p
-        orderlabel <- names(t1[,2][order(-t1[,2])]) # note: categorical: arbitrary ordered by second column
-      }
+        reflev <- as.character(target_reference_level)
+        if (is.na(reflev))reflev<- "NA"
+        # print("Yes")
+        # print(reflev)
+        wh <- which(colnames(t1)==reflev)
+        TMP <<- t1
+        # print(wh)
+        orderlabel <- names(t1[,wh][order(-t1[,wh])]) # note: categorical: arbitrary ordered by second column
+
+        # print(t1)
+        # print(orderlabel)
+              }
 
 
       cross$counts = tab
@@ -656,11 +667,11 @@ targeter <- function(data,
       ##creation of the vector order
       t1 <- rownames(tab)
 
-      if(order_label == "alpha"){
+      if(order_label_ivar == "alpha"){
         orderlabel <- t1[order(t1)]
-      }else if (order_label == "count" ) {
+      }else if (order_label_ivar == "count" ) {
         orderlabel <- t1[order(-tab[,"count"])]
-      }else if (order_label %in% c("props","means"))
+      }else if (order_label_ivar %in% c("props","means"))
       {
         orderlabel <- t1[order(-tab[,'avg'])] # note: categorical: arbitrary ordered by second column
       }
