@@ -21,7 +21,7 @@
 #' The label will be used for the title and the x-axis of the graph.
 #' @param print_NA boolean - By default, the value is TRUE. If FALSE, the missing values of the variable are not printed.
 #' @param target_NA boolean - By default, the value is TRUE. If FALSE, the missing values of the target are not printed.
-#' @param only_target_level boolean - By default, the value is FALSE. If TRUE, only print the values for the target TRUE.
+#' @param only_target_ref_level boolean - By default, the value is FALSE. If TRUE, only print the values for the target TRUE.
 #' @param lim_y  boolean - By default, the value is TRUE. The axis y for the proportion is limited between 0 and 100.
 #' @param ... other parameters
 #'
@@ -39,7 +39,7 @@
 #' t <- crossvar(adult,target="ABOVE50K", var="AGE",)
 #' plot(t,"counts")
 #' plot(t,"counts",type="line")
-#' plot(t,"props",print_NA = FALSE, only_target_level = TRUE)
+#' plot(t,"props",print_NA = FALSE, only_target_ref_level = TRUE)
 #' @method plot crossvar
 #' @export
 #'
@@ -96,6 +96,7 @@ plot.crossvar_numeric <- function(x,
   df <- x$stats
   ##reorder the table:
   df <- df[match(x$orderlabel, rownames(df)),, drop=FALSE]
+
   ## add the level with the rownames
   dfm <- cbind(level=rownames(df),df)
 
@@ -120,7 +121,7 @@ plot.crossvar_numeric <- function(x,
   }
 
 
-  if (numvar_as == 'value'){
+  if (numvar_as == 'value' & x$variable_type=="numeric"){
     # replace labels per bin center values
     dfm[['level']] <-  as.numeric(x$numcenters[dfm[['level']]])
   }
@@ -196,13 +197,13 @@ plot.crossvar_numeric <- function(x,
 
   if (existmissing_var & print_NA==TRUE){
     plotNA <- plotValues(dfm.NA,forNA=TRUE)
-    allplots <-   gridExtra::grid.arrange(allplots, plotNA, widths = c(8,2), nrow=1, top=str_title)
+    allplots <-   gridExtra::arrangeGrob(allplots, plotNA, widths = c(8,2), nrow=1, top=str_title)
   } else {
     # Only main plot
     allplots <- allplots+ggplot2::ggtitle(str_title)
   }
-  print(allplots)
-  invisible(allplots)
+
+  allplots
 
 }
 
@@ -216,7 +217,7 @@ plot.crossvar_categorical <- function(x,
                           metadata = NULL,
                           print_NA = TRUE,
                           target_NA = TRUE,
-                          only_target_level = FALSE,
+                          only_target_ref_level = FALSE,
                           lim_y = TRUE,
                           numvar_as=c("bin","value"),
                           ...){
@@ -224,7 +225,7 @@ plot.crossvar_categorical <- function(x,
   ##option type allows to select the geometry of the graph
   ##option print_NA : if it's equal to false, the values where the variable is NA is not printed
   ##option target_NA: if it's equal to false, the category NA of the target is not printed
-  ##option only_target_level : if it's equal to true, we print only the values "TRUE"
+  ##option only_target_ref_level : if it's equal to true, we print only the values "TRUE"
 
   ##test
   assertthat::assert_that(inherits(x,"crossvar"), msg = "the parameter x must to be an object of class crossvar")
@@ -233,7 +234,7 @@ plot.crossvar_categorical <- function(x,
   assertthat::assert_that(inherits(metadata,"data.frame")| is.null(metadata), msg = "The parameter metadata must be either NULL (no metadata) or a data.frame")
   assertthat::assert_that(inherits(print_NA,"logical"),msg = "The parameter print_NA must to be boolean (TRUE/FALSE)")
   assertthat::assert_that(inherits(target_NA,"logical"),msg = "The parameter target_NA must to be boolean (TRUE/FALSE)")
-  assertthat::assert_that(inherits(only_target_level,"logical"),msg = "The parameter only_target_level must to be boolean (TRUE/FALSE)")
+  assertthat::assert_that(inherits(only_target_ref_level,"logical"),msg = "The parameter only_target_ref_level must to be boolean (TRUE/FALSE)")
   assertthat::assert_that(inherits(lim_y,"logical"),msg = "The parameter lim_y must to be boolean (TRUE/FALSE)")
 
   options(scipen = 999) ## remove scientifical notation in numbers
@@ -246,7 +247,7 @@ plot.crossvar_categorical <- function(x,
   type <- match.arg(type, c("auto","bars","line"), several.ok = FALSE)
 
   numvar_as <- match.arg(numvar_as, c("bin","value"), several.ok = FALSE)
-
+  if (numvar_as=='value' & x$variable_type!='numeric') numvar_as <- 'bin'
 
   if (show == 'woe' & is.null(x$woe)) stop("No WOE for this profile object, maybe it is a categorical target?")
   ## Definiton of a default association between the show and the type parameters.
@@ -268,10 +269,15 @@ plot.crossvar_categorical <- function(x,
 
   ## selection of the appropriate tables
   df <- as.data.frame.matrix(x[[show]])
-  ##reorder the table:
-  df <- df[match(x$orderlabel, rownames(df)),, drop=FALSE]
+
+  # ##reorder the table:
+  # df <- df[x$orderlabel,, drop=FALSE]
+
+  # print(df)
   ## add the level with the rownames
   df <- cbind(level=rownames(df),df)
+
+
 
   if (show == 'woe'){
     return(plot_woe(x,
@@ -282,10 +288,11 @@ plot.crossvar_categorical <- function(x,
 
 
   ## we suppress the first value possible for the target if it's binary
-  if(only_target_level == TRUE){
+  if(only_target_ref_level == TRUE){
     # df <- df[-2]
     df <- df[, c('level', target_ref)]
-    lim_y = FALSE}
+    lim_y = FALSE
+    }
 
   ## we put all values in one column instead of several columns (number of columns: numbers of differents values of the target)
   suppressWarnings(dfm <- melt(as.data.table(df),id ="level"))
@@ -324,7 +331,7 @@ plot.crossvar_categorical <- function(x,
     vbreaks <- unique(c(dfm[[2]], '[Missing]'))
     # print(vbreaks)
     vlabels <- vbreaks
-    if (only_target_level){
+    if (only_target_ref_level){
       vbreaks <- c(target_ref, '[Missing]')
       vcolors <- c('firebrick1','black')
       # print(vbreaks)
@@ -345,19 +352,25 @@ plot.crossvar_categorical <- function(x,
     # print(vcolors)
   }
 
+  if (!is.numeric(dfm[['level']])){
+    dfm$level <- factor(dfm$level, levels=x$orderlabel)
+  }
   ## creation of the graphics
   plotValues <- function(dfm, forNA=FALSE){
 
     ## p1: graph for non missing
 
-    ##add order + theme to graphics
-    p1 <- ggplot2::ggplot(
-      dfm,
-      ggplot2::aes(x=level,y = value)) +
-      ggplot2:: theme_bw()
+
+      p1 <- ggplot2::ggplot(
+        dfm,
+        ggplot2::aes(x=level,y = value)) +
+        ggplot2:: theme_bw()
+
+
+
     #p1 <- ggplot2::ggplot(dfm,ggplot2::aes(x = level,y = value))
 
-
+    # print(type)
     if (type=="bars"){
       ## create bar plot
       p1 = p1 +
@@ -384,6 +397,7 @@ plot.crossvar_categorical <- function(x,
       p1 <- p1 + ggplot2::scale_y_continuous(labels = scales::number)
 
     } else {
+      # print(x$target_type)
       ## lines
       if (forNA) {
         p1 = p1 + ggplot2::geom_point(ggplot2::aes(group=target,col = target), show.legend = FALSE)
@@ -392,15 +406,27 @@ plot.crossvar_categorical <- function(x,
         }
 
       } else  {
-        p1 = p1  +
-          ggplot2::geom_line(ggplot2::aes(group=target,col=target))  +
-          ggplot2::theme(legend.position = "top",legend.title = ggplot2::element_blank())
-        ##change label and colour
         if(x$target_type == 'binary'){
+          nlevels <- length(table(dfm$level))
+          # print(dfm)
+          # print(nlevels)
+          if (nlevels==1){
+            # print("ok")
+            p1 = p1  +
+              ggplot2::geom_point(ggplot2::aes(group=1,col=target))  ##change label and colour
+
+          } else {
+            p1 = p1  +
+              ggplot2::geom_line(ggplot2::aes(group=target,col=target))  ##change label and colour
+
+          }
+
           p1 = p1 + ggplot2::scale_color_manual(breaks=vbreaks,
                                                 labels=vlabels,
                                                 values = vcolors)
         }
+        p1 <- p1 +
+          ggplot2::theme(legend.position = "top",legend.title = ggplot2::element_blank())
 
       }
     }
@@ -414,12 +440,17 @@ plot.crossvar_categorical <- function(x,
         p1 = p1  + ggplot2::ylab("Perc.")
         if(x$target_type == 'binary'){ ## add the pourcentage of the target
 
-          target_ref_perc <- target_stats[target_stats$value  ==x$target_reference_level, 'perc']
+          target_ref_perc <- target_stats[target_stats$value  ==x$target_reference_level, ][['perc']]
         p1 = p1 + ggplot2::geom_hline(yintercept = round((target_ref_perc)*100,2), linetype= "dashed", color = "darkorchid")
+
+        x_text <- ifelse(is.numeric(dfm$level),
+                  min(dfm$level, na.rm=TRUE)+0.05*(max(dfm$level, na.rm=TRUE)-min(dfm$level, na.rm=TRUE)),
+                  1)
+
         p1 <- p1 + ggplot2::geom_text(
           ggplot2::aes(
             y=round(target_ref_perc*100,2),
-            label=paste0(round(target_ref_perc*100,2)), x=1),
+            label=paste0(round(target_ref_perc*100,2)), x=x_text),
           colour="darkorchid", angle=0, vjust = 1.2, size=3.5)
         }
         if(lim_y == TRUE){p1 = p1 +ggplot2::ylim(c(0,100))}
@@ -459,14 +490,14 @@ plot.crossvar_categorical <- function(x,
 
   if (existmissing_var & print_NA==TRUE){
     plotNA <- plotValues(dfm.NA,forNA=TRUE)
-    allplots <-   gridExtra::grid.arrange(allplots, plotNA, widths = c(8,2), nrow=1, top=str_title)
+    allplots <-   gridExtra::arrangeGrob(allplots, plotNA, widths = c(8,2), nrow=1, top=str_title)
 
   } else {
     # Only main plot
     allplots <- allplots+ggplot2::ggtitle(str_title)
   }
-  print(allplots)
-  invisible(allplots)
+
+  allplots
 }
 
 #' @title WOE graph for binary/continuous targets
@@ -509,7 +540,7 @@ plot_woe <- function(x,metadata = NULL,
   ## selection of the appropriate tables
   df <- as.data.frame.matrix(x[['woe']])
   ##reorder the table:
-  df <- df[match(x$orderlabel, rownames(df)),, drop=FALSE]
+  # df <- df[match(x$orderlabel, rownames(df)),, drop=FALSE]
   ## add the level with the rownames
   dfm <- cbind(level=rownames(df),df)
 
@@ -529,7 +560,9 @@ plot_woe <- function(x,metadata = NULL,
     dfm[['level']] <-  as.numeric(x$numcenters[dfm[['level']]])
   }
 
-
+  if (!is.numeric(dfm[['level']])){
+    dfm$level <- factor(dfm$level, levels=x$orderlabel)
+  }
   ## creation of the graphics
   plotValues <- function(dfm, forNA=FALSE){
 
@@ -548,7 +581,7 @@ plot_woe <- function(x,metadata = NULL,
     p1 <- p1 + ggplot2:: theme_bw()
     ## create bar plot
     p1 = p1 +
-      ggplot2::geom_bar(stat="identity",show.legend=FALSE) +
+      ggplot2::geom_bar(stat="identity",show.legend=FALSE, group=1) +
       ggplot2::theme(
         legend.position = "top",
         legend.title = ggplot2::element_blank())  ##change the position of the legend + suppress title legend
@@ -583,19 +616,19 @@ plot_woe <- function(x,metadata = NULL,
   } else{
     str_title <- paste(label(x$targetname, metadata), 'explained by', label(x$varname, metadata))
   }
-  invisible(allplots <- plotValues(dfm)) # Begin with non-NA values
+  allplots <- plotValues(dfm) # Begin with non-NA values
 
   if (existmissing_var & print_NA==TRUE){
     plotNA <- plotValues(dfm.NA,forNA=TRUE)
     # print(str_title)
-    allplots <-   gridExtra::grid.arrange(allplots, plotNA, widths = c(8,2), nrow=1, top=str_title)
+    allplots <-   gridExtra::arrangeGrob(allplots, plotNA, widths = c(8,2), nrow=1, top=str_title)
   } else {
     # Only main plot
     allplots <- allplots+ggplot2::ggtitle(str_title)
 
   }
-  print(allplots)
-  invisible(allplots)
+
+  allplots
 }
 
 
@@ -687,6 +720,7 @@ quadrant_plot <- function(x,metadata=NULL, max_ncat=15, print_NA=TRUE){
       ## collapse stats
       remaining_N <- sum(remaining$N)
       remaining_Y <- sum(remaining$Y * remaining$N)/remaining_N
+      if (is.nan(remaining_Y)) remaining_Y <- 0 # fix
       collapsed <- data.frame(names="[Other]", N=remaining_N, Y=remaining_Y)
       all <- rbindlist(list(top, collapsed), use.names=TRUE)
     } else {
@@ -711,7 +745,7 @@ quadrant_plot <- function(x,metadata=NULL, max_ncat=15, print_NA=TRUE){
   ## changement label
   #p1 <- p1 + ggplot2::labs(size="Pourcentage de profils par modalité")
   ##add label to the point. Advantage the function gives the best position for the label
-  p1 <- p1 + ggrepel::geom_text_repel(size = 2.5)
+  suppressWarnings(p1 <- p1 + ggrepel::geom_text_repel(size = 2.5,  max.overlaps=16))
   ##theme
   p1 <- p1  + ggplot2::theme_bw()
 
