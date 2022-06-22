@@ -16,6 +16,7 @@ summary.crossvar <- function(x, extra_stats=FALSE, which_minmax=as.character(x$t
   out <- data.frame(
     varname=x$varname,
     targetname= x$targetname,
+    vartype=x$variable_type,
     stringsAsFactors = FALSE
   )
   if (x$target_type != "categorical") out$IV <- x$IV
