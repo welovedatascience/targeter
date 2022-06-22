@@ -16,11 +16,15 @@
 #' }
 label <- function(var, metadata, var_field="var", label_field="LABEL",lang=NULL){
   ##test
-  assertthat::assert_that(inherits(metadata,"data.frame"), msg = "The parameter metadata must be a data.frame or data.table")
+
+  if (is.null(metadata)) return(var)
+  assertthat::assert_that(metadata|inherits(metadata,"data.frame"), msg = "The parameter metadata must be a data.frame or data.table")
+
+
   assertthat::assert_that(inherits(var,"character"), msg = "var must be character")
   assertthat::assert_that(length(var)==1,msg="Only one var is admitted")
 
-  assertthat::assert_that(var_field %in% names(metadata), msg = oaste("var_field ",var_field,"not present in metadata"))
+  assertthat::assert_that(var_field %in% names(metadata), msg = paste("var_field ",var_field,"not present in metadata"))
 
   ##add language code
   if (!is.null(lang)) label_field <- paste(label_field,lang, sep='_')
