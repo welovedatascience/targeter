@@ -24,7 +24,9 @@ Imports:
      scales,
      ggrepel,
      knitr,
-     rmarkdown
+     rmarkdown,
+     kableExtra
 Suggests:
      clustering.sc.dp,
-     Ckmeans.1d.dp
+     Ckmeans.1d.dp,
+     flextable
