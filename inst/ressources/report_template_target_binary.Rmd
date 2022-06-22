@@ -23,6 +23,8 @@ header-includes:
 knitr::opts_chunk$set(echo = FALSE)
 library(targeter)
 library(data.table)
+library(ggplot2)
+library(DT)
 ```
 
 ```{r}
@@ -69,7 +71,7 @@ For every criteria, summary table presents its possible value (modality) having 
 
 stats <- setDT(object$profiles[[1]]$target_stats)
 Ntot <-stats[, sum(count)]
-cat("  \n Analyzed population contains ",Ntot," records.")
+cat("\n Analyzed population contains ",Ntot," records.")
 ```
 
 ## Target description
@@ -77,12 +79,21 @@ cat("  \n Analyzed population contains ",Ntot," records.")
 
 ```{r,results='asis'}
 
-if(!is.null(object$description_target)){
-   cat(object$description_target[[1]])}else{cat("No description of the target has been provided uring the analysis")}
+if(!is.null(object$description_target)) {
+  cat(object$description_target[[1]])} else{
+     cat("No description of the target has been provided uring the analysis")}
 
 cat("  \n Target statistic")
-stats[, target_level:=ifelse(as.character(value)==as.character(object$target_reference_level), "*","")]
-knitr::kable(per, format=format_tables)
+stats[, reference_level:=ifelse(as.character(value)==as.character(object$target_reference_level), "*","")]
+# knitr::kable(stats, format=format_tables)
+if (format_tables=="word"){
+   flextable::set_flextable_defaults(font.size = 11)
+  flextable::qflextable(stats)
+  
+} else {
+  kableExtra::kable_styling(knitr::kable(stats, format=format_tables))
+  }
+
 
 ```
 
@@ -92,23 +103,34 @@ knitr::kable(per, format=format_tables)
 
 
 ```{r summarytable}
-df <- summary.callCrossvar(object,criteria=criteria)
 ##filter df columns; remove varname (we have rownames) keep only: index.max.index, index.max.level, index.max.count,
-df2 <- df[,c("index.max.level","index.max.count","index.max.props","index.max.index")]
+df2 <- as.data.frame(summary_object[,
+          c("varname","vartype","IV","index.max.level","index.max.count",
+            "index.max.props","index.max.index")])
 df2$index.max.index = round(df2$index.max.index,2)
 df2$index.max.props = round(df2$index.max.props *100, 2)
-colnames(df2) <- c("Value","#Records","%Records","Index")
+colnames(df2) <- c("variable","type","IV","Level","#Records","%Records","Index")
+df2$IV <- round(df2$IV,3)
+# [the relevant section](#test)
 
 if (!is.null(metadata)){
- df2 <- cbind(data.frame(Criteria=sapply(rownames(df2),label, metadata=metadata),stringsAsFactors = FALSE),df2)
-  rownames(df2) <- NULL
+ df2 <- cbind(data.frame(Label=sapply(df2$variable,label, metadata=metadata),stringsAsFactors = FALSE),df2)
+ rownames(df2) <- NULL
 }
-if(object$target_binary == FALSE){cat("  \n Summary table is related to target value:",levels(df[,"which.minmax.level"]))}
 if (format_tables=="latex"){
   kab <- knitr::kable(df2, format= "latex", booktabs = TRUE)
   if (is.null(rownames)) kableExtra::column_spec(kab, 1, width = "8cm") else kab
-} else   kableExtra::kable_styling(knitr::kable(df2, format=format_tables))
-
+} else  if (format_tables=="html"){
+  df2$variable <- paste0("<a href='#var-",tolower(df2$variable),"'>",df2$variable,"</a>")
+  # kableExtra::kable_styling(knitr::kable(df2, format=format_tables))
+DT::datatable(df2, rownames = FALSE, filter="top", 
+              selection="none", autoHideNavigation = TRUE, 
+              escape = -ifelse(is.null(metadata),1,2),
+              options=list(pageLength=25))
+}  else  if (format_tables=="word") {
+# word 
+  flextable::qflextable(df2)
+}
 
 ```
 
@@ -120,26 +142,48 @@ if (format_tables=="latex"){
 
 
 
-```{r, results='asis', fig.height=4.5, fig.width=9, fig.align='center'}
+```{r, results='asis', echo=FALSE, fig.height=4.5, fig.width=9, fig.align='center'}
 # varnames <- sapply(object$profiles, function(x) x$varname)
-varnames <- rownames(df)
+varnames <- summary_object$varname
+
 for (i in seq_along(varnames)){
   
 ivar <- varnames[i]
- # cat("ivar:", ivar)
-if (!is.null(metadata)){
-  cat("\n\n##",label(ivar, metadata=metadata),"\n")
-} else  cat("\n\n##",ivar,"\n\n")
-  invisible(suppressWarnings(g1 <- plot.crossvar(object$profiles[[ivar]], metadata=metadata,print_NA=TRUE)))
-if(object$target_binary == TRUE){
- invisible(suppressWarnings(
-   g2 <- plot.crossvar(object$profiles[[ivar]],show="props",type="l",metadata=metadata,print_NA=TRUE,only_TRUE =TRUE)
-   )) } else {
-  invisible(suppressWarnings(g2 <- plot(object$profiles[[ivar]],show="props",type="l",metadata=metadata,print_NA=TRUE,only_TRUE =FALSE)
-                             ))
-  }
- gridExtra::grid.arrange(g1, g2, ncol=2)
- if(object$target_binary == TRUE){
+ivar_label = label(ivar, metadata = metadata)
+iprofile <- object$profiles[[ivar]]
+# https://stackoverflow.com/questions/39281266/use-internal-links-in-rmarkdown-html-output
+# explicit link: you give a custom name to a header ## Test {#test} and later refer to it with a link syntax: see [the relevant section](#test).
+cat("\n\n\\newpage\n\n")
+if (format_tables=="html"){
+  
+  cat(paste0("<div id='var-",tolower(ivar),"'>\n\n## ",label(ivar, metadata=metadata), ifelse(ivar_label!=ivar, paste0(" (",ivar,")"),""),"\n</div>"))
+  
+} else {
+cat("\n\n## ",label(ivar, metadata=metadata),"\n")
+  
+}
+
+cat("\n__IV:", round(iprofile$IV,3),"__\n\n")
+
+invisible(suppressWarnings(
+  g1 <- plot.crossvar(iprofile, 
+                      metadata=metadata,
+                      print_NA=TRUE, 
+                      numvar_as = 'value')))
+ 
+invisible(suppressWarnings(
+ g2 <- plot.crossvar(iprofile, 
+                     show="props", 
+                     type="l",
+                     metadata=metadata,
+                     print_NA=TRUE,
+                     only_target_ref_level =TRUE, 
+                     numvar_as = 'value')
+   )) 
+# print(cowplot::plot_grid(g1,g2))
+# patchwork::wrap_plots(g1, g2)
+ suppressWarnings(gridExtra::grid.arrange(g1, g2, ncol=2))
+ # if(object$target_binary == TRUE){
 #   
 #   if(df2$`Index`[i] >1){g <- "higher"} else {g <- "lower"}
 #   if(round(object$profiles[[1]][["pourcentage_cible"]][[2]] *100,2) < df2$`%Records`[i]){ p <- "more"}else {p <-"less"}
@@ -151,17 +195,17 @@ if(object$target_binary == TRUE){
 # 
 # cat(paste("\n  On the left part of the graphics, the criteria possible modality ", df2$Criteria[i]," = ",df$index.min.level[i], "concerns",df$index.min.count[i]," records from which ",round(df$index.min.props[i]*100,2),"% are targets. This target penetration is the lowest for the criteria segment and is ",p," important than global average penetration",round(object$profiles[[1]][["pourcentage_cible"]][[2]] *100,2),"% [(which is also minimal index:",round(df$index.min.index[i],2),g," than 1).  \n"))
 # 
-
-   
  
- if(substring(ivar,1,2) == "C_"){
-   
-   g3 <- suppressWarnings(cadran_plot.crossvar(object$profiles[[ivar]], metadata=metadata))
-   print(g3)
- }
+ 
+invisible(suppressWarnings(g3 <- plot_woe(iprofile, metadata=metadata)))
+ 
+if (iprofile$variable_type %in% c('character')) {
+   suppressWarnings(g4 <- quadrant_plot(iprofile, metadata=metadata))
+} else {
+    g4 <- ggplot() + theme_void()
+
 }
- 
-
+ gridExtra::grid.arrange(g3, g4, ncol=2)
 cat('\\pagebreak')
 }
 ```
