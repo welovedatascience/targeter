@@ -40,7 +40,9 @@ report <- function(object,
                            min_criteria = NULL,
                            metadata=NULL,
                            force_vars=character(),
-                           output_format="pdf_document",
+                           output_format=c("html","pdf","word"),
+                           output_file = NULL,
+                           output_dir = tempdir(),
                            ...){
 
 
@@ -53,10 +55,17 @@ report <- function(object,
   assertthat::assert_that(inherits(metadata,"data.frame")| is.null(metadata), msg = "The parameter metadata must be either NULL (no metadata) or a data.frame")
   assertthat::assert_that(inherits(min_criteria,"numeric")|inherits(min_criteria,"integer")|is.null(min_criteria), msg="The parameter min_criteria must to be an integer or numeric")
 
+
+  output_format <- match.arg(output_format, c("html","pdf","word"), several.ok = FALSE)
   ## apply focus/top
+  if (is.null(summary_object)){
+    # compute summary object
+    cat("?")
+    summary_object <- summary(object, nmin = nmin, criteria = criteria,
+                              min_criteria = min_criteria)
+  }
   if(!is.null(ntop)){
-    object <- focus(object, n = ntop, nmin = nmin, criteria = criteria,
-                            min_criteria = min_criteria, force_vars = force_vars,
+    object <- focus(object, n = ntop, force_vars = force_vars,
                             summary_object = summary_object )}
   attr(object, 'metadata') <- metadata
 
@@ -65,11 +74,24 @@ report <- function(object,
     template <- file.path(path.package("targeter"), "ressources",paste0("report_template_",object$target_type,".Rmd"))
   }
 
-  format_tables <- switch(output_format,
-                          "html_document"="html",
-                          "pdf_document"="latex")
+  format_tables <- output_format
 
-  outfile <- rmarkdown::render(template,output_format=output_format,...)
+  outfile <- rmarkdown::render(template,
+            output_format=paste(output_format,'document',sep="_"),
+            output_file=output_file,output_dir=output_dir,...)
   if (browse) utils::browseURL(outfile)
   return(outfile)
 }
+
+
+# A <- targeter(adult, target="ABOVE50K",binning_method='clustering',woe_post_cluster=TRUE)
+
+## html
+# report(A,  browse=TRUE, template=file.path("/hackdata/share/code/R/packages/targeter/inst/ressources/report_template_target_binary.Rmd"), output_format='html')
+# report(N,  browse=TRUE, template=file.path("/hackdata/share/code/R/packages/targeter/inst/ressources/report_template_target_numeric.Rmd"), output_format='html')
+
+## pdf
+# report(A,  browse=TRUE, template=file.path("/hackdata/share/code/R/packages/targeter/inst/ressources/report_template_target_binary.Rmd"), output_format='pdf')
+
+## word
+# report(A,  browse=TRUE, template=file.path("/hackdata/share/code/R/packages/targeter/inst/ressources/report_template_target_binary.Rmd"), output_format='word')
