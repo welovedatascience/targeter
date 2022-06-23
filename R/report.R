@@ -71,7 +71,7 @@ report <- function(object,
 
   if (is.null(template)){
     ## default template
-    template <- file.path(path.package("targeter"), "ressources",paste0("report_template_",object$target_type,".Rmd"))
+    template <- file.path(find.package("targeter", lib.loc=.libPaths()), "ressources",paste0("report_template_target_",object$target_type,".Rmd"))
   }
 
   format_tables <- switch(output_format,
