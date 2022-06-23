@@ -95,30 +95,31 @@
 #' targeter(adult,target ="ABOVE50K")
 
 targeter <- function(data,
-                        description_data =NULL,
-                        target,
-                        target_type = c("autoguess","binary","categorical","numeric"),
-                        target_reference_level=NULL, # NULL: auto will check for 1, TRUE
-                        description_target = NULL,
-                        analysis_name=NULL,
-                        select_vars=NULL,
-                        exclude_vars=NULL,
-                        nbins=12,
-                        binning_method=c("quantile","clustering","tree"), # todo
-                        naming_conventions=getOption("profile.use_naming_conventions"),
-                        useNA = getOption("profile.useNA"), #option package by default
-                        verbose=FALSE,
-                        dec = 2,
-                        order_label = c("auto","alpha","count","props","means"),
-                        cont_target_trim=0.01,
-                        bxp_factor=1.5,
-                        num_as_categorical_nval = 5,
-                        autoguess_nrows = 1000, # 0: use all rows
-                        woe_alternate_version = c("if_continuous","always"),
-                        woe_shift=0.01,
-                        woe_post_cluster=FALSE,
-                        woe_post_cluster_n=6
-                        ){
+                     description_data =NULL,
+                     target,
+                     target_type = c("autoguess","binary","categorical","numeric"),
+                     target_reference_level=NULL, # NULL: auto will check for 1, TRUE
+                     description_target = NULL,
+                     analysis_name=NULL,
+                     select_vars=NULL,
+                     exclude_vars=NULL,
+                     nbins=12,
+                     binning_method=c("quantile","clustering","smart"), # todo: tree
+                     naming_conventions=getOption("profile.use_naming_conventions"),
+                     useNA = getOption("profile.useNA"), #option package by default
+                     verbose=FALSE,
+                     dec = 2,
+                     order_label = c("auto","alpha","count","props","means"),
+                     cont_target_trim=0.01,
+                     bxp_factor=1.5,
+                     num_as_categorical_nval = 5,
+                     autoguess_nrows = 1000, # 0: use all rows
+                     woe_alternate_version = c("if_continuous","always"),
+                     woe_shift=0.01,
+                     woe_post_cluster=FALSE,
+                     woe_post_cluster_n=6,
+                     smart_quantile_by=0.01
+){
 
   ##test
   assertthat::assert_that(inherits(data,"data.frame") | inherits(data, "data.table"), msg = "Data must to be a data.frame or a data.table")
@@ -161,7 +162,7 @@ targeter <- function(data,
   ##<todo>: introduce a yes or always
   useNA <- match.arg(useNA,c("ifany","no"),several.ok=FALSE)
 
-  binning_method <- match.arg(binning_method,c("quantile","clustering","tree"),several.ok = FALSE)
+  binning_method <- match.arg(binning_method,c("quantile","clustering","smart"),several.ok = FALSE)
   if (binning_method=="clustering") assertthat::assert_that(requireNamespace('Ckmeans.1d.dp', quietly = TRUE), msg = 'Ckmeans.1d.dp package required for clustering method.')
   if (woe_post_cluster) {
     assertthat::assert_that(requireNamespace('Ckmeans.1d.dp', quietly = TRUE), msg = 'Ckmeans.1d.dp package required for WOE post clustering.')
@@ -172,7 +173,7 @@ targeter <- function(data,
   # order_label <- order_label[1]
   ## the variable order_lable can only accept this following values
   order_label <- match.arg(order_label,c("auto","alpha","count","props","means"),several.ok = FALSE)
-# cat("\n",order_label ,"\n")
+  # cat("\n",order_label ,"\n")
 
   ## list all variables to cross with
 
@@ -315,9 +316,32 @@ targeter <- function(data,
 
   }
 
+  binning_smart <- function(x, nbins, variable){
+
+    quantiles = seq(0, 1, length.out = 1+round(1/smart_quantile_by))
+    nqu <- length(quantiles)
+    qu_indices <- (1:nqu)%/% (nqu/nbins)
+    ## take the value of the quantile for the variable x
+    qu <- quantile(x, quantiles, na.rm = TRUE)
+    qmin <- qu[1]
+    qmax <- qu[nqu]
+    uqu <- qu[names(qu)[!duplicated(qu_indices)]]
+    new_nbin <- min(c(length(unique(uqu)),nqu))
+    # cl_centers <- Ckmeans.1d.dp::Ckmeans.1d.dp(x[!is.na(x)], k=new_nbin)$centers
+    cl_centers <- clustering.sc.dp::clustering.sc.dp(matrix(qu,ncol=1), k=new_nbin)$centers[,1]
+    cutcenter_list[[variable]] <<- cl_centers
+    cutpoints <- sort(unique(c(cl_centers[-length(cl_centers)]+diff(cl_centers/2), qmin, qmax)))
+
+    cutpoints_list[[variable]] <<- cutpoints
+    ## find the interval containing each element of x in cutpoints
+    findInterval(x,cutpoints, rightmost.closed=TRUE)
+  }
+
+
   binning_foos <- list(
     quantile = binning_quantile,
-    clustering = binning_clustering)
+    clustering = binning_clustering,
+    smart=binning_smart)
 
   binning_foo <- binning_foos[[binning_method]]
 
@@ -361,9 +385,9 @@ targeter <- function(data,
         ,std=sd(get(target), na.rm = TRUE)
         ,min=min(get(target), na.rm=TRUE)
         ,"
-       ,paste("q",round(100*probs),"=quantile(get(target),",probs, ",na.rm=TRUE)",
-              sep="", collapse=","),
-       ",max=max(get(target), na.rm=TRUE)
+                 ,paste("q",round(100*probs),"=quantile(get(target),",probs, ",na.rm=TRUE)",
+                        sep="", collapse=","),
+                 ",max=max(get(target), na.rm=TRUE)
        ,sum=sum(get(target), na.rm=TRUE)
        ,count=.N
        ,nNA=sum(is.na(get(target)))",")]")
@@ -493,7 +517,7 @@ targeter <- function(data,
       # ## we drop the column variable
       tab <- tab[, -1, drop=FALSE]
 
-            #   cutpoints_list[[variable]] <-
+      #   cutpoints_list[[variable]] <-
       #   nb <- length(cutpoints_list[[variable]]) ## number of values
       #   lab <- vector(length = nb-1) ##vector to stock label
       #   let <- c(letters)[1:nb]
@@ -548,13 +572,14 @@ targeter <- function(data,
     if (variable %in% num_vars){
       cross$variable_type <- 'numeric'
       numcenters <-    cutcenter_list[[variable]]
+      # print(numcenters)
       rn <- rownames(tab)
       rn <- rn[rn != '[Missing]']
       # print(rn)
       names(numcenters) <- rn
       cross$numcenters <- numcenters
 
-      } else {
+    } else {
       cross$variable_type <- 'character'
     }
 
@@ -562,7 +587,7 @@ targeter <- function(data,
 
       alternate_version <- ifelse(
         woe_alternate_version=="always", TRUE,    ## ALWAYS: alternate: TRUE
-          (target_type == "numeric"))             ## IF_CONTINUOUS: alternate: if target is numeric
+        (target_type == "numeric"))             ## IF_CONTINUOUS: alternate: if target is numeric
 
 
 
@@ -652,7 +677,7 @@ targeter <- function(data,
 
         # print(t1)
         # print(orderlabel)
-              }
+      }
 
 
       cross$counts = tab
@@ -663,7 +688,7 @@ targeter <- function(data,
 
       class(cross) <- c("crossvar",paste("crossvar", target_type, sep="_"), class(cross))
     } else {
-        # continuous / ordinal target
+      # continuous / ordinal target
       ##creation of the vector order
       t1 <- rownames(tab)
 
