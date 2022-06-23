@@ -77,7 +77,6 @@ if(!is.null(object$description_target)) {
      cat("No description of the target has been provided uring the analysis")}
 
 cat("  \n Target statistic")
-stats[, reference_level:=ifelse(as.character(value)==as.character(object$target_reference_level), "*","")]
 # knitr::kable(stats, format=format_tables)
 if (format_tables=="word"){
    flextable::set_flextable_defaults(font.size = 11)
@@ -131,7 +130,7 @@ DT::datatable(df2, rownames = FALSE, filter="top",
 \newpage
 
 
-
+## Variables
 
 
 ```{r, results='asis', echo=FALSE, fig.height=4.5, fig.width=9, fig.align='center'}
@@ -151,7 +150,7 @@ if (format_tables=="html"){
   cat(paste0("<div id='var-",tolower(ivar),"'>\n\n## ",label(ivar, metadata=metadata), ifelse(ivar_label!=ivar, paste0(" (",ivar,")"),""),"\n</div>"))
   
 } else {
-cat("\n\n## ",label(ivar, metadata=metadata),"\n")
+cat("\n\n### ",label(ivar, metadata=metadata),"\n")
   
 }
 

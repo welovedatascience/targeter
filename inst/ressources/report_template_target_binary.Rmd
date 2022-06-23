@@ -137,11 +137,8 @@ DT::datatable(df2, rownames = FALSE, filter="top",
 
 
 
-\newpage
 
-
-
-
+## Variables
 
 ```{r, results='asis', echo=FALSE, fig.height=4.5, fig.width=9, fig.align='center'}
 # varnames <- sapply(object$profiles, function(x) x$varname)
@@ -160,20 +157,20 @@ if (format_tables=="html"){
   cat(paste0("<div id='var-",tolower(ivar),"'>\n\n## ",label(ivar, metadata=metadata), ifelse(ivar_label!=ivar, paste0(" (",ivar,")"),""),"\n</div>"))
   
 } else {
-cat("\n\n## ",label(ivar, metadata=metadata),"\n")
+cat("\n\n### ",label(ivar, metadata=metadata),"\n")
   
 }
 
 cat("\n__IV:", round(iprofile$IV,3),"__\n\n")
 
 invisible(suppressWarnings(
-  g1 <- plot.crossvar(iprofile, 
+  g1 <- plot(iprofile, 
                       metadata=metadata,
                       print_NA=TRUE, 
                       numvar_as = 'value')))
  
 invisible(suppressWarnings(
- g2 <- plot.crossvar(iprofile, 
+ g2 <- plot(iprofile, 
                      show="props", 
                      type="l",
                      metadata=metadata,
@@ -181,22 +178,8 @@ invisible(suppressWarnings(
                      only_target_ref_level =TRUE, 
                      numvar_as = 'value')
    )) 
-# print(cowplot::plot_grid(g1,g2))
-# patchwork::wrap_plots(g1, g2)
  suppressWarnings(gridExtra::grid.arrange(g1, g2, ncol=2))
- # if(object$target_binary == TRUE){
-#   
-#   if(df2$`Index`[i] >1){g <- "higher"} else {g <- "lower"}
-#   if(round(object$profiles[[1]][["pourcentage_cible"]][[2]] *100,2) < df2$`%Records`[i]){ p <- "more"}else {p <-"less"}
-#    
-#  cat(paste("\n  The value the most on the right of the graphic - that is the modality ",df2$Criteria[i]," = ",df2$Valie[i], "gather ",df2$`#Records`[i], "records from which ",df2$`%Records`[i], "% are corresponding to a target. This proportion - target penetration - is  the highest observed and is ",p, "important than global average penetration", round(object$profiles[[1]][["pourcentage_cible"]][[2]] *100,2),"% (which is also maximal index :",df2$`Index`[i], g, "than  1).  \n"))
-#  
-#    if(round(df$index.min.index[i],2) >1){g <- "higher"} else {g <- "lower"}
-#   if(round(object$profiles[[1]][["pourcentage_cible"]][[2]] *100,2) <round(df$index.min.props[i]*100,2)){ p <- "higher"}else {p <-"lower"}
-# 
-# cat(paste("\n  On the left part of the graphics, the criteria possible modality ", df2$Criteria[i]," = ",df$index.min.level[i], "concerns",df$index.min.count[i]," records from which ",round(df$index.min.props[i]*100,2),"% are targets. This target penetration is the lowest for the criteria segment and is ",p," important than global average penetration",round(object$profiles[[1]][["pourcentage_cible"]][[2]] *100,2),"% [(which is also minimal index:",round(df$index.min.index[i],2),g," than 1).  \n"))
-# 
- 
+
  
 invisible(suppressWarnings(g3 <- plot_woe(iprofile, metadata=metadata)))
  
@@ -207,7 +190,6 @@ if (iprofile$variable_type %in% c('character')) {
 
 }
  gridExtra::grid.arrange(g3, g4, ncol=2)
-cat('\\pagebreak')
 }
 ```
 
