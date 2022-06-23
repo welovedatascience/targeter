@@ -71,19 +71,23 @@ cat("\n Analyzed population contains ",Ntot," records.")
 
 ```{r,results='asis'}
 
+
 if(!is.null(object$description_target)) {
   cat(object$description_target[[1]])} else{
      cat("No description of the target has been provided uring the analysis")}
 
 cat("  \n Target statistic")
+stats[, reference_level:=ifelse(as.character(value)==as.character(object$target_reference_level), "*","")]
 # knitr::kable(stats, format=format_tables)
 if (format_tables=="word"){
    flextable::set_flextable_defaults(font.size = 11)
   flextable::qflextable(stats)
   
-} else {
+} else if (format_tables=="html") {
   kableExtra::kable_styling(knitr::kable(stats, format=format_tables))
-  }
+} else if (format_tables=="latex"){
+    knitr::kable(stats, format= "latex", booktabs = TRUE)
+    }
 
 
 ```
@@ -106,8 +110,8 @@ if (!is.null(metadata)){
  rownames(df2) <- NULL
 }
 if (format_tables=="latex"){
-  kab <- knitr::kable(df2, format= "latex", booktabs = TRUE)
-  if (is.null(rownames)) kableExtra::column_spec(kab, 1, width = "8cm") else kab
+  knitr::kable(df2, format= "latex", booktabs = TRUE)
+  
 } else  if (format_tables=="html"){
   df2$variable <- paste0("<a href='#var-",tolower(df2$variable),"'>",df2$variable,"</a>")
   # kableExtra::kable_styling(knitr::kable(df2, format=format_tables))
@@ -161,16 +165,35 @@ invisible(suppressWarnings(
  
 invisible(suppressWarnings(
  g2 <- plot.crossvar(iprofile, 
+                     show="count", 
+                     type="bars",
+                     metadata=metadata,
+                     print_NA=TRUE,
+                     numvar_as = 'value')
+   )) 
+# print(cowplot::plot_grid(g1,g2))
+# patchwork::wrap_plots(g1, g2)
+ suppressWarnings(gridExtra::grid.arrange(g1, g2, ncol=2))
+ # if(object$target_binary == TRUE){
+invisible(suppressWarnings(
+ g3 <- plot.crossvar(iprofile, 
                      show="woe", 
                      type="bars",
                      metadata=metadata,
                      print_NA=TRUE,
                      numvar_as = 'bin')
    )) 
-# print(cowplot::plot_grid(g1,g2))
-# patchwork::wrap_plots(g1, g2)
- suppressWarnings(gridExtra::grid.arrange(g1, g2, ncol=2))
- # if(object$target_binary == TRUE){
+
+if (iprofile$variable_type %in% c('character')) {
+   suppressWarnings(g4 <- quadrant_plot(iprofile, metadata=metadata))
+} else {
+    g4 <- ggplot() + theme_void()
+
+}
+ 
+ gridExtra::grid.arrange(g3, g4, ncol=2)
+cat('\\pagebreak')
+ 
 #   
 }
 ```
