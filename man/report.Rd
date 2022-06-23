@@ -15,7 +15,9 @@ report(
   min_criteria = NULL,
   metadata = NULL,
   force_vars = character(),
-  output_format = "pdf_document",
+  output_format = c("html", "pdf", "word"),
+  output_file = NULL,
+  output_dir = tempdir(),
   ...
 )
 }

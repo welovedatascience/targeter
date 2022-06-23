@@ -15,7 +15,7 @@ targeter(
   select_vars = NULL,
   exclude_vars = NULL,
   nbins = 12,
-  binning_method = c("quantile", "clustering", "tree"),
+  binning_method = c("quantile", "clustering", "smart"),
   naming_conventions = getOption("profile.use_naming_conventions"),
   useNA = getOption("profile.useNA"),
   verbose = FALSE,
@@ -28,7 +28,8 @@ targeter(
   woe_alternate_version = c("if_continuous", "always"),
   woe_shift = 0.01,
   woe_post_cluster = FALSE,
-  woe_post_cluster_n = 6
+  woe_post_cluster_n = 6,
+  smart_quantile_by = 0.01
 )
 }
 \arguments{

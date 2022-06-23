@@ -34,7 +34,7 @@ The label will be used for the title and the x-axis of the graph.}
 
 \item{target_NA}{boolean - By default, the value is TRUE. If FALSE, the missing values of the target are not printed.}
 
-\item{only_TRUE}{boolean - By default, the value is FALSE. If TRUE, only print the values for the target TRUE.}
+\item{only_target_ref_level}{boolean - By default, the value is FALSE. If TRUE, only print the values for the target TRUE.}
 
 \item{lim_y}{boolean - By default, the value is TRUE. The axis y for the proportion is limited between 0 and 100.}
 }
@@ -48,7 +48,7 @@ This function allows to generate graphs on the object of class "crossvar".
 t <- crossvar(adult,target="ABOVE50K", var="AGE",)
 plot(t,"counts")
 plot(t,"counts",type="line")
-plot(t,"props",print_NA = FALSE, only_TRUE = TRUE)
+plot(t,"props",print_NA = FALSE, only_target_ref_level = TRUE)
 }
 \seealso{
 \itemize{
