@@ -768,11 +768,10 @@ quadrant_plot <- function(x,metadata=NULL, max_ncat=15, print_NA=TRUE){
 
   ##add horizontal line
   if (x$target_type == 'binary'){
-    target_perc <- x$target_stats[as.character(x$target_stats$value)==target_level,'perc']
+    target_perc <- x$target_stats[as.character(x$target_stats$value)==target_level,][['perc']]
     target_mean <- round(100*target_perc, 2)
-  } else
-  {
-    target_mean <- x$target_stats$avg
+  } else{
+    target_mean <- x$target_stats[['avg']]
   }
 
   p1 <- p1 + ggplot2::geom_hline(yintercept = target_mean,
@@ -784,11 +783,7 @@ quadrant_plot <- function(x,metadata=NULL, max_ncat=15, print_NA=TRUE){
   #                x=min(N)+0.95*(max(N)-min(N))), colour="darkorchid", angle=0, vjust = 1.2, size=3.5)
 
   ## add title
-  if(is.null(metadata)){
-    str_title <- paste(x$targetname)
-  } else{
-    str_title <- paste(label(x$targetname, metadata))
-  }
+  str_title <- label(x$targetname, metadata=metadata)
   p1 <- p1 + ggplot2:: ggtitle(str_title)
 
   ## add title for axis x and axis y
