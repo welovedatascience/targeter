@@ -62,13 +62,13 @@ plot.crossvar_binary <- function(x,...){
 
 #' @method plot crossvar_numeric
 plot.crossvar_numeric <- function(x,
-                                  show=c("boxplot","median", "avg","woe"),
+                                  show=c("boxplot","median", "count","avg","woe"),
                                   type= c("auto","bars","line"),
                                   numvar_as=c("bin","value"),
                                   metadata = NULL,
                                   print_NA =  TRUE,
                                   ...){
-    assertthat::assert_that(inherits(x,"crossvar"), msg = "the parameter x must to be an object of class crossvar")
+  assertthat::assert_that(inherits(x,"crossvar"), msg = "the parameter x must to be an object of class crossvar")
   assertthat::assert_that(inherits(show,"character"), msg = "the parameter show must to be a character")
   assertthat::assert_that(inherits(type,"character"), msg = "the parameter type must to be a character")
   assertthat::assert_that(inherits(metadata,"data.frame")| is.null(metadata), msg = "The parameter metadata must be either NULL (no metadata) or a data.frame")
@@ -77,7 +77,7 @@ plot.crossvar_numeric <- function(x,
   options(scipen = 999) ## remove scientifical notation in numbers
 
   ##this command allows to make shortcut during the function call and to be sure to enter the good values
-  show <- match.arg(show, c("boxplot","median", "avg","woe"), several.ok = FALSE)
+  show <- match.arg(show, c("boxplot","median", "count","avg","woe"), several.ok = FALSE)
   type <- match.arg(type, c("auto","bars","line"), several.ok = FALSE)
   numvar_as <- match.arg(numvar_as, c("bin","value"), several.ok = FALSE)
 
@@ -95,7 +95,7 @@ plot.crossvar_numeric <- function(x,
   }
   df <- x$stats
   ##reorder the table:
-  df <- df[match(x$orderlabel, rownames(df)),, drop=FALSE]
+  # df <- df[match(x$orderlabel, rownames(df)),, drop=FALSE]
 
   ## add the level with the rownames
   dfm <- cbind(level=rownames(df),df)
@@ -110,9 +110,14 @@ plot.crossvar_numeric <- function(x,
   } else {
     if (show %in% c("median","avg")){
       yrange <- range(df[[show]])
+    } else if (show %in% "count"){
+      yrange <- c(0, max(df[[show]]))
     }
   }
 
+  if (show %in% "count"){
+    setnames(dfm,'count','N')
+  }
   if (existmissing_var){
     ## we take only the class [Missing]
     dfm.NA <- dfm[dfm$level=="[Missing]",]
@@ -124,6 +129,10 @@ plot.crossvar_numeric <- function(x,
   if (numvar_as == 'value' & x$variable_type=="numeric"){
     # replace labels per bin center values
     dfm[['level']] <-  as.numeric(x$numcenters[dfm[['level']]])
+  }
+
+  if (!is.numeric(dfm[['level']])){
+    dfm$level <- factor(dfm$level, levels=x$orderlabel)
   }
 
   plotValues <- function(dfm, forNA=FALSE){
@@ -147,6 +156,8 @@ plot.crossvar_numeric <- function(x,
         p1 <- ggplot2::ggplot(dfm,ggplot2::aes(x=level,y = median))
       } else if (show=="avg"){
         p1 <- ggplot2::ggplot(dfm,ggplot2::aes(x=level,y = avg))
+      } else if (show=="count"){
+        p1 <- ggplot2::ggplot(dfm,ggplot2::aes(x=level,y = N))
       }
       p1 <- p1 + ggplot2:: theme_bw()
       if (type=="bars"){
@@ -167,6 +178,11 @@ plot.crossvar_numeric <- function(x,
         }
       }
 
+    }
+
+    if (show %in% c('boxplot','avg','median')){
+      #
+      p1 = p1 + ggplot2::geom_hline(yintercept = x$target_stats$avg, linetype= "solid", color = "darkorchid")
     }
     ## add a label to the x axis : the variable name. If there is a metadata file, it puts the label of the variabe
     if (forNA){
@@ -212,15 +228,15 @@ plot.crossvar_numeric <- function(x,
 
 #' @method plot crossvar_categorical
 plot.crossvar_categorical <- function(x,
-                          show = c("counts","props","index","woe"),
-                          type = c("auto","bars","line"),
-                          metadata = NULL,
-                          print_NA = TRUE,
-                          target_NA = TRUE,
-                          only_target_ref_level = FALSE,
-                          lim_y = TRUE,
-                          numvar_as=c("bin","value"),
-                          ...){
+                                      show = c("counts","props","index","woe"),
+                                      type = c("auto","bars","line"),
+                                      metadata = NULL,
+                                      print_NA = TRUE,
+                                      target_NA = TRUE,
+                                      only_target_ref_level = FALSE,
+                                      lim_y = TRUE,
+                                      numvar_as=c("bin","value"),
+                                      ...){
   ##option show allows to work on contigent table (counts) or percentage table (props)
   ##option type allows to select the geometry of the graph
   ##option print_NA : if it's equal to false, the values where the variable is NA is not printed
@@ -292,7 +308,7 @@ plot.crossvar_categorical <- function(x,
     # df <- df[-2]
     df <- df[, c('level', target_ref)]
     lim_y = FALSE
-    }
+  }
 
   ## we put all values in one column instead of several columns (number of columns: numbers of differents values of the target)
   suppressWarnings(dfm <- melt(as.data.table(df),id ="level"))
@@ -343,7 +359,7 @@ plot.crossvar_categorical <- function(x,
       nontarget <- vbreaks[!vbreaks %in% c(target_ref, '[Missing]')]
       names(vcolors) <- c(nontarget, target_ref, '[Missing]')
     }
-      if (!target_NA){
+    if (!target_NA){
       ## remove option for NA for target
       vbreaks <- vbreaks[vbreaks!='[Missing]']
       vlabels <- vbreaks
@@ -361,10 +377,10 @@ plot.crossvar_categorical <- function(x,
     ## p1: graph for non missing
 
 
-      p1 <- ggplot2::ggplot(
-        dfm,
-        ggplot2::aes(x=level,y = value)) +
-        ggplot2:: theme_bw()
+    p1 <- ggplot2::ggplot(
+      dfm,
+      ggplot2::aes(x=level,y = value)) +
+      ggplot2:: theme_bw()
 
 
 
@@ -374,13 +390,13 @@ plot.crossvar_categorical <- function(x,
     if (type=="bars"){
       ## create bar plot
       p1 = p1 +
-            ggplot2::geom_bar(
-              stat="identity",
-              ggplot2::aes(fill = target),
-              show.legend=!forNA) +
-            ggplot2::theme(
-              legend.position = "top",
-              legend.title = ggplot2::element_blank())  ##change the position of the legend + suppress title legend
+        ggplot2::geom_bar(
+          stat="identity",
+          ggplot2::aes(fill = target),
+          show.legend=!forNA) +
+        ggplot2::theme(
+          legend.position = "top",
+          legend.title = ggplot2::element_blank())  ##change the position of the legend + suppress title legend
 
       ##change label and color
       if(x$target_type == "binary"){
@@ -434,27 +450,27 @@ plot.crossvar_categorical <- function(x,
     ## add a label to the y axis
     if (show =="counts"){
       if(forNA == FALSE){
-          p1 = p1    + ggplot2::ylab("N")
+        p1 = p1    + ggplot2::ylab("N")
       }else{p1 <- p1 + ggplot2::theme(axis.title.y = ggplot2::element_blank()) }
     } else {
-        p1 = p1  + ggplot2::ylab("Perc.")
-        if(x$target_type == 'binary'){ ## add the pourcentage of the target
+      p1 = p1  + ggplot2::ylab("Perc.")
+      if(x$target_type == 'binary'){ ## add the pourcentage of the target
 
-          target_ref_perc <- target_stats[target_stats$value  ==x$target_reference_level, ][['perc']]
-        p1 = p1 + ggplot2::geom_hline(yintercept = round((target_ref_perc)*100,2), linetype= "dashed", color = "darkorchid")
+        target_ref_perc <- target_stats[target_stats$value  ==x$target_reference_level, ][['perc']]
+        p1 = p1 + ggplot2::geom_hline(yintercept = round((target_ref_perc)*100,2), linetype= "solid", color = "darkorchid")
 
         x_text <- ifelse(is.numeric(dfm$level),
-                  min(dfm$level, na.rm=TRUE)+0.05*(max(dfm$level, na.rm=TRUE)-min(dfm$level, na.rm=TRUE)),
-                  1)
+                         min(dfm$level, na.rm=TRUE)+0.05*(max(dfm$level, na.rm=TRUE)-min(dfm$level, na.rm=TRUE)),
+                         1)
 
         p1 <- p1 + ggplot2::geom_text(
           ggplot2::aes(
             y=round(target_ref_perc*100,2),
             label=paste0(round(target_ref_perc*100,2)), x=x_text),
           colour="darkorchid", angle=0, vjust = 1.2, size=3.5)
-        }
-        if(lim_y == TRUE){p1 = p1 +ggplot2::ylim(c(0,100))}
       }
+      if(lim_y == TRUE){p1 = p1 +ggplot2::ylim(c(0,100))}
+    }
 
     ## add a label to the x axis : the variable name. If there is a metadata file, it puts the label of the variabe
     if (forNA){
@@ -482,7 +498,7 @@ plot.crossvar_categorical <- function(x,
 
   ## title for the graphics
   if(is.null(metadata)){
-  str_title <- paste(x$targetname)
+    str_title <- paste(x$targetname)
   } else{
     str_title <- paste(label(x$targetname, metadata))
   }
@@ -762,10 +778,10 @@ quadrant_plot <- function(x,metadata=NULL, max_ncat=15, print_NA=TRUE){
   p1 <- p1 + ggplot2::geom_hline(yintercept = target_mean,
                                  linetype= "solid",
                                  color = "darkorchid")
-  p1 <- p1 + ggplot2::geom_text(
-    ggplot2::aes(y=target_mean,
-                 label=prettyNum(target_mean),
-                 x=min(N)+0.95*(max(N)-min(N))), colour="darkorchid", angle=0, vjust = 1.2, size=3.5)
+  # p1 <- p1 + ggplot2::geom_text(
+  #   ggplot2::aes(y=target_mean,
+  #                label=prettyNum(target_mean),
+  #                x=min(N)+0.95*(max(N)-min(N))), colour="darkorchid", angle=0, vjust = 1.2, size=3.5)
 
   ## add title
   if(is.null(metadata)){
