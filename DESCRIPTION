@@ -1,7 +1,7 @@
 Package: targeter
 Type: Package
 Title: target automated profiling
-Version: 0.1
+Version: 0.2
 Author: WeLoveDataScience
 Maintainer: Eric Lecoutre <eric.lecoutre@welovedatascience.com>
 Description: Describes a target (binary/nominal/continuous) by crossing
@@ -25,8 +25,8 @@ Imports:
      ggrepel,
      knitr,
      rmarkdown,
-     kableExtra
-Suggests:
+     kableExtra,
      clustering.sc.dp,
      Ckmeans.1d.dp,
+Suggests:
      flextable
