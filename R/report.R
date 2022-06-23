@@ -31,19 +31,19 @@
 #' report(ntop=5)
 #' }
 report <- function(object,
-                           template=NULL,
-                           summary_object=NULL,
-                           browse=FALSE,
-                           ntop=NULL,
-                           nmin=20,
-                           criteria=c("IV"),
-                           min_criteria = NULL,
-                           metadata=NULL,
-                           force_vars=character(),
-                           output_format=c("html","pdf","word"),
-                           output_file = NULL,
-                           output_dir = tempdir(),
-                           ...){
+                   template=NULL,
+                   summary_object=NULL,
+                   browse=FALSE,
+                   ntop=NULL,
+                   nmin=20,
+                   criteria=c("IV"),
+                   min_criteria = NULL,
+                   metadata=NULL,
+                   force_vars=character(),
+                   output_format=c("html","pdf","word"),
+                   output_file = NULL,
+                   output_dir = tempdir(),
+                   ...){
 
 
   knitr::knit_meta(clean=TRUE) ## https://github.com/rstudio/rstudio/issues/2319
@@ -66,7 +66,7 @@ report <- function(object,
   }
   if(!is.null(ntop)){
     object <- focus(object, n = ntop, force_vars = force_vars,
-                            summary_object = summary_object )}
+                    summary_object = summary_object )}
   attr(object, 'metadata') <- metadata
 
   if (is.null(template)){
@@ -74,24 +74,32 @@ report <- function(object,
     template <- file.path(path.package("targeter"), "ressources",paste0("report_template_",object$target_type,".Rmd"))
   }
 
-  format_tables <- output_format
+  format_tables <- switch(output_format,
+                          "html"="html",
+                          "word"="word",
+                          "pdf"="latex")
 
   outfile <- rmarkdown::render(template,
-            output_format=paste(output_format,'document',sep="_"),
-            output_file=output_file,output_dir=output_dir,...)
+                               output_format=paste(output_format,'document',sep="_"),
+                               output_file=output_file,output_dir=output_dir,...)
   if (browse) utils::browseURL(outfile)
   return(outfile)
 }
 
 
 # A <- targeter(adult, target="ABOVE50K",binning_method='clustering',woe_post_cluster=TRUE)
+# A <- targeter(adult, target="ABOVE50K",binning_method='smart',woe_post_cluster=TRUE)
+
+# N <- targeter(adult, target="AGE",binning_method='smart',woe_post_cluster=TRUE)
 
 ## html
-# report(A,  browse=TRUE, template=file.path("/hackdata/share/code/R/packages/targeter/inst/ressources/report_template_target_binary.Rmd"), output_format='html')
-# report(N,  browse=TRUE, template=file.path("/hackdata/share/code/R/packages/targeter/inst/ressources/report_template_target_numeric.Rmd"), output_format='html')
+# report(A,  browse=TRUE, template=file.path("./inst/ressources/report_template_target_binary.Rmd"), output_format='html')
+
+# report(A,  browse=TRUE, template="./inst/ressources/report_template_target_binary.Rmd", output_format='html')
+# report(N,  browse=TRUE, template="./inst/ressources/report_template_target_numeric.Rmd", output_format='html')
 
 ## pdf
-# report(A,  browse=TRUE, template=file.path("/hackdata/share/code/R/packages/targeter/inst/ressources/report_template_target_binary.Rmd"), output_format='pdf')
+# report(A,  browse=TRUE, template="./inst/ressources/report_template_target_binary.Rmd", output_format='pdf')
 
 ## word
-# report(A,  browse=TRUE, template=file.path("/hackdata/share/code/R/packages/targeter/inst/ressources/report_template_target_binary.Rmd"), output_format='word')
+# report(A,  browse=TRUE, template=file.path("./inst/ressources/report_template_target_binary.Rmd"), output_format='word')
