@@ -166,7 +166,7 @@ cat("\n__IV:", round(iprofile$IV,3),"__\n\n")
 invisible(suppressWarnings(
   g1 <- plot(iprofile, 
                       metadata=metadata,
-                      print_NA=TRUE, 
+                      print_NA=TRUE, do_plot=FALSE,
                       numvar_as = 'value')))
  
 invisible(suppressWarnings(
@@ -174,14 +174,14 @@ invisible(suppressWarnings(
                      show="props", 
                      type="l",
                      metadata=metadata,
-                     print_NA=TRUE,
+                     print_NA=TRUE,do_plot=FALSE,
                      only_target_ref_level =TRUE, 
                      numvar_as = 'value')
    )) 
  suppressWarnings(gridExtra::grid.arrange(g1, g2, ncol=2))
 
  
-invisible(suppressWarnings(g3 <- plot_woe(iprofile, metadata=metadata)))
+invisible(suppressWarnings(g3 <- plot_woe(iprofile, metadata=metadata,do_plot=FALSE)))
  
 if (iprofile$variable_type %in% c('character')) {
    suppressWarnings(g4 <- quadrant_plot(iprofile, metadata=metadata))

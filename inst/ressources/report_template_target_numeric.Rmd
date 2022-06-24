@@ -159,7 +159,7 @@ cat("\n__IV:", round(iprofile$IV,3),"__\n\n")
 invisible(suppressWarnings(
   g1 <- plot.crossvar(iprofile, show='boxplot', 
                       metadata=metadata,
-                      print_NA=TRUE, 
+                      print_NA=TRUE, do_plot=FALSE,
                       numvar_as = 'value')))
  
 invisible(suppressWarnings(
@@ -167,7 +167,7 @@ invisible(suppressWarnings(
                      show="count", 
                      type="bars",
                      metadata=metadata,
-                     print_NA=TRUE,
+                     print_NA=TRUE,do_plot=FALSE,
                      numvar_as = 'value')
    )) 
 # print(cowplot::plot_grid(g1,g2))
@@ -179,7 +179,7 @@ invisible(suppressWarnings(
                      show="woe", 
                      type="bars",
                      metadata=metadata,
-                     print_NA=TRUE,
+                     print_NA=TRUE,do_plot=FALSE,
                      numvar_as = 'bin')
    )) 
 
