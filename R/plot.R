@@ -67,6 +67,7 @@ plot.crossvar_numeric <- function(x,
                                   numvar_as=c("bin","value"),
                                   metadata = NULL,
                                   print_NA =  TRUE,
+                                  do_plot=TRUE,
                                   ...){
   assertthat::assert_that(inherits(x,"crossvar"), msg = "the parameter x must to be an object of class crossvar")
   assertthat::assert_that(inherits(show,"character"), msg = "the parameter show must to be a character")
@@ -218,7 +219,7 @@ plot.crossvar_numeric <- function(x,
     # Only main plot
     allplots <- allplots+ggplot2::ggtitle(str_title)
   }
-
+if (do_plot=TRUE) plot(allplots)
   allplots
 
 }
@@ -236,6 +237,7 @@ plot.crossvar_categorical <- function(x,
                                       only_target_ref_level = FALSE,
                                       lim_y = TRUE,
                                       numvar_as=c("bin","value"),
+                                      do_plot=TRUE,
                                       ...){
   ##option show allows to work on contigent table (counts) or percentage table (props)
   ##option type allows to select the geometry of the graph
@@ -512,7 +514,7 @@ plot.crossvar_categorical <- function(x,
     # Only main plot
     allplots <- allplots+ggplot2::ggtitle(str_title)
   }
-
+  if (do_plot) plot(allplots)
   allplots
 }
 
@@ -548,6 +550,7 @@ plot.crossvar_categorical <- function(x,
 plot_woe <- function(x,metadata = NULL,
                      print_NA = TRUE,
                      numvar_as=c("bin","value"),
+                     do_plot=TRUE,
                      ...){
 
   # type <- match.arg(type, c("bars","line"), several.ok = FALSE)
@@ -643,6 +646,7 @@ plot_woe <- function(x,metadata = NULL,
     allplots <- allplots+ggplot2::ggtitle(str_title)
 
   }
+  if(do_plot) plot(allplots)
 
   allplots
 }
