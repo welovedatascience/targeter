@@ -264,6 +264,18 @@ targeter <- function(data,
     if (autoguess_nrows==0) autoguess_nrows <- nrow(data)
     autoguess_nrows <- min(autoguess_nrows, nrow(data))
     data_types <- dt_vartype_autoguess(data[1:autoguess_nrows,..select_vars], num_as_categorical_nval)
+    cl <- sapply(data[,..select_vars], function(x)class(x)[1])
+    to_convert <- names(data_types)[data_types!="numeric" & (cl %in% c("numeric","integer"))]
+    # print(cl)
+    # print(data_types)
+    # print(to_convert)
+    if (length(to_convert)>0){
+      for (ivar in to_convert){
+        if (verbose){cat("\nconverting:", ivar, " as character.")}
+        data[,(ivar):=as.character(get(ivar))]
+
+      }
+    }
     num_vars <- names(data_types)[data_types == "numeric"]
 
   }
@@ -317,7 +329,7 @@ targeter <- function(data,
   }
 
   binning_smart <- function(x, nbins, variable){
-
+    # if (verbose)cat("\n smart binning:", variable)
     quantiles = seq(0, 1, length.out = 1+round(1/smart_quantile_by))
     nqu <- length(quantiles)
     qu_indices <- (1:nqu)%/% (nqu/nbins)
@@ -325,6 +337,10 @@ targeter <- function(data,
     qu <- quantile(x, quantiles, na.rm = TRUE)
     qmin <- qu[1]
     qmax <- qu[nqu]
+
+    qu[qu==-Inf] <- min(x[is.finite(x)], na.rm=TRUE)
+    qu[qu==Inf] <- max(x[is.finite(x)], na.rm=TRUE)
+
     uqu <- qu[names(qu)[!duplicated(qu_indices)]]
     new_nbin <- min(c(length(unique(uqu)),nqu))
     # cl_centers <- Ckmeans.1d.dp::Ckmeans.1d.dp(x[!is.na(x)], k=new_nbin)$centers
@@ -371,6 +387,8 @@ targeter <- function(data,
   ## dataCut is composed of character variables from data without modification
   ##and numeric variables but into classes
   dataCut <- eval(parse(text=txt))
+
+  # TMP<<- dataCut
   if(verbose){cat("\nPreliminary cut performed\n")}
 
 
