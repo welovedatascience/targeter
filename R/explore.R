@@ -30,14 +30,16 @@
 #' @importFrom gridExtra grid.arrange
 
 
-explore <- function(object, summary_object=NULL,metadata=NULL, ...) {
+explore <- function(object, summary_object=NULL,metadata=NULL, display=c("dialog","browser"),...) {
+
+  display <- match.arg(display, c("dialog","browser"), several.ok = FALSE)
 
   if (is.null(summary_object)){
     summary_object <- summary(object,...)
   }
   ui <- miniUI::miniPage(
-    tags$head(
-      tags$style(HTML(
+    shiny::tags$head(
+      shiny::tags$style(shiny::HTML(
         ".excluded { color: rgb(211,211,211); font-style: italic; }"
       ))
     ),
@@ -50,15 +52,14 @@ explore <- function(object, summary_object=NULL,metadata=NULL, ...) {
                    right = miniUI::miniTitleBarButton("done", "Stop", primary = TRUE)
     ),
     miniUI::miniContentPanel(
-      shiny::fluidRow(shiny::column(width=7,
+      shiny::fluidRow(shiny::column(width=12,
                      ## DT
                      DT::DTOutput('dt_summary')
-                     ),
-
-               shiny::column(width=5,
-                      shiny::fluidRow(shiny::plotOutput(('plot_1'))),
-                      shiny::fluidRow(shiny::plotOutput(('plot_2'))))
-      )
+                     )),
+            shiny::fluidRow(
+              shiny::column(width=6,shiny::plotOutput(('plot_1'))),
+              shiny::column(width=6,shiny::plotOutput(('plot_2')))
+            )
     )
   )
 
@@ -147,27 +148,28 @@ explore <- function(object, summary_object=NULL,metadata=NULL, ...) {
 
       dat <- cbind(Selected = "ok", df2, id = paste0("row_",1:nrow(df2)))
 
-      datatable(dat, rownames = rowNames,
+      DT::datatable(dat, rownames = rowNames,
                 filter='top',
                 autoHideNavigation = TRUE,
                 extensions = c("Select", "Buttons"),
                 selection = "single",
-                callback = JS(callback),
+                callback = htmlwidgets::JS(callback),
                 options = list(
-                  rowId = JS(sprintf("function(data){return data[%d];}",
+                  pageLength=6,
+                  rowId = htmlwidgets::JS(sprintf("function(data){return data[%d];}",
                                      ncol(dat)-1+colIndex)),
                   columnDefs = list(
                     list(visible = FALSE, targets = ncol(dat)-1+colIndex),
                     list(className = "dt-center", targets = "_all"),
                     list(className = "notselectable", targets = colIndex),
-                    list(targets = colIndex, render = JS(render))
+                    list(targets = colIndex, render = htmlwidgets::JS(render))
                   ),
-                  dom = "Bftp",
+                  dom = "tp",
                   buttons = list("copy", "csv",
                                  list(
                                    extend = "collection",
                                    text = 'Select all',
-                                   action = JS(restore)
+                                   action = htmlwidgets::JS(restore)
                                  )
                   ),
                   select = list(style = "single",
@@ -195,18 +197,35 @@ explore <- function(object, summary_object=NULL,metadata=NULL, ...) {
       if (!is.null(input$dt_summary_row_last_clicked)){
         var <- summary_object[input$dt_summary_row_last_clicked,][['varname']]
         iprofile <- object$profiles[[var]]
-        g1 <- plot.crossvar(iprofile,
-                            metadata=metadata,
-                            print_NA=TRUE,
-                            numvar_as = 'value')
 
-        g2 <- plot.crossvar(iprofile,
-                      show="props",
-                      type="l",
-                      metadata=metadata,
-                      print_NA=TRUE,
-                      only_target_ref_level =TRUE,
-                      numvar_as = 'value')
+        if (iprofile$target_type %in% c("binary","categorical")){
+
+          g1 <- plot.crossvar(iprofile,
+                              metadata=metadata,
+                              print_NA=TRUE,
+                              numvar_as = 'value')
+
+          g2 <- plot.crossvar(iprofile,
+                              show="props",
+                              type="l",
+                              metadata=metadata,
+                              print_NA=TRUE,
+                              only_target_ref_level =TRUE,
+                              numvar_as = 'value')
+        } else {
+          # numeric target
+          g1 <- plot.crossvar(iprofile,show="boxplot",
+                              metadata=metadata,
+                              print_NA=TRUE,
+                              numvar_as = 'value')
+
+          g2 <- plot.crossvar(iprofile,
+                              show="count",
+                              type="b",
+                              metadata=metadata,
+                              print_NA=TRUE,
+                              numvar_as = 'value')
+        }
 
         gridExtra::grid.arrange(g1, g2, ncol=2)
 
@@ -220,11 +239,14 @@ explore <- function(object, summary_object=NULL,metadata=NULL, ...) {
         iprofile <- object$profiles[[var]]
         g3 <- plot_woe(iprofile, metadata=metadata)
 
-        if (iprofile$variable_type %in% c('character')) {
-          g4 <- quadrant_plot(iprofile, metadata=metadata)
-        } else {
-          g4 <- ggplot() + theme_void()
-
+        g4 <- ggplot2::ggplot() + ggplot2::theme_void()
+        if (iprofile$target_type=="binary"){
+          if (iprofile$variable_type %in% c('character')) {
+            g4 <- quadrant_plot(iprofile, metadata=metadata)
+          }
+        }
+        if (iprofile$target_type=="numeric"){
+          g4 <- plot.crossvar(iprofile, show="avg", type="l", print_NA=TRUE)
         }
         gridExtra::grid.arrange(g3, g4, ncol=2)
 
@@ -300,8 +322,10 @@ explore <- function(object, summary_object=NULL,metadata=NULL, ...) {
       }
     })
 
-    }
+  }
 
-  shiny::runGadget(ui, server, viewer = shiny::dialogViewer("targeter-explore", width=2000, height=1600))
+  display <- match.arg(display, c("dialog","browser"))
+
+  shiny::runGadget(ui, server, viewer = shiny::dialogViewer("targeter-explore", width=2000, height=1800))
   # shiny::runGadget(ui, server, viewer = shiny::browserViewer())
 }
