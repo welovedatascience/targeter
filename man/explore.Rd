@@ -4,7 +4,13 @@
 \alias{explore}
 \title{FUNCTION_TITLE}
 \usage{
-explore(object, summary_object = NULL, metadata = NULL, ...)
+explore(
+  object,
+  summary_object = NULL,
+  metadata = NULL,
+  display = c("dialog", "browser"),
+  ...
+)
 }
 \arguments{
 \item{object}{PARAM_DESCRIPTION}
