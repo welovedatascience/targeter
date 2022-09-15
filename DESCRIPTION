@@ -1,7 +1,7 @@
 Package: targeter
 Type: Package
 Title: target automated profiling
-Version: 0.2
+Version: 0.3
 Author: WeLoveDataScience
 Maintainer: Eric Lecoutre <eric.lecoutre@welovedatascience.com>
 Description: Describes a target (binary/nominal/continuous) by crossing

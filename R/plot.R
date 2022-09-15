@@ -219,7 +219,7 @@ plot.crossvar_numeric <- function(x,
     # Only main plot
     allplots <- allplots+ggplot2::ggtitle(str_title)
   }
-if (do_plot=TRUE) plot(allplots)
+if (do_plot) plot(allplots)
   allplots
 
 }
