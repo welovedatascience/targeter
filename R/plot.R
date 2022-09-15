@@ -92,7 +92,8 @@ plot.crossvar_numeric <- function(x,
     return(plot_woe(x,
                     metadata = metadata,
                     print_NA = print_NA,
-                    numvar_as=numvar_as))
+                    numvar_as=numvar_as,
+                    do_plot=do_plot))
   }
   df <- x$stats
   ##reorder the table:

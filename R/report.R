@@ -67,7 +67,7 @@ report <- function(object,
   if(!is.null(ntop)){
     object <- focus(object, n = ntop, force_vars = force_vars,
                     summary_object = summary_object )}
-  attr(object, 'metadata') <- metadata
+  # attr(object, 'metadata') <- metadata
 
   if (is.null(template)){
     ## default template
@@ -78,6 +78,10 @@ report <- function(object,
                           "html"="html",
                           "word"="word",
                           "pdf"="latex")
+
+  print(head(metadata,2))
+  print(head(summary_object,2))
+
 
   outfile <- rmarkdown::render(template,
                                output_format=paste(output_format,'document',sep="_"),

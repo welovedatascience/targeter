@@ -27,7 +27,7 @@ library(ggplot2)
 library(DT)
 ```
 
-```{r}
+```{r, eval=FALSE}
 metadata <- attr(object, "metadata")
 ```
 
@@ -99,9 +99,18 @@ if (format_tables=="word"){
 ```{r summarytable}
 ##filter df columns; remove varname (we have rownames) keep only: index.max.index, index.max.level, index.max.count,
 df2 <- as.data.frame(summary_object)
+
+
+
 df2 <- df2[,-2] # remove targetname column
 colnames(df2)[1] <- c("variable")
-df2$IV <- round(df2$IV,3)
+df2$IV <- round(df2$IV,6)
+
+if ('F' %in% colnames(df2)){
+  df2$F <- round(df2$F,0)
+  df2$pval <- formatC(df2$pval)
+  
+}
 # [the relevant section](#test)
 
 if (!is.null(metadata)){
