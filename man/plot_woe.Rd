@@ -9,6 +9,7 @@ plot_woe(
   metadata = NULL,
   print_NA = TRUE,
   numvar_as = c("bin", "value"),
+  do_plot = TRUE,
   ...
 )
 }
