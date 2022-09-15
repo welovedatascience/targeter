@@ -154,7 +154,7 @@ cat("\n\n### ",label(ivar, metadata=metadata),"\n")
   
 }
 
-cat("\n__IV:", round(iprofile$IV,3),"__\n\n")
+cat("\n__IV:", round(iprofile$IV,6),"__\n\n")
 
 invisible(suppressWarnings(
   g1 <- plot.crossvar(iprofile, show='boxplot', 
@@ -186,7 +186,13 @@ invisible(suppressWarnings(
 if (iprofile$variable_type %in% c('character')) {
    suppressWarnings(g4 <- quadrant_plot(iprofile, metadata=metadata))
 } else {
-    g4 <- ggplot() + theme_void()
+    # g4 <- ggplot() + theme_void()
+   g4 <- plot.crossvar(iprofile, 
+                     show="avg", 
+                     type="line",
+                     metadata=metadata,
+                     print_NA=TRUE,do_plot=FALSE,
+                     numvar_as = 'value')
 
 }
  
