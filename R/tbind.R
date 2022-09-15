@@ -18,7 +18,7 @@ tbind <- function(list_targeters, check=TRUE){
   #https://stackoverflow.com/questions/18538977/combine-merge-lists-by-elements-names
   all <- list_targeters[[1]]
   all$profiles <- do.call(mapply, c(FUN=c, lapply(list_targeters, `[`, 'profiles')))
-  names(all$profiles) <-   sapply(list_targeters, function(t) names(t$profiles))
+  names(all$profiles) <-   unlist(sapply(list_targeters, function(t) names(t$profiles)))
 
   return(all)
 }
