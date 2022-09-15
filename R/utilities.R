@@ -18,9 +18,10 @@ label <- function(var, metadata, var_field="var", label_field="LABEL",lang=NULL)
   ##test
 
   if (is.null(metadata)) return(var)
-  assertthat::assert_that(metadata|inherits(metadata,"data.frame"), msg = "The parameter metadata must be a data.frame or data.table")
+  assertthat::assert_that(inherits(metadata,"data.frame"), msg = "The parameter metadata must be a data.frame or data.table")
 
-
+  metadata <- as.data.frame(metadata)
+  rownames(metadata) <- metadata[[var_field]]
   assertthat::assert_that(inherits(var,"character"), msg = "var must be character")
   assertthat::assert_that(length(var)==1,msg="Only one var is admitted")
 
@@ -33,7 +34,9 @@ label <- function(var, metadata, var_field="var", label_field="LABEL",lang=NULL)
 
   ##take the label in the metadata; if not label, keep var name
   var_hasLabel <- var %in% metadata[[var_field]]
-  labels <- sapply(var, function(var) metadata[metadata[[var_field]]==var,][[label_field]])
+  #labels <- sapply(var, function(var) metadata[which(metadata[[var_field]]==var),][[label_field]])
+  labels <- metadata[var,][[label_field]]
+
   labels[!var_hasLabel] <- var[!var_hasLabel]
   labels <- unlist(labels)
   return(labels)
