@@ -94,6 +94,9 @@
 #' @examples
 #' targeter(adult,target ="ABOVE50K")
 
+
+
+## <idea> check for WOE monotonicity
 targeter <- function(data,
                      description_data =NULL,
                      target,
@@ -104,7 +107,7 @@ targeter <- function(data,
                      select_vars=NULL,
                      exclude_vars=NULL,
                      nbins=12,
-                     binning_method=c("quantile","clustering","smart"), # todo: tree
+                     binning_method=c("quantile","clustering","smart"), # todo: tree (min size)+ constrained clustrering  https://cran.r-project.org/web/packages/scclust/scclust.pdf
                      naming_conventions=getOption("profile.use_naming_conventions"),
                      useNA = getOption("profile.useNA"), #option package by default
                      verbose=FALSE,
@@ -215,6 +218,37 @@ targeter <- function(data,
       select_vars <-select_vars[check]
     }}
 
+
+  ## ensuring correct variables names (R valid for names in profiles slot + unique)
+  # explanatory variables
+  cn <- select_vars
+  nn <- make.names(cn, unique = TRUE)
+  if (any(cn !=nn)){
+    old_names <- cn[cn!=nn]
+    new_names <- nn[cn!=nn]
+    positions <- which(cn!=nn)
+    info <- paste(cn[positions],nn[positions], sep='->', collapse = '\t')
+    msg <- c(msg, list(WARNING=paste(
+      "silently changing some variables names to be valid unique R names:", info,'\n\tPlease note it might lead to issues with metadata and that unique valid R names should be used (see make.names(x, unique=TRUE))'))
+    )
+    colnames(data)[positions] <- new_names  # we don't use setnames as we might have duplicated names, setnames would raise a warning and not necessary do what we want
+    select_vars <- nn
+  }
+  # target
+  cn <- target
+  nn <- make.names(target)
+  if (any(cn !=nn)){
+    old_names <- cn[cn!=nn]
+    new_names <- nn[cn!=nn]
+    info <- paste(cn,nn, sep='->', collapse = '\t')
+    msg <- c(msg, list(WARNING=paste(
+      "silently changing target names to be valid  R name:", info, '\n\tPlease note it might lead to issues with metadata and that unique valid R names should be used (see make.names(x, unique=TRUE))'))
+    )
+    setnames(data, old_names, new_names)
+    target <- nn
+  }
+
+
   ## target type
   if (target_type == "autoguess"){
     target_type <- dt_vartype_autoguess_onevar(data, target, num_as_categorical_nval)
@@ -297,7 +331,7 @@ targeter <- function(data,
   names(cutpoints_list) <- num_vars
   cutcenter_list <- vector(mode="list", length=length(num_vars))
   names(cutcenter_list) <- num_vars
-
+# print(cutcenter_list)
 
   ##function to cut in classes.
   ## binning > quantile ----
@@ -572,6 +606,7 @@ targeter <- function(data,
       #
       # ## we drop the column variable
       # tab <- tab[,-1]
+      rownames(tab)[rownames(tab)==''] <- '[empty]'
       return(tab)
     }
 
@@ -614,6 +649,10 @@ targeter <- function(data,
         min_max <- quantile(data[[target]], probs=c(cont_target_trim, 1- cont_target_trim))
         dataCut <- dataCut[get(target)>=min_max[1] & get(target)<=min_max[2],]
       }
+
+      # DA <<- dataCut
+      # VA <<- variable
+      # TARGET <<- target
       woe_iv <- dt_WOE_IV(dataCut,
                           var_interest = target,
                           var_cross = variable,
@@ -622,9 +661,9 @@ targeter <- function(data,
                           woe_shift = woe_shift)
 
       WOE <- woe_iv$WOE[, c('variable', 'WOE'), with=FALSE]
-
+    # print(variable)
       WOE <- treat_tab_labels(WOE, variable, is_numeric=(variable %in% num_vars),cutpoints_list)
-
+      # print(WOE)
       IV <- woe_iv$IV
 
       if (woe_post_cluster){
