@@ -19,7 +19,14 @@ summary.crossvar <- function(x, extra_stats=FALSE, which_minmax=as.character(x$t
     vartype=x$variable_type,
     stringsAsFactors = FALSE
   )
-  if (x$target_type != "categorical") out$IV <- x$IV
+  if (x$target_type != "categorical"){
+    out$IV <- x$IV
+    #major impact direction
+    direction <- sign(range(x$woe)[which.max(abs(range(x$woe)))])
+    out$highest_impact <- ifelse(direction==1, '[+] over-target','[-] under-target')
+
+
+  }
 
   ## binary/categorical target
   if (x$target_type %in% c("binary","categorical")){
