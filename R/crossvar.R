@@ -52,9 +52,10 @@ print.crossvar <- function(x,...){
   if (x$target_type %in% c("binary","categorical")){
     print(cbind(as.data.frame.matrix(x$counts), as.data.frame.matrix(x$props)))
   } else if (x$target_type %in% c("numeric")){
+    if (!is.null(x$woe)) { x$stats <- cbind(x$stats, x$woe)}
     print(x$stats)
   }
-  if (!is.null(x$IV)) cat(paste0("\nInfomation value: ", round(x$IV,3),"\n"))
+  if (!is.null(x$IV)) cat(paste0("\nInfomation value: ", round(x$IV,6),"\n"))
   cat("\nThere is a `summary` method available as well as various `plot` function.")
 
 }
