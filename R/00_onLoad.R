@@ -1,11 +1,11 @@
 .onLoad <- function(libname, pkgname) {
   op <- options()
-  op.profile <- list(
-    profile.use_naming_conventions = FALSE,
-    profile.useNA = "ifany"
+  op.targeter <- list(
+    targeter.use_naming_conventions = FALSE,
+    targeter.useNA = "ifany"
   )
-  toset <- !(names(op.profile) %in% names(op))
-  if(any(toset)) options(op.profile[toset])
+  toset <- !(names(op.targeter) %in% names(op))
+  if(any(toset)) options(op.targeter[toset])
 
   invisible()
 }
