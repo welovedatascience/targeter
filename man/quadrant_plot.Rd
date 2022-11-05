@@ -12,21 +12,22 @@ quadrant_plot(x, metadata = NULL, max_ncat = 15, print_NA = TRUE)
 \item{metadata}{data.frame - if metadata is  loaded in R environment, label of the variables can be used. Default value (NULL) corresponds to no metadata available.
 The label will be used for the title and the x-axis of the graph.}
 
-\item{max_ncat:}{maximmum number of values/categories that will be displayed ( additional will be collapsed) - default: 15}
+\item{max_ncat}{maximmum number of values/categories that will be displayed ( additional will be collapsed) - default: 15}
 
-\item{print_NA:}{boolean: whether to display or not the NA possible category (default: TRUE)}
+\item{print_NA}{boolean: whether to display or not the NA possible category (default: TRUE)}
 }
 \value{
 The function returns a graph.
 }
 \description{
-quadrant method for crossvar object
+quadrant method for crossvar object, displays explanatory variable categories (or bin) in a quadrant plot crossing category size (N) and target (percentage for binary target or average for continuous target).
 
 This function allows to generate a quadrant graphic on an object of class "crossvar".
 }
 \examples{
 t <- crossvar(adult,"ABOVE50K","WORKCLASS")
 quadrant_plot(t)
+quadrant_plot(t, max_ncat=2)
 }
 \seealso{
 \itemize{

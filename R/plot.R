@@ -1,30 +1,14 @@
 #' @title plot.crossvar
-#' @description plot method for crossvar object
+#' @description plot method for crossvar object.
+#' plot is the main function that will automatically dispatch to plot.crossvar_binary, plot.crossvar_categorical or plot.crossvar_continuous,
+#'  depending on taret type.
 
 #' @param x object of class "crossvar"
-#' @param show character - determine on which data considered. By default, the value is "counts".
-#'  This parameter can only take the following values:
-#' \itemize{
-#' \item "counts" : the data used is the contigency table created by the function crossvar.
-#' \item "props" : the data used is the proportion table created by the function crossvar.
-#' \item "index" : the data used is the index table created by the function crossvar.
-#' }
-#' @param type character - determine the type of graph. By default, the value is "auto".
-#'  This parameter can only take the following values:
-#' \itemize{
-#' \item "auto" : "counts" shows a bar plot and "props" shows a line plot.
-#' \item "bars" : shows a bar plot.
-#' \item "line": shows a line plot.
-#' }
-#' @param metadata data.frame - if metadata is  loaded in R environment, label of the variables can be used. Default value (NULL) corresponds to no metadata available.
-#' The label will be used for the title and the x-axis of the graph.
-#' @param print_NA boolean - By default, the value is TRUE. If FALSE, the missing values of the variable are not printed.
-#' @param target_NA boolean - By default, the value is TRUE. If FALSE, the missing values of the target are not printed.
-#' @param only_target_ref_level boolean - By default, the value is FALSE. If TRUE, only print the values for the target TRUE.
-#' @param lim_y  boolean - By default, the value is TRUE. The axis y for the proportion is limited between 0 and 100.
-#' @param ... other parameters
+#' @param ... parameter to pass to plot.crossvar function specific for the target type.
 #'
-#' @return The function returns a graph.
+#'
+#'
+#' @return The function returns a ggplot graph
 #' @seealso
 #' \itemize{
 #' \item \code{\link{crossvar}}
@@ -34,14 +18,13 @@
 #' @importFrom gridExtra grid.arrange
 #' @importFrom  ggplot2 ggplot
 #'
-#' @usage plot(x, show='count', type='auto', print_NA=TRUE, target_NA=TRUE, only_taget_ref_level=FALSE, lim_y=TRUE)
-#'
 #' @examples
 #' t <- crossvar(adult,target="ABOVE50K", var="AGE",)
 #' plot(t,"counts")
 #' plot(t,"counts",type="line")
 #' plot(t,"props",print_NA = FALSE, only_target_ref_level = TRUE)
 #' @method plot crossvar
+#' @rdname plot.crossvar
 #' @export
 #'
 #'
@@ -61,8 +44,35 @@ plot.crossvar_binary <- function(x,...){
 }
 
 
-#' @method plot crossvar_numeric
+
+#' @title plot.crossvar_numeric
+#' @description plot method for crossvar object with continuous/numeric  target.
+
+#' @param x object of class "crossvar"
+#' @param show character - determine on which data considered. By default, the value is "counts".
+#'  This parameter can only take the following values:
+#' \itemize{
+#' \item "counts" : the data used is the contigency table created by the function crossvar.
+#' \item "props" : the data used is the proportion table created by the function crossvar.
+#' \item "index" : the data used is the index table created by the function crossvar.
+#' }
+#' @param type character - determine the type of graph. By default, the value is "auto".
+#'  This parameter can only take the following values:
+#' \itemize{
+#' \item "auto" : "counts" shows a bar plot and "props" shows a line plot.
+#' \item "bars" : shows a bar plot.
+#' \item "line": shows a line plot.
+#' }
+#' @param metadata data.frame - if metadata is  loaded in R environment, label of the variables can be used. Default value (NULL) corresponds to no metadata available.
+#' The label will be used for the title and the x-axis of the graph.
+#' @param print_NA boolean - By default, the value is TRUE. If FALSE, the missing values of the variable are not printed.
+#' @param do_plot boolean - whether to effectively show the plot or not (internal use to combine plots)
+#' @param ... additional parameter
+#' @rdname plot.crossvar
+#' @return The function returns a ggplot graph
+#'
 #' @importFrom data.table setnames
+
 plot.crossvar_numeric <- function(x,
                                   show=c("boxplot","median", "count","avg","woe"),
                                   type= c("auto","bars","line"),
@@ -229,8 +239,36 @@ if (do_plot) plot(allplots)
 
 
 
+#' @title plot.crossvar_categorical
+#' @description plot method for crossvar object with binary/categorical  target.
 
-#' @method plot crossvar_categorical
+#' @param x object of class "crossvar"
+#' @param show character - determine on which data considered. By default, the value is "counts".
+#'  This parameter can only take the following values:
+#' \itemize{
+#' \item "counts" : the data used is the contigency table created by the function crossvar.
+#' \item "props" : the data used is the proportion table created by the function crossvar.
+#' \item "index" : the data used is the index table created by the function crossvar.
+#' }
+#' @param type character - determine the type of graph. By default, the value is "auto".
+#'  This parameter can only take the following values:
+#' \itemize{
+#' \item "auto" : "counts" shows a bar plot and "props" shows a line plot.
+#' \item "bars" : shows a bar plot.
+#' \item "line": shows a line plot.
+#' }
+#' @param metadata data.frame - if metadata is  loaded in R environment, label of the variables can be used. Default value (NULL) corresponds to no metadata available.
+#' The label will be used for the title and the x-axis of the graph.
+#' @param print_NA boolean - By default, the value is TRUE. If FALSE, the missing values of the variable are not printed.
+#' @param target_NA boolean - By default, the value is TRUE. If FALSE, the missing values of the target are not printed.
+#' @param only_target_ref_level boolean - By default, the value is FALSE. If TRUE, only print the values for the target TRUE.
+#' @param lim_y  boolean - By default, the value is TRUE. The axis y for the proportion is limited between 0 and 100.
+#' @param numvar_as character, one of "bin" (default),"value": how to display (binned) numeric explanatory variable. 'Bin' will display bins side by side without taking into accounts real values of variable whereas as 'value' will center all bars at bins centers.
+#' @param do_plot boolean - whether to effectively show the plot or not (internal use to combine plots)
+#' @param ... additional parameter
+#' @rdname plot.crossvar
+#' @return The function returns a ggplot graph
+
 #' @importFrom data.table melt
 plot.crossvar_categorical <- function(x,
                                       show = c("counts","props","index","woe"),
@@ -534,7 +572,7 @@ plot.crossvar_categorical <- function(x,
 #'\item bin (default) - display WOE for adjacent binning without respecting variable raw values
 #'\item value - plot WOE using centers of binning classes, thus respecting variable raw values
 #'}
-#' #@param do_plot - boolean  whether to effectively render or not the plot.
+#' @param do_plot boolean - whether to effectively show the plot or not (internal use to combine plots)
 #' @param ... extra parameters (not used currently)
 #' @return plot a graph and returns its ggplot2 object
 #' @examples
@@ -661,14 +699,14 @@ plot_woe <- function(x,metadata = NULL,
 
 
 #' @title quadrant_plot
-#' @description quadrant method for crossvar object
+#' @description quadrant method for crossvar object, displays explanatory variable categories (or bin) in a quadrant plot crossing category size (N) and target (percentage for binary target or average for continuous target).
 #'
 #'This function allows to generate a quadrant graphic on an object of class "crossvar".
 #' @param x object of class "crossvar"
-#' @param max_ncat: maximmum number of values/categories that will be displayed ( additional will be collapsed) - default: 15
-#' @param print_NA: boolean: whether to display or not the NA possible category (default: TRUE)
 #' @param metadata data.frame - if metadata is  loaded in R environment, label of the variables can be used. Default value (NULL) corresponds to no metadata available.
 #' The label will be used for the title and the x-axis of the graph.
+#' @param max_ncat maximmum number of values/categories that will be displayed ( additional will be collapsed) - default: 15
+#' @param print_NA boolean: whether to display or not the NA possible category (default: TRUE)
 #'
 #' @return The function returns a graph.
 #'
@@ -681,6 +719,7 @@ plot_woe <- function(x,metadata = NULL,
 #' @examples
 #' t <- crossvar(adult,"ABOVE50K","WORKCLASS")
 #' quadrant_plot(t)
+#' quadrant_plot(t, max_ncat=2)
 #' @export quadrant_plot
 #' @importFrom assertthat assert_that
 #' @importFrom data.table setorder rbindlist

@@ -56,8 +56,8 @@ that}
 
 \item{nbins}{The nbins is by default 10. It is the number of quantiles to be considered.}
 
-\item{binning_method}{character, one of 'quantile' (default) or 'clustering' (parameter expansion usable).
-Method used to derive the `nbins` buckets for the continuous explanatatory variables.}
+\item{binning_method}{character, one of 'quantile' (default) or 'clustering', 'smart' (parameter expansion usable).
+Method used to derive the `nbins` buckets for the continuous explanatory variables.}
 
 \item{naming_conventions}{boolean - by default TRUE. It means that a certain naming convention is respected.}
 
@@ -103,7 +103,7 @@ this could be adequate to group together some modalities/buckets. Clusters would
 
 \item{woe_post_cluster_n}{integer (default: 6). If woe_post_cluster is TRUE, number of clusters to be used.}
 
-\item{analysis_date}{date of the analysis. By default, the system date.}
+\item{smart_quantile_by}{numeric, for binning method 'smart', quantile step - default y step of 0.01.}
 }
 \value{
 The function returns a list of class "targeter".

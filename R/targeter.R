@@ -28,13 +28,12 @@
 #' that
 #' @param description_target text on the description of target.
 #' @param analysis_name  name of the analysis.
-#' @param analysis_date date of the analysis. By default, the system date.
 #' @param select_vars  a list of explanatory variables. By default, NULL and all columns are considered.
 #' @param exclude_vars  a list of variables to exclude from the analysis.
 #' @param naming_conventions boolean - by default TRUE. It means that a certain naming convention is respected.
 #' @param nbins The nbins is by default 10. It is the number of quantiles to be considered.
-#' @param binning_method character, one of 'quantile' (default) or 'clustering' (parameter expansion usable).
-#' Method used to derive the `nbins` buckets for the continuous explanatatory variables.
+#' @param binning_method character, one of 'quantile' (default) or 'clustering', 'smart' (parameter expansion usable).
+#' Method used to derive the `nbins` buckets for the continuous explanatory variables.
 #' @param useNA Two values are possible : "ifany" and "no". By default, the package option is "ifany".
 #' \itemize{
 #' \item The value "ifany" takes in consideration the missing values if there are any.
@@ -65,6 +64,7 @@
 #' @param woe_post_cluster boolean (default FALSE). Once WOE are computed, on could cluster values to see if this
 #'  this could be adequate to group together some modalities/buckets. Clusters would be used in graphics. See vignette on methodology.
 #' @param woe_post_cluster_n integer (default: 6). If woe_post_cluster is TRUE, number of clusters to be used.
+#' @param smart_quantile_by numeric, for binning method 'smart', quantile step - default y step of 0.01.
 
 
 #'

@@ -2,14 +2,41 @@
 % Please edit documentation in R/plot.R
 \name{plot.crossvar}
 \alias{plot.crossvar}
+\alias{plot.crossvar_numeric}
+\alias{plot.crossvar_categorical}
 \title{plot.crossvar}
 \usage{
-plot(x, show='count', type='auto', print_NA=TRUE, target_NA=TRUE, only_taget_ref_level=FALSE, lim_y=TRUE)
+\method{plot}{crossvar}(x, ...)
+
+\method{plot}{crossvar_numeric}(
+  x,
+  show = c("boxplot", "median", "count", "avg", "woe"),
+  type = c("auto", "bars", "line"),
+  numvar_as = c("bin", "value"),
+  metadata = NULL,
+  print_NA = TRUE,
+  do_plot = TRUE,
+  ...
+)
+
+\method{plot}{crossvar_categorical}(
+  x,
+  show = c("counts", "props", "index", "woe"),
+  type = c("auto", "bars", "line"),
+  metadata = NULL,
+  print_NA = TRUE,
+  target_NA = TRUE,
+  only_target_ref_level = FALSE,
+  lim_y = TRUE,
+  numvar_as = c("bin", "value"),
+  do_plot = TRUE,
+  ...
+)
 }
 \arguments{
 \item{x}{object of class "crossvar"}
 
-\item{...}{other parameters}
+\item{...}{additional parameter}
 
 \item{show}{character - determine on which data considered. By default, the value is "counts".
  This parameter can only take the following values:
@@ -27,10 +54,14 @@ plot(x, show='count', type='auto', print_NA=TRUE, target_NA=TRUE, only_taget_ref
 \item "line": shows a line plot.
 }}
 
+\item{numvar_as}{character, one of "bin" (default),"value": how to display (binned) numeric explanatory variable. 'Bin' will display bins side by side without taking into accounts real values of variable whereas as 'value' will center all bars at bins centers.}
+
 \item{metadata}{data.frame - if metadata is  loaded in R environment, label of the variables can be used. Default value (NULL) corresponds to no metadata available.
 The label will be used for the title and the x-axis of the graph.}
 
 \item{print_NA}{boolean - By default, the value is TRUE. If FALSE, the missing values of the variable are not printed.}
+
+\item{do_plot}{boolean - whether to effectively show the plot or not (internal use to combine plots)}
 
 \item{target_NA}{boolean - By default, the value is TRUE. If FALSE, the missing values of the target are not printed.}
 
@@ -39,10 +70,20 @@ The label will be used for the title and the x-axis of the graph.}
 \item{lim_y}{boolean - By default, the value is TRUE. The axis y for the proportion is limited between 0 and 100.}
 }
 \value{
-The function returns a graph.
+The function returns a ggplot graph
+
+The function returns a ggplot graph
+
+The function returns a ggplot graph
 }
 \description{
-plot method for crossvar object
+plot method for crossvar object.
+plot is the main function that will automatically dispatch to plot.crossvar_binary, plot.crossvar_categorical or plot.crossvar_continuous,
+ depending on taret type.
+
+plot method for crossvar object with continuous/numeric  target.
+
+plot method for crossvar object with binary/categorical  target.
 }
 \examples{
 t <- crossvar(adult,target="ABOVE50K", var="AGE",)
