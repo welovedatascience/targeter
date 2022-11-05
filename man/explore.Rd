@@ -2,7 +2,7 @@
 % Please edit documentation in R/explore.R
 \name{explore}
 \alias{explore}
-\title{FUNCTION_TITLE}
+\title{explore}
 \usage{
 explore(
   object,
@@ -13,34 +13,30 @@ explore(
 )
 }
 \arguments{
-\item{object}{PARAM_DESCRIPTION}
+\item{object}{a targeter object}
 
-\item{summary_object}{PARAM_DESCRIPTION, Default: NULL}
+\item{summary_object}{optional: pre-computed summary object (see \code{\link{summary.targeter}}), Default: NULL}
 
-\item{metadata}{PARAM_DESCRIPTION, Default: NULL}
+\item{metadata}{optional: metadata to use to display variables labels, Default: NULL}
 
-\item{...}{PARAM_DESCRIPTION}
+\item{display}{character, one of 'dialog', 'browser': how to open the shiny app/gadget (default: dialog)}
+
+\item{...}{additional parameters to be used by summary.targeter function (when no summary object are passed)}
 }
 \value{
-OUTPUT_DESCRIPTION
+NULL (side effect: open gadget)
 }
 \description{
-FUNCTION_DESCRIPTION
-}
-\details{
-DETAILS
+shiny small app to explore a targeter object.
 }
 \examples{
 \dontrun{
 if(interactive()){
- #EXAMPLE1
+x <- targeter(adult,target ="ABOVE50K")
+explore(x)
  }
 }
 }
 \seealso{
-\code{\link[miniUI]{miniPage}}, \code{\link[miniUI]{miniTitleBar}}, \code{\link[miniUI]{miniButtonBlock}}, \code{\link[miniUI]{miniContentPanel}}
- \code{\link[shiny]{fluidPage}}, \code{\link[shiny]{column}}, \code{\link[shiny]{plotOutput}}, \code{\link[shiny]{renderPlot}}, \code{\link[shiny]{observeEvent}}, \code{\link[shiny]{runGadget}}, \code{\link[shiny]{viewer}}
- \code{\link[DT]{dataTableOutput}}
- \code{\link[gridExtra]{arrangeGrob}}
- \code{\link[targeter]{report}}
+\code{\link[targeter]{report}}
 }

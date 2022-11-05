@@ -25,7 +25,8 @@ The label will be used for the title and the x-axis of the graph.}
 #'\itemize{
 \item bin (default) - display WOE for adjacent binning without respecting variable raw values
 \item value - plot WOE using centers of binning classes, thus respecting variable raw values
-}}
+}
+#@param do_plot - boolean  whether to effectively render or not the plot.}
 
 \item{...}{extra parameters (not used currently)}
 }
@@ -46,5 +47,5 @@ if(interactive()){
 }
 }
 \seealso{
-\code{\link[crossvar]{crossvar}}
+\code{\link[targeter]{crossvar}}
 }

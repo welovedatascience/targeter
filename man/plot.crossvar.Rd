@@ -2,9 +2,9 @@
 % Please edit documentation in R/plot.R
 \name{plot.crossvar}
 \alias{plot.crossvar}
-\title{Function plot.crossvar()}
+\title{plot.crossvar}
 \usage{
-\method{plot}{crossvar}(x, ...)
+plot(x, show='count', type='auto', print_NA=TRUE, target_NA=TRUE, only_taget_ref_level=FALSE, lim_y=TRUE)
 }
 \arguments{
 \item{x}{object of class "crossvar"}
@@ -42,7 +42,7 @@ The label will be used for the title and the x-axis of the graph.}
 The function returns a graph.
 }
 \description{
-This function allows to generate graphs on the object of class "crossvar".
+plot method for crossvar object
 }
 \examples{
 t <- crossvar(adult,target="ABOVE50K", var="AGE",)
@@ -54,6 +54,6 @@ plot(t,"props",print_NA = FALSE, only_target_ref_level = TRUE)
 \itemize{
 \item \code{\link{crossvar}}
 \item \code{\link{summary.crossvar}}
-\item \code{\link{cadran_plot.crossvar}}
+\item \code{\link{quadrant_plot}}
 }
 }

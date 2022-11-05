@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot.R
 \name{quadrant_plot}
 \alias{quadrant_plot}
-\title{Function quadrant_plot}
+\title{quadrant_plot}
 \usage{
 quadrant_plot(x, metadata = NULL, max_ncat = 15, print_NA = TRUE)
 }
@@ -11,12 +11,18 @@ quadrant_plot(x, metadata = NULL, max_ncat = 15, print_NA = TRUE)
 
 \item{metadata}{data.frame - if metadata is  loaded in R environment, label of the variables can be used. Default value (NULL) corresponds to no metadata available.
 The label will be used for the title and the x-axis of the graph.}
+
+\item{max_ncat:}{maximmum number of values/categories that will be displayed ( additional will be collapsed) - default: 15}
+
+\item{print_NA:}{boolean: whether to display or not the NA possible category (default: TRUE)}
 }
 \value{
 The function returns a graph.
 }
 \description{
-This function allows to generate a quandrant graphic on an object of class "crossvar".
+quadrant method for crossvar object
+
+This function allows to generate a quadrant graphic on an object of class "crossvar".
 }
 \examples{
 t <- crossvar(adult,"ABOVE50K","WORKCLASS")

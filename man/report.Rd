@@ -30,11 +30,11 @@ report(
 
 \item{browse}{by default TRUE : print in the browse the output.}
 
-\item{ntop}{integer - number of variables to show in the report. For more information, see the function top. By default, NULL i.e. all variables are taken.}
+\item{ntop}{integer - number of variables to show in the report. For more information, see the function focus By default, NULL i.e. all variables are taken.}
 
-\item{nmin}{integer - minimum number of profiles in the seleected class. For more information, see the function top.}
+\item{nmin}{integer - minimum number of profiles in the seleected class. For more information, see the function focus.}
 
-\item{criteria}{character - By default, the value is index.max.index. For more information, see the function top.}
+\item{criteria}{character - By default, the value is index.max.index. For more information, see the function focus.}
 
 \item{min_criteria}{- By default NULL. If it's speciefied, only the observations which have criteria >= min_criteria.}
 
@@ -45,10 +45,14 @@ The label will be used for the title and the x-axis of the graph.}
 
 \item{output_format}{- By default it's html. For a pdf, output_format="pdf_document" and for a word, output_format="word_document".}
 
+\item{output_file}{- name of the output file to be generated. If NULL (default) an, automated name will be generated.}
+
+\item{output_dir}{- output directory, default: tempdir().}
+
 \item{...}{other parameter from the function render.}
 }
 \value{
-A report in pdf, html or Word.
+path to the generated report. Side effect would be to open a document, if \code{browse} is TRUE.
 }
 \description{
 This function creates an automatic report according to a predefined template in the package or a user-generated template.
@@ -64,6 +68,6 @@ report(ntop=5)
 \itemize{
 \item \code{\link{targeter}}
 \item \code{\link{summary.targeter}}
-\item \code{\link{top}}
+\item \code{\link{focus}}
 }
 }

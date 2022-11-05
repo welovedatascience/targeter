@@ -39,5 +39,5 @@ if(interactive()){
 }
 \seealso{
 \code{\link[targeter]{targeter}}
- \code{\link[plot.crossvar]{plot.crossvar}}
+ \code{\link[targeter]{plot.crossvar}}
 }

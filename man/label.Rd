@@ -11,6 +11,10 @@ label(var, metadata, var_field = "var", label_field = "LABEL", lang = NULL)
 
 \item{metadata}{data.frame - if we have a metadata loaded in your R, you can use to take the label of the vars.}
 
+\item{var_field}{- character: name of the column in metadata that contains variable name (default: 'var')}
+
+\item{label_field}{- character: name of the column in metadata that contains variable label (default: 'LABEL')}
+
 \item{lang}{character - the code for the language. It's useful if you have a metadata with different labels for differents languages.
 By default, the value is NULL.}
 }
