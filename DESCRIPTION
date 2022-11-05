@@ -1,13 +1,13 @@
 Package: targeter
 Type: Package
-Title: The Another Report Generation Engine for Target Exploration in R.
+Title: The Another Report Generation Engine for Target Exploration in R
 Version: 0.4
 Author: WeLoveDataScience
 Maintainer: Eric Lecoutre <eric.lecoutre@welovedatascience.com>
 Description: Automated EDA for targets exploration. Describes a target (binary/nominal/continuous) by crossing
     it with many candidate explanatory variables. Generates aggregated statistics
-    allowing to prioritize inspection, such as Information Value.
-    We also provide plot method and a report generation engine.
+    allowing to prioritize inspection, such as Information Value (including an extension of this metric for continuus targets).
+    We also provide plot methods, automated reports based on markdown and a shiny gadget for interactive explorations.
     Package is aimed at exploring big datasets, both in terms of records or variables.
 License: file LICENSE
 Encoding: UTF-8
