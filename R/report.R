@@ -6,23 +6,25 @@
 #' @param template template file path. By default, it put to NULL and take the default template.
 #' @param summary_object an object of class "summary.targeter": pre-computed summary of object.
 #' @param browse by default TRUE : print in the browse the output.
-#' @param ntop integer - number of variables to show in the report. For more information, see the function top. By default, NULL i.e. all variables are taken.
-#' @param nmin integer - minimum number of profiles in the seleected class. For more information, see the function top.
-#' @param criteria character - By default, the value is index.max.index. For more information, see the function top.
+#' @param ntop integer - number of variables to show in the report. For more information, see the function focus By default, NULL i.e. all variables are taken.
+#' @param nmin integer - minimum number of profiles in the seleected class. For more information, see the function focus.
+#' @param criteria character - By default, the value is index.max.index. For more information, see the function focus.
 #' @param min_criteria - By default NULL. If it's speciefied, only the observations which have criteria >= min_criteria.
 #' @param metadata data.frame - if metadata is  loaded in R environment, label of the variables can be used. Default value (NULL) corresponds to no metadata available.
 #' The label will be used for the title and the x-axis of the graph.
 #' @param force_vars - character, list of variables that will be kept and then won't never be filterered.
 #' @param  output_format - By default it's html. For a pdf, output_format="pdf_document" and for a word, output_format="word_document".
+#' @param output_file - name of the output file to be generated. If NULL (default) an, automated name will be generated.
+#' @param output_dir - output directory, default: tempdir().
 #' @param ... other parameter from the function render.
-#' @return A report in pdf, html or Word.
+#' @return path to the generated report. Side effect would be to open a document, if \code{browse} is TRUE.
 #' @export report
 #'
 #' @seealso
 #' \itemize{
 #' \item \code{\link{targeter}}
 #' \item \code{\link{summary.targeter}}
-#' \item \code{\link{top}}
+#' \item \code{\link{focus}}
 #' }
 #' @examples
 #' \dontrun{
@@ -30,6 +32,7 @@
 #' report(t,output_format="pdf_document")
 #' report(ntop=5)
 #' }
+#' @importFrom utils head
 report <- function(object,
                    template=NULL,
                    summary_object=NULL,
@@ -60,7 +63,7 @@ report <- function(object,
   ## apply focus/top
   if (is.null(summary_object)){
     # compute summary object
-    cat("?")
+
     summary_object <- summary(object, nmin = nmin, criteria = criteria,
                               min_criteria = min_criteria)
   }
@@ -79,8 +82,8 @@ report <- function(object,
                           "word"="word",
                           "pdf"="latex")
 
-  print(head(metadata,2))
-  print(head(summary_object,2))
+  print(utils::head(metadata,2))
+  print(utils::head(summary_object,2))
 
 
   outfile <- rmarkdown::render(template,

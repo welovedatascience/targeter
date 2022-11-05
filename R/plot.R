@@ -1,7 +1,6 @@
-#' Function plot.crossvar()
-#'
-#' This function allows to generate graphs on the object of class "crossvar".
-#'
+#' @title plot.crossvar
+#' @description plot method for crossvar object
+
 #' @param x object of class "crossvar"
 #' @param show character - determine on which data considered. By default, the value is "counts".
 #'  This parameter can only take the following values:
@@ -30,10 +29,12 @@
 #' \itemize{
 #' \item \code{\link{crossvar}}
 #' \item \code{\link{summary.crossvar}}
-#' \item \code{\link{cadran_plot.crossvar}}
+#' \item \code{\link{quadrant_plot}}
 #' }
 #' @importFrom gridExtra grid.arrange
 #' @importFrom  ggplot2 ggplot
+#'
+#' @usage plot(x, show='count', type='auto', print_NA=TRUE, target_NA=TRUE, only_taget_ref_level=FALSE, lim_y=TRUE)
 #'
 #' @examples
 #' t <- crossvar(adult,target="ABOVE50K", var="AGE",)
@@ -61,6 +62,7 @@ plot.crossvar_binary <- function(x,...){
 
 
 #' @method plot crossvar_numeric
+#' @importFrom data.table setnames
 plot.crossvar_numeric <- function(x,
                                   show=c("boxplot","median", "count","avg","woe"),
                                   type= c("auto","bars","line"),
@@ -118,7 +120,7 @@ plot.crossvar_numeric <- function(x,
   }
 
   if (show %in% "count"){
-    setnames(dfm,'count','N')
+    data.table::setnames(dfm,'count','N')
   }
   if (existmissing_var){
     ## we take only the class [Missing]
@@ -229,6 +231,7 @@ if (do_plot) plot(allplots)
 
 
 #' @method plot crossvar_categorical
+#' @importFrom data.table melt
 plot.crossvar_categorical <- function(x,
                                       show = c("counts","props","index","woe"),
                                       type = c("auto","bars","line"),
@@ -314,7 +317,7 @@ plot.crossvar_categorical <- function(x,
   }
 
   ## we put all values in one column instead of several columns (number of columns: numbers of differents values of the target)
-  suppressWarnings(dfm <- melt(as.data.table(df),id ="level"))
+  suppressWarnings(dfm <- data.table::melt(as.data.table(df),id ="level"))
   ## we rename the column by "Target"
   names(dfm)[2] <- "target"
   dfm$target <- as.character(dfm$target)  # re-encode as character
@@ -531,6 +534,7 @@ plot.crossvar_categorical <- function(x,
 #'\item bin (default) - display WOE for adjacent binning without respecting variable raw values
 #'\item value - plot WOE using centers of binning classes, thus respecting variable raw values
 #'}
+#' #@param do_plot - boolean  whether to effectively render or not the plot.
 #' @param ... extra parameters (not used currently)
 #' @return plot a graph and returns its ggplot2 object
 #' @examples
@@ -542,7 +546,7 @@ plot.crossvar_categorical <- function(x,
 #'  }
 #' }
 #' @seealso
-#'  \code{\link[crossvar]{crossvar}}
+#'  \code{\link[targeter]{crossvar}}
 #' @rdname plot_woe
 #' @export
 #' @importFrom ggplot2 ggplot aes theme_bw geom_bar theme element_blank scale_y_continuous ylim xlab element_text ggtitle
@@ -656,10 +660,13 @@ plot_woe <- function(x,metadata = NULL,
 
 
 
-#' Function quadrant_plot
+#' @title quadrant_plot
+#' @description quadrant method for crossvar object
 #'
-#'This function allows to generate a quandrant graphic on an object of class "crossvar".
+#'This function allows to generate a quadrant graphic on an object of class "crossvar".
 #' @param x object of class "crossvar"
+#' @param max_ncat: maximmum number of values/categories that will be displayed ( additional will be collapsed) - default: 15
+#' @param print_NA: boolean: whether to display or not the NA possible category (default: TRUE)
 #' @param metadata data.frame - if metadata is  loaded in R environment, label of the variables can be used. Default value (NULL) corresponds to no metadata available.
 #' The label will be used for the title and the x-axis of the graph.
 #'
@@ -676,7 +683,7 @@ plot_woe <- function(x,metadata = NULL,
 #' quadrant_plot(t)
 #' @export quadrant_plot
 #' @importFrom assertthat assert_that
-#' @importFrom data.table setorder
+#' @importFrom data.table setorder rbindlist
 #' @importFrom ggplot2 ggplot aes geom_point scale_color_manual theme_bw geom_hline geom_text ggtitle xlab ylab theme element_text scale_x_continuous
 #' @importFrom ggrepel geom_text_repel
 #' @importFrom scales label_comma
@@ -732,7 +739,7 @@ quadrant_plot <- function(x,metadata=NULL, max_ncat=15, print_NA=TRUE){
     if (print_NA){
       # force NA to be there
       if (!("[Missing]") %in% top$names){
-        top <- rbindlist(list(top, all[all$names=="[Missing]",]))
+        top <- data.table::rbindlist(list(top, all[all$names=="[Missing]",]))
         # remove from remaining
         remaining <- remaining[remaining$names != "[Missing]",]
       }

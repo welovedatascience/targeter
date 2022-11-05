@@ -93,7 +93,8 @@
 #' }
 #' @examples
 #' targeter(adult,target ="ABOVE50K")
-
+#' @importFrom stats quantile median
+#' @importFrom data.table dcast
 
 
 ## <idea> check for WOE monotonicity
@@ -108,8 +109,8 @@ targeter <- function(data,
                      exclude_vars=NULL,
                      nbins=12,
                      binning_method=c("quantile","clustering","smart"), # todo: tree (min size)+ constrained clustrering  https://cran.r-project.org/web/packages/scclust/scclust.pdf
-                     naming_conventions=getOption("profile.use_naming_conventions"),
-                     useNA = getOption("profile.useNA"), #option package by default
+                     naming_conventions=getOption("targeter.use_naming_conventions"),
+                     useNA = getOption("targeter.useNA"), #option package by default
                      verbose=FALSE,
                      dec = 2,
                      order_label = c("auto","alpha","count","props","means"),
@@ -339,7 +340,7 @@ targeter <- function(data,
     ## put a vector from 0 to 1 by 1/nbins
     quantiles = seq(0, 1, length.out = nbins+1)
     ## take the value of the quantile for the variable x
-    cutpoints = unname(unique(quantile(x, quantiles, na.rm = TRUE)))
+    cutpoints = unname(unique(stats::quantile(x, quantiles, na.rm = TRUE)))
 
     centers <- cutpoints[-length(cutpoints)]+diff(cutpoints/2)
     cutcenter_list[[variable]] <<- centers
@@ -486,7 +487,7 @@ targeter <- function(data,
       colnames(x)[1:2] <- c(variable,target)
       ## we have one column with all values for the target, but we want a table with one column for the first value of the target, a second column for the second value of the target and so on
       ## we transform the table to have the values of the target in column
-      tab=dcast(x, get(variable)~get(target),value.var="N")
+      tab=data.table::dcast(x, get(variable)~get(target),value.var="N")
       # tab[, variable:=as.character(variable)]
       # tab <- as.data.frame(tab)
 
@@ -799,14 +800,14 @@ targeter <- function(data,
 }
 
 #' @method print targeter
-#' @export
+#' @importFrom utils head
 print.targeter <- function(x,...){
   cat("\nTarget profiling object with following properties:")
   cat(paste0("\n\tTarget:"), x$target, " of type:", x$target_type)
   if (x$target_type == 'binary') cat(paste0("  (target level:", x$target_reference_level),")")
   cat(paste0("\n\tRun on data:"), x$dataname, " the:", format(x$date))
   nprof <- length(x$profiles)
-  vars_profile <- head(names(x$profiles),5)
+  vars_profile <-  utils::head(names(x$profiles),5)
   vars_profile <- paste(vars_profile, collapse=", ")
   if (nprof>5) vars_profile <- paste0(vars_profile, "...")
   cat(paste0("\n", length(x$profiles), " profiles available (",vars_profile,")"))

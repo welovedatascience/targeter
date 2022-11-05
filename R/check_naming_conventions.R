@@ -3,6 +3,7 @@
 #'This function determines if the naming convention is respected for each column.
 #'
 #' @param data data.table or data.frame
+#' @param test_target_type also check if any variable that should be a target through naming conventions (ie Z_) also has a target nature provided in name.
 #'
 #' @return a table which contains two columns "ErrorType" and "ErrorTarget". Each row corresponds to a variable of the data.
 #' The column "ErrorType" == FALSE when the condition on the first letter is respected.

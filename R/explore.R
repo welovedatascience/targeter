@@ -2,32 +2,31 @@
 # library(miniUI)
 # library(ggplot2)
 
-#' @title FUNCTION_TITLE
-#' @description FUNCTION_DESCRIPTION
-#' @param object PARAM_DESCRIPTION
-#' @param summary_object PARAM_DESCRIPTION, Default: NULL
-#' @param metadata PARAM_DESCRIPTION, Default: NULL
-#' @param ... PARAM_DESCRIPTION
-#' @return OUTPUT_DESCRIPTION
-#' @details DETAILS
+#' @title explore
+#' @description shiny small app to explore a targeter object.
+#' @param object a targeter object
+#' @param summary_object optional: pre-computed summary object (see \code{\link{summary.targeter}}), Default: NULL
+#' @param metadata optional: metadata to use to display variables labels, Default: NULL
+#' @param display character, one of 'dialog', 'browser': how to open the shiny app/gadget (default: dialog)
+#' @param ... additional parameters to be used by summary.targeter function (when no summary object are passed)
+#' @return NULL (side effect: open gadget)
 #' @examples
 #' \dontrun{
 #' if(interactive()){
-#'  #EXAMPLE1
+#' x <- targeter(adult,target ="ABOVE50K")
+#' explore(x)
 #'  }
 #' }
 #' @seealso
-#'  \code{\link[miniUI]{miniPage}}, \code{\link[miniUI]{miniTitleBar}}, \code{\link[miniUI]{miniButtonBlock}}, \code{\link[miniUI]{miniContentPanel}}
-#'  \code{\link[shiny]{fluidPage}}, \code{\link[shiny]{column}}, \code{\link[shiny]{plotOutput}}, \code{\link[shiny]{renderPlot}}, \code{\link[shiny]{observeEvent}}, \code{\link[shiny]{runGadget}}, \code{\link[shiny]{viewer}}
-#'  \code{\link[DT]{dataTableOutput}}
-#'  \code{\link[gridExtra]{arrangeGrob}}
 #'  \code{\link[targeter]{report}}
 #' @rdname explore
 #' @export
 #' @importFrom miniUI miniPage gadgetTitleBar miniButtonBlock miniTitleBarButton miniContentPanel
-#' @importFrom shiny fluidRow column plotOutput renderPlot observeEvent runGadget dialogViewer
+#' @importFrom shiny fluidRow column plotOutput renderPlot observeEvent runGadget dialogViewer stopApp
 #' @importFrom DT DTOutput renderDataTable
 #' @importFrom gridExtra grid.arrange
+#' @importFrom shinybusy show_modal_spinner
+#' @importFrom htmlwidgets JS
 
 
 explore <- function(object, summary_object=NULL,metadata=NULL, display=c("dialog","browser"),...) {
@@ -257,14 +256,14 @@ explore <- function(object, summary_object=NULL,metadata=NULL, display=c("dialog
     # When the Done button is clicked, return a value
     shiny::observeEvent(input$done, {
       returnValue <- "Done"
-      stopApp(returnValue)
+      shiny::stopApp(returnValue)
     })
 
     shiny::observeEvent(input$report_html, {
       selvars <-   summary_object[setdiff(1:nrow(summary_object), input[["excludedRows"]]),][["varname"]]
       if (length(selvars)>1){
         summary_object <- summary_object[summary_object$varname %in% selvars,]
-        S <<- summary_object
+        #S <<- summary_object
         shinybusy::show_modal_spinner() # show the modal window
         targeter::report(object=object,
                          template=NULL,

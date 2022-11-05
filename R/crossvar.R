@@ -25,11 +25,12 @@
 
 #' @seealso
 #'  \code{\link[targeter]{targeter}}
-#'  \code{\link[plot.crossvar]{plot.crossvar}}
+#'  \code{\link[targeter]{plot.crossvar}}
 
 #' @rdname crossvar
 #' @export crossvar
 #' @importFrom assertthat assert_that
+#' @importFrom data.table as.data.table
 
 crossvar <- function(data, target, var, ...){
   assertthat::assert_that(inherits(data,"data.frame") | inherits(data, "data.table"), msg = "Data must to be a data.frame or a data.table")
@@ -38,7 +39,7 @@ crossvar <- function(data, target, var, ...){
   assertthat::assert_that(var %in% names(data), msg = "var is not present in data")
   assertthat::assert_that(target %in% names(data), msg = "target is not present in data")
   assertthat::assert_that(requireNamespace('data.table', quietly = TRUE), msg='data.table package required')
-  data_sel <- as.data.table(data)[,c(target, var), with=FALSE]
+  data_sel <- data.table::as.data.table(data)[,c(target, var), with=FALSE]
   targeter(data_sel, target=target, select_vars=var,...)$profiles[[var]]
 }
 

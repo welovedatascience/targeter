@@ -1,3 +1,6 @@
+
+
+#' @importFrom data.table setnames
 dt_WOE_IV <- function(data,
                       var_interest,
                       var_cross,
@@ -24,7 +27,7 @@ dt_WOE_IV <- function(data,
     (get(var_interest) - vRANGE[1]) / diff(vRANGE)
   )
   ) ,by =c(var_cross)]
-  setnames(agg, var_cross, 'variable')
+  data.table::setnames(agg, var_cross, 'variable')
   if (!alternate_version){
     # replace count with "non-events 0" or numeric "opposite
     agg[, vcount:=(vcount - vsum)]
