@@ -1,3 +1,6 @@
+#' @noRd
+#' @importFrom stats pf
+
 aov_aggstats <- function(m, sd, n, full_output=TRUE){
   # https://rdrr.io/cran/rpsychi/src/R/ind.oneway.second.R
   if(length(n)==1){
@@ -19,7 +22,7 @@ aov_aggstats <- function(m, sd, n, full_output=TRUE){
     SSt <- SSb + SSw
   }
   f.value <- MSb/MSw                #f value
-  p.value <- pf(f.value, df1=dfb, df2=dfw, lower.tail = FALSE, log.p=FALSE)
+  p.value <-  stats::pf(f.value, df1=dfb, df2=dfw, lower.tail = FALSE, log.p=FALSE)
   out <- data.frame(F=f.value, pval=p.value)
 
   if (full_output){
