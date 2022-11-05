@@ -1,0 +1,75 @@
+#' Adult Data Set
+#'
+#' The `adult` data set contains the questionnaire data of the
+#' _Adult_ database (originally called the _Census Income_
+#' Database) formatted as a data.frame.
+#'
+#' The Adult database was extracted from the census bureau database
+#' found at \url{https://www.census.gov/} in 1994 by Ronny Kohavi and Barry
+#' Becker (Data Mining and Visualization, Silicon Graphics). It was originally
+#' used to predict whether income exceeds USD 50K/yr based on census data.
+
+#' @name adult
+#' @docType data
+#' @format `adult` is a data.frame
+#' with `r data(adult); nrow(adult)` rows
+#' and `r data(adult); ncol(adult)` columns. See below for details.
+#'
+#' \describe{
+#'  \item{AGE}{a numeric vector.}
+#'  \item{WORKCLASS}{a factor with levels `Federal-gov`,
+#' `Local-gov`, `Never-worked`, `Private`, `Self-emp-inc`,
+#' `Self-emp-not-inc`, `State-gov`, and `Without-pay`.}
+#' \item{FNLWGT}{a numeric vector}
+#' \item{EDUCATION}{an ordered factor with levels `Preschool` <
+#' `1st-4th` < `5th-6th` < `7th-8th` < `9th` < `10th`
+#' < `11th` < `12th` < `HS-grad` < `Prof-school` <
+#' `Assoc-acdm` < `Assoc-voc` < `Some-college` <
+#' `Bachelors` < `Masters` < `Doctorate`.}
+#' \item{EDUCATIONNUM}{a numeric vector.}
+#' \item{MARITALSTATUS}{a factor with
+#' levels `Divorced`, `Married-AF-spouse`, `Married-civ-spouse`,
+#' `Married-spouse-absent`, `Never-married`, `Separated`, and
+#' `Widowed`.}
+#' \item{OCCUPATION}{a factor with levels `Adm-clerical`,
+#' `Armed-Forces`, `Craft-repair`, `Exec-managerial`,
+#' `Farming-fishing`, `Handlers-cleaners`, `Machine-op-inspct`,
+#' `Other-service`, `Priv-house-serv`, `Prof-specialty`,
+#' `Protective-serv`, `Sales`, `Tech-support`, and
+#' `Transport-moving`.}
+#' \item{RELATIONSHIP}{a factor with levels
+#' `Husband`, `Not-in-family`, `Other-relative`,
+#' `Own-child`, `Unmarried`, and `Wife`.}
+#' \item{FACE}{a factor
+#' with levels `Amer-Indian-Eskimo`, `Asian-Pac-Islander`,
+#' `Black`, `Other`, and `White`.}
+#' \item{SEX}{a factor with levels `Female` and `Male`.}
+#' \item{CAPITALGAIN}{a numeric vector.}
+#' \item{CAPITALLOSS}{a numeric vector.}
+#' \item{HOURSPERWEEK}{a numeric vector.}
+#' \item{NATIVECOUNTRY}{a factor with levels `Cambodia`, `Canada`, `China`,
+#' `Columbia`, `Cuba`, `Dominican-Republic`, `Ecuador`,
+#' `El-Salvador`, `England`, `France`, `Germany`,
+#' `Greece`, `Guatemala`, `Haiti`, `Holand-Netherlands`,
+#' `Honduras`, `Hong`, `Hungary`, `India`, `Iran`,
+#' `Ireland`, `Italy`, `Jamaica`, `Japan`, `Laos`,
+#' `Mexico`, `Nicaragua`, `Outlying-US(Guam-USVI-etc)`,
+#' `Peru`, `Philippines`, `Poland`, `Portugal`,
+#' `Puerto-Rico`, `Scotland`, `South`, `Taiwan`,
+#' `Thailand`, `Trinadad&Tobago`, `United-States`,
+#' `Vietnam`, and `Yugoslavia`.}
+#' \item{ABOVE50K}{a binary integere (0/1) mentionning whether INCOME is above 50K or not.}
+#' }
+#' @references A. Asuncion & D. J. Newman (2007): UCI Repository of Machine
+#' Learning Databases.  Irvine, CA: University of California, Department of
+#' Information and Computer Science.
+#'
+#' The data set was first cited in Kohavi, R. (1996): Scaling Up the Accuracy
+#' of Naive-Bayes Classifiers: a Decision-Tree Hybrid.  _Proceedings of
+#' the Second International Conference on Knowledge Discovery and Data Mining_.
+#' @source \url{https://www.ics.uci.edu/~mlearn/MLRepository.html}
+#' @keywords datasets
+#' @examples
+#' adult
+#'
+NULL
