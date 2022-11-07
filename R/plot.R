@@ -1,7 +1,7 @@
 #' @title plot.crossvar
 #' @description plot method for crossvar object.
 #' plot is the main function that will automatically dispatch to plot.crossvar_binary, plot.crossvar_categorical or plot.crossvar_continuous,
-#'  depending on taret type.
+#'  depending on target type.
 
 #' @param x object of class "crossvar"
 #' @param ... parameter to pass to plot.crossvar function specific for the target type.
@@ -38,15 +38,12 @@ plot.crossvar <- function(x,...){
 
 }
 
-#' @method plot crossvar_binary
 plot.crossvar_binary <- function(x,...){
   plot.crossvar_categorical(x,...)
 }
 
 
 
-#' @title plot.crossvar_numeric
-#' @description plot method for crossvar object with continuous/numeric  target.
 
 #' @param x object of class "crossvar"
 #' @param show character - determine on which data considered. By default, the value is "counts".
@@ -69,7 +66,6 @@ plot.crossvar_binary <- function(x,...){
 #' @param do_plot boolean - whether to effectively show the plot or not (internal use to combine plots)
 #' @param ... additional parameter
 #' @rdname plot.crossvar
-#' @return The function returns a ggplot graph
 #'
 #' @importFrom data.table setnames
 
@@ -79,6 +75,7 @@ plot.crossvar_numeric <- function(x,
                                   numvar_as=c("bin","value"),
                                   metadata = NULL,
                                   print_NA =  TRUE,
+                                  title = TRUE,
                                   do_plot=TRUE,
                                   ...){
   assertthat::assert_that(inherits(x,"crossvar"), msg = "the parameter x must to be an object of class crossvar")
@@ -217,12 +214,7 @@ plot.crossvar_numeric <- function(x,
 
   }
 
-  ## title for the graphics
-  if(is.null(metadata)){
-    str_title <- paste(x$targetname)
-  } else{
-    str_title <- paste(label(x$targetname, metadata))
-  }
+
   allplots <- plotValues(dfm) # Begin with non-NA values
 
   if (existmissing_var & print_NA==TRUE){
@@ -230,7 +222,19 @@ plot.crossvar_numeric <- function(x,
     allplots <-   gridExtra::arrangeGrob(allplots, plotNA, widths = c(8,2), nrow=1, top=str_title)
   } else {
     # Only main plot
-    allplots <- allplots+ggplot2::ggtitle(str_title)
+    ## add title
+    if (is.logical(title)){
+      if (title) {
+        str_title <- label(x$targetname, metadata=metadata)
+        allplots <- allplots + ggplot2:: ggtitle(str_title)
+      }
+
+    } else if (is.character(title)){
+      allplots <- allplots + ggplot2:: ggtitle(title)
+
+    }
+
+
   }
 if (do_plot) plot(allplots)
   allplots
@@ -238,9 +242,6 @@ if (do_plot) plot(allplots)
 }
 
 
-
-#' @title plot.crossvar_categorical
-#' @description plot method for crossvar object with binary/categorical  target.
 
 #' @param x object of class "crossvar"
 #' @param show character - determine on which data considered. By default, the value is "counts".
@@ -267,7 +268,6 @@ if (do_plot) plot(allplots)
 #' @param do_plot boolean - whether to effectively show the plot or not (internal use to combine plots)
 #' @param ... additional parameter
 #' @rdname plot.crossvar
-#' @return The function returns a ggplot graph
 
 #' @importFrom data.table melt
 plot.crossvar_categorical <- function(x,
@@ -279,6 +279,7 @@ plot.crossvar_categorical <- function(x,
                                       only_target_ref_level = FALSE,
                                       lim_y = TRUE,
                                       numvar_as=c("bin","value"),
+                                      title = TRUE,
                                       do_plot=TRUE,
                                       ...){
   ##option show allows to work on contigent table (counts) or percentage table (props)
@@ -554,7 +555,19 @@ plot.crossvar_categorical <- function(x,
 
   } else {
     # Only main plot
-    allplots <- allplots+ggplot2::ggtitle(str_title)
+    ## add title
+    if (is.logical(title)){
+      if (title) {
+        str_title <- label(x$targetname, metadata=metadata)
+        allplots <- allplots + ggplot2:: ggtitle(str_title)
+      }
+
+    } else if (is.character(title)){
+      allplots <- allplots + ggplot2:: ggtitle(title)
+
+    }
+
+
   }
   if (do_plot) plot(allplots)
   allplots
@@ -593,6 +606,7 @@ plot.crossvar_categorical <- function(x,
 plot_woe <- function(x,metadata = NULL,
                      print_NA = TRUE,
                      numvar_as=c("bin","value"),
+                     title = TRUE,
                      do_plot=TRUE,
                      ...){
 
@@ -673,11 +687,14 @@ plot_woe <- function(x,metadata = NULL,
 
 
   ## title for the graphics
-  if(is.null(metadata)){
-    str_title <- paste(x$targetname, 'explained by', x$varname)
-  } else{
-    str_title <- paste(label(x$targetname, metadata), 'explained by', label(x$varname, metadata))
-  }
+  str_title <- NULL
+  if (is.logical(title)){
+    if (title) {
+      str_title <- paste(x$targetname, 'explained by', x$varname)
+    } else {
+    str_title <- NULL
+    }} else str_title <- title
+
   allplots <- plotValues(dfm) # Begin with non-NA values
 
   if (existmissing_var & print_NA==TRUE){
@@ -686,9 +703,10 @@ plot_woe <- function(x,metadata = NULL,
     allplots <-   gridExtra::arrangeGrob(allplots, plotNA, widths = c(8,2), nrow=1, top=str_title)
   } else {
     # Only main plot
-    allplots <- allplots+ggplot2::ggtitle(str_title)
+    ## add title
+    if (!is.null(str_title))  allplots <- allplots + ggplot2:: ggtitle(str_title)
 
-  }
+
   if(do_plot) plot(allplots)
 
   allplots
@@ -707,6 +725,7 @@ plot_woe <- function(x,metadata = NULL,
 #' The label will be used for the title and the x-axis of the graph.
 #' @param max_ncat maximmum number of values/categories that will be displayed ( additional will be collapsed) - default: 15
 #' @param print_NA boolean: whether to display or not the NA possible category (default: TRUE)
+#' @param title either boolean or character. If boolean: do we plot (default generated ) title, if character, provided title wil be used
 #'
 #' @return The function returns a graph.
 #'
@@ -726,7 +745,11 @@ plot_woe <- function(x,metadata = NULL,
 #' @importFrom ggplot2 ggplot aes geom_point scale_color_manual theme_bw geom_hline geom_text ggtitle xlab ylab theme element_text scale_x_continuous
 #' @importFrom ggrepel geom_text_repel
 #' @importFrom scales label_comma
-quadrant_plot <- function(x,metadata=NULL, max_ncat=15, print_NA=TRUE){
+quadrant_plot <- function(x,
+                          metadata=NULL,
+                          max_ncat=15,
+                          print_NA=TRUE,
+                          title = TRUE){
 
   ##test
   assertthat::assert_that(inherits(x,"crossvar"), msg = "the parameter x must to be an object of class crossvar")
@@ -833,9 +856,6 @@ quadrant_plot <- function(x,metadata=NULL, max_ncat=15, print_NA=TRUE){
   #                label=prettyNum(target_mean),
   #                x=min(N)+0.95*(max(N)-min(N))), colour="darkorchid", angle=0, vjust = 1.2, size=3.5)
 
-  ## add title
-  str_title <- label(x$targetname, metadata=metadata)
-  p1 <- p1 + ggplot2:: ggtitle(str_title)
 
   ## add title for axis x and axis y
   p1 <- p1 + ggplot2::xlab("N records")
@@ -851,6 +871,18 @@ quadrant_plot <- function(x,metadata=NULL, max_ncat=15, print_NA=TRUE){
 
   ##hide legend
   p1 <- p1 + ggplot2::theme(legend.position="none")
+
+  ## add title
+  if (is.logical(title)){
+    if (title) {
+      str_title <- label(x$targetname, metadata=metadata)
+      p1 <- p1 + ggplot2:: ggtitle(str_title)
+    }
+
+  } else if (is.character(title)){
+    p1 <- p1 + ggplot2:: ggtitle(title)
+
+  }
 
   ## return graph
   return(p1)
