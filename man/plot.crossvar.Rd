@@ -71,19 +71,11 @@ The label will be used for the title and the x-axis of the graph.}
 }
 \value{
 The function returns a ggplot graph
-
-The function returns a ggplot graph
-
-The function returns a ggplot graph
 }
 \description{
 plot method for crossvar object.
 plot is the main function that will automatically dispatch to plot.crossvar_binary, plot.crossvar_categorical or plot.crossvar_continuous,
- depending on taret type.
-
-plot method for crossvar object with continuous/numeric  target.
-
-plot method for crossvar object with binary/categorical  target.
+ depending on target type.
 }
 \examples{
 t <- crossvar(adult,target="ABOVE50K", var="AGE",)

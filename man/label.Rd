@@ -2,7 +2,7 @@
 % Please edit documentation in R/utilities.R
 \name{label}
 \alias{label}
-\title{Add label to a var}
+\title{label: add label to a var}
 \usage{
 label(var, metadata, var_field = "var", label_field = "LABEL", lang = NULL)
 }
@@ -27,6 +27,6 @@ Obviously, this function can be applied only if a metadata exists
 }
 \examples{
 \dontrun{
-label(adult$EDUCATIONNUM, metadata=mymetadata) # assumes mymetadata file exists
+label(adult$EDUCATIONNUM, metadata=mymetadata) # assumes mymetadata dataframe exists
 }
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/targeter.R
 \name{targeter}
 \alias{targeter}
-\title{Function targeter()}
+\title{targeter}
 \usage{
 targeter(
   data,

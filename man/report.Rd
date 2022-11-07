@@ -2,7 +2,7 @@
 % Please edit documentation in R/report.R
 \name{report}
 \alias{report}
-\title{Function report()}
+\title{report}
 \usage{
 report(
   object,
