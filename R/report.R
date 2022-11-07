@@ -1,6 +1,5 @@
-#' Function report()
-#'
-#'This function creates an automatic report according to a predefined template in the package or a user-generated template.
+#' @title report
+#' @description This function creates an automatic report according to a predefined template in the package or a user-generated template.
 #'
 #' @param object an object of calss "targeter".
 #' @param template template file path. By default, it put to NULL and take the default template.
