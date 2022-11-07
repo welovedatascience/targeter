@@ -1,6 +1,6 @@
-#' Add label to a var
+#' @title label: add label to a var
 #'
-#' This functions allows to add a label to var. It's useful for the graphics or the reports.
+#' @description This functions allows to add a label to var. It's useful for the graphics or the reports.
 #' Obviously, this function can be applied only if a metadata exists
 #'
 #' @param var character - the name of the var(s) that we want to remplace by the label, could be a vector
@@ -14,7 +14,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' label(adult$EDUCATIONNUM, metadata=mymetadata) # assumes mymetadata file exists
+#' label(adult$EDUCATIONNUM, metadata=mymetadata) # assumes mymetadata dataframe exists
 #' }
 label <- function(var, metadata, var_field="var", label_field="LABEL",lang=NULL){
   ##test

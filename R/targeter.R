@@ -1,6 +1,5 @@
-#' Function targeter()
-#'
-#'For each variable, the function crosses two variables: a target to be explained and an explanatory variable.
+#' @title targeter
+#' @description For each variable, the function crosses two variables: a target to be explained and an explanatory variable.
 #'For this purpose, these variables are converted in categorical variables by a binning process and the statistics
 #'are derived.
 #'\itemize{

@@ -1,6 +1,3 @@
-
-
-
 #' @title summary.targeter
 #' @description summary method for targeter object
 #' @param object an object of class targeter
