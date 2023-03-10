@@ -68,7 +68,11 @@ report <- function(object,
   }
   if(!is.null(ntop)){
     object <- focus(object, n = ntop, force_vars = force_vars,
-                    summary_object = summary_object )}
+                    summary_object = summary_object )
+
+  }
+
+  summary_object<- summary_object[varname %in% names(object$profiles)]
   # attr(object, 'metadata') <- metadata
 
   if (is.null(template)){

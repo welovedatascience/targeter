@@ -9,6 +9,7 @@ plot_woe(
   metadata = NULL,
   print_NA = TRUE,
   numvar_as = c("bin", "value"),
+  title = TRUE,
   do_plot = TRUE,
   ...
 )
@@ -26,6 +27,8 @@ The label will be used for the title and the x-axis of the graph.}
 \item bin (default) - display WOE for adjacent binning without respecting variable raw values
 \item value - plot WOE using centers of binning classes, thus respecting variable raw values
 }}
+
+\item{title}{boolean: do we plot default generated title Y/N or character (override title) - default: TRUE}
 
 \item{do_plot}{boolean - whether to effectively show the plot or not (internal use to combine plots)}
 

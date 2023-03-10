@@ -4,7 +4,7 @@
 \alias{quadrant_plot}
 \title{quadrant_plot}
 \usage{
-quadrant_plot(x, metadata = NULL, max_ncat = 15, print_NA = TRUE)
+quadrant_plot(x, metadata = NULL, max_ncat = 15, print_NA = TRUE, title = TRUE)
 }
 \arguments{
 \item{x}{object of class "crossvar"}
@@ -15,6 +15,8 @@ The label will be used for the title and the x-axis of the graph.}
 \item{max_ncat}{maximmum number of values/categories that will be displayed ( additional will be collapsed) - default: 15}
 
 \item{print_NA}{boolean: whether to display or not the NA possible category (default: TRUE)}
+
+\item{title}{either boolean or character. If boolean: do we plot (default generated ) title, if character, provided title wil be used}
 }
 \value{
 The function returns a graph.

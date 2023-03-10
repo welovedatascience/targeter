@@ -15,6 +15,7 @@
   numvar_as = c("bin", "value"),
   metadata = NULL,
   print_NA = TRUE,
+  title = TRUE,
   do_plot = TRUE,
   ...
 )
@@ -29,6 +30,7 @@
   only_target_ref_level = FALSE,
   lim_y = TRUE,
   numvar_as = c("bin", "value"),
+  title = TRUE,
   do_plot = TRUE,
   ...
 )
@@ -60,6 +62,8 @@
 The label will be used for the title and the x-axis of the graph.}
 
 \item{print_NA}{boolean - By default, the value is TRUE. If FALSE, the missing values of the variable are not printed.}
+
+\item{title}{boolean: do we plot default generated title Y/N or character (override title) - default: TRUE}
 
 \item{do_plot}{boolean - whether to effectively show the plot or not (internal use to combine plots)}
 

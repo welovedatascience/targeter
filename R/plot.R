@@ -63,6 +63,7 @@ plot.crossvar_binary <- function(x,...){
 #' @param metadata data.frame - if metadata is  loaded in R environment, label of the variables can be used. Default value (NULL) corresponds to no metadata available.
 #' The label will be used for the title and the x-axis of the graph.
 #' @param print_NA boolean - By default, the value is TRUE. If FALSE, the missing values of the variable are not printed.
+#' @param title boolean: do we plot default generated title Y/N or character (override title) - default: TRUE
 #' @param do_plot boolean - whether to effectively show the plot or not (internal use to combine plots)
 #' @param ... additional parameter
 #' @rdname plot.crossvar
@@ -101,8 +102,9 @@ plot.crossvar_numeric <- function(x,
     return(plot_woe(x,
                     metadata = metadata,
                     print_NA = print_NA,
-                    numvar_as=numvar_as,
-                    do_plot=do_plot))
+                    numvar_as = numvar_as,
+                    title = title,
+                    do_plot = do_plot))
   }
   df <- x$stats
   ##reorder the table:
@@ -219,7 +221,8 @@ plot.crossvar_numeric <- function(x,
 
   if (existmissing_var & print_NA==TRUE){
     plotNA <- plotValues(dfm.NA,forNA=TRUE)
-    allplots <-   gridExtra::arrangeGrob(allplots, plotNA, widths = c(8,2), nrow=1, top=str_title)
+
+    allplots <-   gridExtra::arrangeGrob(allplots, plotNA, widths = c(8,2), nrow=1)
   } else {
     # Only main plot
     ## add title
@@ -265,6 +268,7 @@ if (do_plot) plot(allplots)
 #' @param only_target_ref_level boolean - By default, the value is FALSE. If TRUE, only print the values for the target TRUE.
 #' @param lim_y  boolean - By default, the value is TRUE. The axis y for the proportion is limited between 0 and 100.
 #' @param numvar_as character, one of "bin" (default),"value": how to display (binned) numeric explanatory variable. 'Bin' will display bins side by side without taking into accounts real values of variable whereas as 'value' will center all bars at bins centers.
+#' @param title boolean: do we plot default generated title Y/N or character (override title) - default: TRUE
 #' @param do_plot boolean - whether to effectively show the plot or not (internal use to combine plots)
 #' @param ... additional parameter
 #' @rdname plot.crossvar
@@ -542,16 +546,11 @@ plot.crossvar_categorical <- function(x,
   }
 
   ## title for the graphics
-  if(is.null(metadata)){
-    str_title <- paste(x$targetname)
-  } else{
-    str_title <- paste(label(x$targetname, metadata))
-  }
   allplots <- plotValues(dfm) # Begin with non-NA values
 
   if (existmissing_var & print_NA==TRUE){
     plotNA <- plotValues(dfm.NA,forNA=TRUE)
-    allplots <-   gridExtra::arrangeGrob(allplots, plotNA, widths = c(8,2), nrow=1, top=str_title)
+    allplots <-   gridExtra::arrangeGrob(allplots, plotNA, widths = c(8,2), nrow=1)
 
   } else {
     # Only main plot
@@ -585,6 +584,7 @@ plot.crossvar_categorical <- function(x,
 #'\item bin (default) - display WOE for adjacent binning without respecting variable raw values
 #'\item value - plot WOE using centers of binning classes, thus respecting variable raw values
 #'}
+#' @param title boolean: do we plot default generated title Y/N or character (override title) - default: TRUE
 #' @param do_plot boolean - whether to effectively show the plot or not (internal use to combine plots)
 #' @param ... extra parameters (not used currently)
 #' @return plot a graph and returns its ggplot2 object
@@ -605,13 +605,13 @@ plot.crossvar_categorical <- function(x,
 #' @importFrom gridExtra grid.arrange
 plot_woe <- function(x,metadata = NULL,
                      print_NA = TRUE,
-                     numvar_as=c("bin","value"),
+                     numvar_as=c('bin','value'),
                      title = TRUE,
                      do_plot=TRUE,
                      ...){
 
   # type <- match.arg(type, c("bars","line"), several.ok = FALSE)
-  numvar_as <- match.arg(numvar_as, c("bin","value"), several.ok = FALSE)
+  numvar_as <- match.arg(numvar_as, c('bin','value'), several.ok = FALSE)
 
   ## selection of the appropriate tables
   df <- as.data.frame.matrix(x[['woe']])
@@ -693,19 +693,15 @@ plot_woe <- function(x,metadata = NULL,
       str_title <- paste(x$targetname, 'explained by', x$varname)
     } else {
     str_title <- NULL
-    }} else str_title <- title
-
+    }
+    } else str_title <- title
   allplots <- plotValues(dfm) # Begin with non-NA values
 
   if (existmissing_var & print_NA==TRUE){
     plotNA <- plotValues(dfm.NA,forNA=TRUE)
-    # print(str_title)
-    allplots <-   gridExtra::arrangeGrob(allplots, plotNA, widths = c(8,2), nrow=1, top=str_title)
-  } else {
-    # Only main plot
-    ## add title
-    if (!is.null(str_title))  allplots <- allplots + ggplot2:: ggtitle(str_title)
-
+    allplots <-   gridExtra::arrangeGrob(allplots, plotNA, widths = c(8,2), nrow=1)
+  }
+  if (!is.null(str_title))  allplots <- allplots + ggplot2:: ggtitle(str_title)
 
   if(do_plot) plot(allplots)
 
@@ -873,16 +869,20 @@ quadrant_plot <- function(x,
   p1 <- p1 + ggplot2::theme(legend.position="none")
 
   ## add title
+
+
+  str_title <- NULL
   if (is.logical(title)){
     if (title) {
-      str_title <- label(x$targetname, metadata=metadata)
-      p1 <- p1 + ggplot2:: ggtitle(str_title)
+      str_title <- paste(x$targetname, 'explained by', x$varname)
+    } else {
+      str_title <- NULL
     }
+  } else str_title <- title
 
-  } else if (is.character(title)){
-    p1 <- p1 + ggplot2:: ggtitle(title)
+  if (!is.null(str_title))  p1 <- p1 + ggplot2:: ggtitle(str_title)
 
-  }
+
 
   ## return graph
   return(p1)

@@ -25,7 +25,13 @@ library(targeter)
 library(data.table)
 library(ggplot2)
 library(DT)
+
+source('/hackdata/share/code/R/packages/targeter/R/plot.R', local=TRUE)
+source('/hackdata/share/code/R/packages/targeter/R/fullplot.R', local=TRUE)
+
 ```
+
+
 
 ```{r, eval=FALSE}
 metadata <- attr(object, "metadata")
@@ -74,16 +80,16 @@ cat("\n Analyzed population contains ",Ntot," records.")
 
 if(!is.null(object$description_target)) {
   cat(object$description_target[[1]])} else{
-     cat("No description of the target has been provided uring the analysis")}
+     cat("No description of the target has been provided during the analysis.")}
 
-cat("  \n Target statistic")
+cat("  \n Target statistics:")
 # knitr::kable(stats, format=format_tables)
 if (format_tables=="word"){
    flextable::set_flextable_defaults(font.size = 11)
   flextable::qflextable(stats)
   
 } else if (format_tables=="html") {
-  kableExtra::kable_styling(knitr::kable(stats, format=format_tables))
+  suppressWarnings(kableExtra::kable_styling(knitr::kable(stats, format=format_tables)))
 } else if (format_tables=="latex"){
     knitr::kable(stats, format= "latex", booktabs = TRUE)
     }
@@ -142,7 +148,7 @@ DT::datatable(df2, rownames = FALSE, filter="top",
 ## Variables
 
 
-```{r, results='asis', echo=FALSE, fig.height=4.5, fig.width=9, fig.align='center'}
+```{r, results='asis', echo=FALSE, fig.height=8, fig.width=9, fig.align='center'}
 # varnames <- sapply(object$profiles, function(x) x$varname)
 varnames <- summary_object$varname
 
@@ -164,48 +170,8 @@ cat("\n\n### ",label(ivar, metadata=metadata),"\n")
 }
 
 cat("\n__IV:", round(iprofile$IV,6),"__\n\n")
+print(fullplot(iprofile))
 
-invisible(suppressWarnings(
-  g1 <- plot.crossvar(iprofile, show='boxplot', 
-                      metadata=metadata,
-                      print_NA=TRUE, do_plot=FALSE,
-                      numvar_as = 'value')))
- 
-invisible(suppressWarnings(
- g2 <- plot.crossvar(iprofile, 
-                     show="count", 
-                     type="bars",
-                     metadata=metadata,
-                     print_NA=TRUE,do_plot=FALSE,
-                     numvar_as = 'value')
-   )) 
-# print(cowplot::plot_grid(g1,g2))
-# patchwork::wrap_plots(g1, g2)
- suppressWarnings(gridExtra::grid.arrange(g1, g2, ncol=2))
- # if(object$target_binary == TRUE){
-invisible(suppressWarnings(
- g3 <- plot.crossvar(iprofile, 
-                     show="woe", 
-                     type="bars",
-                     metadata=metadata,
-                     print_NA=TRUE,do_plot=FALSE,
-                     numvar_as = 'bin')
-   )) 
-
-if (iprofile$variable_type %in% c('character')) {
-   suppressWarnings(g4 <- quadrant_plot(iprofile, metadata=metadata))
-} else {
-    # g4 <- ggplot() + theme_void()
-   g4 <- plot.crossvar(iprofile, 
-                     show="avg", 
-                     type="line",
-                     metadata=metadata,
-                     print_NA=TRUE,do_plot=FALSE,
-                     numvar_as = 'value')
-
-}
- 
- gridExtra::grid.arrange(g3, g4, ncol=2)
 cat('\\pagebreak')
  
 #   

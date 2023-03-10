@@ -81,9 +81,9 @@ cat("\n Analyzed population contains ",Ntot," records.")
 
 if(!is.null(object$description_target)) {
   cat(object$description_target[[1]])} else{
-     cat("No description of the target has been provided uring the analysis")}
+     cat("No description of the target has been provided during the analysis.")}
 
-cat("  \n Target statistic")
+cat("  \n Target statistics:")
 stats[, reference_level:=ifelse(as.character(value)==as.character(object$target_reference_level), "*","")]
 # knitr::kable(stats, format=format_tables)
 if (format_tables=="word"){
@@ -91,7 +91,7 @@ if (format_tables=="word"){
   flextable::qflextable(stats)
   
 } else if (format_tables=="html") {
-  kableExtra::kable_styling(knitr::kable(stats, format=format_tables))
+  suppressWarnings(kableExtra::kable_styling(knitr::kable(stats, format=format_tables)))
 } else if (format_tables=="latex"){
     knitr::kable(stats, format= "latex", booktabs = TRUE)
     }
@@ -140,7 +140,7 @@ DT::datatable(df2, rownames = FALSE, filter="top",
 
 ## Variables
 
-```{r, results='asis', echo=FALSE, fig.height=4.5, fig.width=9, fig.align='center'}
+```{r, results='asis', echo=FALSE, fig.height=8, fig.width=9, fig.align='center'}
 # varnames <- sapply(object$profiles, function(x) x$varname)
 varnames <- summary_object$varname
 
@@ -161,35 +161,8 @@ cat("\n\n### ",label(ivar, metadata=metadata),"\n")
   
 }
 
-cat("\n__IV:", round(iprofile$IV,3),"__\n\n")
-
-invisible(suppressWarnings(
-  g1 <- plot(iprofile, 
-                      metadata=metadata,
-                      print_NA=TRUE, do_plot=FALSE,
-                      numvar_as = 'value')))
- 
-invisible(suppressWarnings(
- g2 <- plot(iprofile, 
-                     show="props", 
-                     type="l",
-                     metadata=metadata,
-                     print_NA=TRUE,do_plot=FALSE,
-                     only_target_ref_level =TRUE, 
-                     numvar_as = 'value')
-   )) 
- suppressWarnings(gridExtra::grid.arrange(g1, g2, ncol=2))
-
- 
-invisible(suppressWarnings(g3 <- plot_woe(iprofile, metadata=metadata,do_plot=FALSE)))
- 
-if (iprofile$variable_type %in% c('character')) {
-   suppressWarnings(g4 <- quadrant_plot(iprofile, metadata=metadata))
-} else {
-    g4 <- ggplot() + theme_void()
-
-}
- gridExtra::grid.arrange(g3, g4, ncol=2)
+  cat("\n__IV:", round(iprofile$IV,3),"__\n\n")
+  print(fullplot(iprofile))
 }
 ```
 
