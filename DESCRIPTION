@@ -3,8 +3,8 @@ Type: Package
 Title: The Another Report Generation Engine for Target Exploration in R
 Version: 0.5.1
 Authors@R: c(
-    person("Eric","Lecoutre",email = "eric.lecoutre@welovedatascience.com", role = c("aut", "cre")),
-    person("Emilie", "Lejeune", email = "emilie.lejeune@welovedatscience.com", role = "aut")
+    person("Eric","Lecoutre", email = "eric.lecoutre@welovedatascience.com", role = c("aut", "cre")),
+    person("Emilie", "Lejeune", email = "emilie.lejeune@welovedatscience.com", role = "aut"),
     person("WeLoveDataScience", role = c("cph", "fnd")))
 Description: Automated Explanatory Data Analysis (EDA) for targets exploration. Describes a target (binary/nominal/continuous) by crossing
     it with any other candidate explanatory variables. Generates aggregated statistics
