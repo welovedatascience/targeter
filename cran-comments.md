@@ -1,8 +1,6 @@
-## R CMD check results
+## targeter
 
-Apologies for guilty posting, .md files in wrong folder...
-
-### 20230911 - NOTES
+## targeter 0.5.1 - NOTES
 
 * This is a new release: first public version
 
