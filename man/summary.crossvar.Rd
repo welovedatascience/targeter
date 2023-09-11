@@ -27,7 +27,7 @@ a one-row data.table
 summary method for crossvar object
 }
 \details{
-Returned table contains one row for the crossvar explanatory variable analysed in targeter and columns for associations measures / metrics.
+Returned table contains one row for the crossvar explanatory variable analyzed in targeter and columns for associations measures / metrics.
 }
 \examples{
  data(adult)
