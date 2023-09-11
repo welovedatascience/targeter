@@ -7,7 +7,7 @@
 label(var, metadata, var_field = "var", label_field = "LABEL", lang = NULL)
 }
 \arguments{
-\item{var}{character - the name of the var(s) that we want to remplace by the label, could be a vector}
+\item{var}{character - the name of the var(s) that we want to replace by the label, could be a vector}
 
 \item{metadata}{data.frame - if we have a metadata loaded in your R, you can use to take the label of the vars.}
 
@@ -15,7 +15,7 @@ label(var, metadata, var_field = "var", label_field = "LABEL", lang = NULL)
 
 \item{label_field}{- character: name of the column in metadata that contains variable label (default: 'LABEL')}
 
-\item{lang}{character - the code for the language. It's useful if you have a metadata with different labels for differents languages.
+\item{lang}{character - the code for the language. It's useful if you have a metadata with different labels for different languages.
 By default, the value is NULL.}
 }
 \value{

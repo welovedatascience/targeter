@@ -41,10 +41,10 @@ By default, 100.}
 only the observations that have criteria >= min_criteria.}
 
 \item{force_vars}{- character, list of variables that will be
-kept and then won't never be filterered.}
+kept and then won't never be filtered.}
 
 \item{summary_object}{- By default NULL. If provided, must be
-precomputed summary on x callcross var object}
+pre-computed summary on x callcross var object}
 }
 \value{
 It returns the filtered input object.

@@ -13,7 +13,7 @@ crossvar(data, target, var, ...)
 
 \item{var}{character - name of the candidate variable to be crossed with target}
 
-\item{...}{Additional parameter to be passeed to \code{\link[targeter]{targeter}}}
+\item{...}{Additional parameter to be passed to \code{\link[targeter]{targeter}}}
 }
 \value{
 returns an object of class crossvar
@@ -25,7 +25,7 @@ this is a convenience function that behind the scene calls complete \code{\link[
 }
 \details{
 content of returned object depends on the type of the target (binary/categorical/continuous.)
- For more information, look at the documentation of the crosssvar class.
+ For more information, look at the documentation of the crossvar class.
 }
 \examples{
 \dontrun{

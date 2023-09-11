@@ -52,7 +52,7 @@ with levels `Amer-Indian-Eskimo`, `Asian-Pac-Islander`,
 `Puerto-Rico`, `Scotland`, `South`, `Taiwan`,
 `Thailand`, `Trinadad&Tobago`, `United-States`,
 `Vietnam`, and `Yugoslavia`.}
-\item{ABOVE50K}{a binary integere (0/1) mentionning whether INCOME is above 50K or not.}
+\item{ABOVE50K}{a binary integer (0/1) mentioning whether INCOME is above 50K or not.}
 }
 }
 \source{

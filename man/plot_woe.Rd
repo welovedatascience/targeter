@@ -22,7 +22,7 @@ The label will be used for the title and the x-axis of the graph.}
 
 \item{print_NA}{boolean. Should we display WOE for NA values of the explanatory variable. Default: TRUE}
 
-\item{numvar_as}{character. How should continuous explanatorey variables be displayed:
+\item{numvar_as}{character. How should continuous explanatory variables be displayed:
 #'\itemize{
 \item bin (default) - display WOE for adjacent binning without respecting variable raw values
 \item value - plot WOE using centers of binning classes, thus respecting variable raw values

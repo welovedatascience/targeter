@@ -15,13 +15,17 @@ explore(
 \arguments{
 \item{object}{a targeter object}
 
-\item{summary_object}{optional: pre-computed summary object (see \code{\link{summary.targeter}}), Default: NULL}
+\item{summary_object}{optional: pre-computed summary object
+(see \code{\link{summary.targeter}}), Default: NULL}
 
-\item{metadata}{optional: metadata to use to display variables labels, Default: NULL}
+\item{metadata}{optional: metadata to use to display variables labels,
+default: NULL}
 
-\item{display}{character, one of 'dialog', 'browser': how to open the shiny app/gadget (default: dialog)}
+\item{display}{character, one of 'dialog', 'browser':
+how to open the shiny app/gadget (default: dialog)}
 
-\item{...}{additional parameters to be used by summary.targeter function (when no summary object are passed)}
+\item{...}{additional parameters to be used by summary.targeter
+function (when no summary object are passed)}
 }
 \value{
 NULL (side effect: open gadget)
@@ -31,10 +35,10 @@ shiny small app to explore a targeter object.
 }
 \examples{
 \dontrun{
-if(interactive()){
-x <- targeter(adult,target ="ABOVE50K")
-explore(x)
- }
+if (interactive()) {
+  x <- targeter(adult, target = "ABOVE50K")
+  explore(x)
+}
 }
 }
 \seealso{

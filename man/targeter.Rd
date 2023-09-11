@@ -39,10 +39,10 @@ targeter(
 
 \item{target}{character - name of the variable to explain.}
 
-\item{target_type}{charater: type of target - one of 'autoguess' (default), 'binary','categorical' (>2 modalities) or 'numeric'.
-ExpParameter expansion if applied so that one could also use 'a'or 'b','c' or 'n'}
+\item{target_type}{character: type of target - one of 'autoguess' (default), 'binary','categorical' (>2 modalities) or 'numeric'.
+ExpParameter expansion if applied so that one could also use 'a' or 'b','c' or 'n'}
 
-\item{target_reference_level}{character or numeric. For categorical or (espcially) binary targets, level / value of special
+\item{target_reference_level}{character or numeric. For categorical or (especially) binary targets, level / value of special
 TRUE or 1 or 'bad' for binary targets.
 that}
 
@@ -67,7 +67,7 @@ Method used to derive the `nbins` buckets for the continuous explanatory variabl
 \item The value "no" doesn't take in consideration the missing values in any case.
 }}
 
-\item{verbose}{- boolean (default FALSE). If TRUE some more information is displayed in console. COuld be usefull
+\item{verbose}{- boolean (default FALSE). If TRUE some more information is displayed in console. Could be useful
 when using package on big data.}
 
 \item{dec}{- integer : the number of decimal for numeric variable. By default, the value is 2.}
@@ -82,7 +82,7 @@ when using package on big data.}
 }}
 
 \item{cont_target_trim}{numeric (default 0.01). For continuous targets, it is desirable to trim
-extrem values before computing WOE. This is the trimming factor in percentage (between 0: no trim and <1).}
+extreme values before computing WOE. This is the trimming factor in percentage (between 0: no trim and <1).}
 
 \item{bxp_factor}{(default) 1.5 for continuous target, coefficient to be used to compute boxplot whiskers.}
 
@@ -110,14 +110,13 @@ The function returns a list of class "targeter".
 This list is composed of this following elements:
 \itemize{
 \item dataname - name of the analyzed dataset.
-\item target - name of the target.
 \item description_data text about the description of data
-\item description_target text about the description of target
+\item target - name of the target.
 \item target_type - Target type, one of autoguess (default)/binary/numeric/categorical (text is expended so "b" also works for binary)
-\item target_stats - summary statistics on target
-\item analysis - name of the analysis
-\item date - date of the analysis
-\item profiles : list of elements containing the result the individual crossing per variable
+\item description_target text about the description of target
+\item analysis - name of the analysis.
+\item date - date of the analysis.
+\item profiles : list of elements containing the result the individual crossing per variable.
 See crossvar class documentation.
 }
 }
@@ -131,10 +130,10 @@ are derived.
 \item An index is calculated as the proportion of profiles per class and modality divided by the proportion of the modality of all profiles (=proportion / (sum of column counts/sum of all counts)).
 \itemize{
 \item If the value of the index is high (more than one), it implies that
-for this subpopulation is overrepresented for this variable.
-\item If the value of the index is equal to 1, the criterium is not signifiant
+for this subpopulation is over-represented for this variable.
+\item If the value of the index is equal to 1, the criterium is not significant
 \item If the value of the index is less than 1, it implies that
-for this subpopulation is subrepresented for this variable.
+for this subpopulation is sub-represented for this variable.
 }
 \item Weight of Evidence and Information Value are derived for binary and continuous targets.
 }

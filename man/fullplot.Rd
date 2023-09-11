@@ -13,45 +13,64 @@ fullplot(
   only_target_ref_level = TRUE,
   lim_y = TRUE,
   title = TRUE,
-  subtitle = TRUE
+  subtitle = TRUE,
+  which_plot = 1:2
 )
 }
 \arguments{
 \item{x}{object of class 'crossvar' or 'targeter'}
 
-\item{var}{character, used when x is a targeter object to select the variable of interest (crossvar in x$profiles slot)}
+\item{var}{character, used when x is a targeter object to select the variable
+of interest (crossvar in x$profiles slot)}
 
 \item{numvar_as}{character, one of 'value' (default) and 'bin'}
 
-\item{metadata}{data.frame - if metadata is  loaded in R environment, label of the variables can be used. Default value (NULL) corresponds to no metadata available.
+\item{metadata}{data.frame - if metadata is  loaded in R environment, label
+of the variables can be used. Default value (NULL) corresponds to no metadata
+available.
 The label will be used for the title and the x-axis of the graph.}
 
-\item{print_NA}{boolean - By default, the value is TRUE. If FALSE, the missing values of the variable are not printed.}
+\item{print_NA}{boolean - By default, the value is TRUE. If FALSE, the
+missing values of the variable are not printed.}
 
-\item{only_target_ref_level}{boolean - By default, the value is FALSE. If TRUE, only print the values for the target TRUE.}
+\item{only_target_ref_level}{boolean - By default, the value is FALSE.
+If TRUE, only print the values for the target TRUE.}
 
-\item{lim_y}{boolean - By default, the value is TRUE. The axis y for the proportion is limited between 0 and 100.}
+\item{lim_y}{boolean - By default, the value is TRUE.
+The axis y for the proportion is limited between 0 and 100.}
 
-\item{title}{boolean: do we plot default generated title Y/N or character (override title) - default: TRUE}
+\item{title}{boolean: do we plot default generated title Y/N or character
+(override title) - default: TRUE}
 
-\item{subtitle}{boolean: do we plot default generated subtitle Y/N or character (override subtitle)- default: TRUE}
+\item{subtitle}{boolean: do we plot default generated subtitle Y/N
+or character (override subtitle)- default: TRUE}
+
+\item{which_plot}{integer: which plots must contain the full plot
+using: binary targets:  1 for counts, 2 for percentages, 3 for WOE and
+4 for quadrant. For numeric targets: 1 for boxplots, 2 for counts, 3 for
+WoE and 4 for quadrant plot.
+Default: 1:2}
 }
 \value{
 The function returns a ggplot graph
 }
 \description{
-autoplot method for crossvar OR targrter object (with a variable specification).
+autoplot method for crossvar OR targeter object 
+(with a variable specification).
 draws the combination of 4 selected plots/
 }
 \examples{
-C <- crossvar(adult,target="ABOVE50K", var="AGE")
+C <- crossvar(adult, target = "ABOVE50K", var = "AGE")
 fullplot(C)
 
-CN <- crossvar(adult,target="AGE", var="SEX")
-fullplot(CN, title='this is my title', subtitle=FALSE)
+CN <- crossvar(adult, target = "AGE", var = "SEX")
+fullplot(CN, title = "this is my title", subtitle = FALSE)
 
-t <- targeter(adult,target="ABOVE50K")
-fullplot(t, var = 'AGE', numvar_as = 'bin')
+t <- targeter(adult, target = "ABOVE50K")
+fullplot(t, var = "AGE", numvar_as = "bin")
+t <- targeter(adult, target = "ABOVE50K")
+fullplot(t, var = "AGE", numvar_as = "bin", which_plot = 1:4)
+fullplot(t, var = "EDUCATION", numvar_as = "bin", which_plot = 2:3)
 }
 \seealso{
 \itemize{

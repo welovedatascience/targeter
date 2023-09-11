@@ -32,16 +32,16 @@ report(
 
 \item{ntop}{integer - number of variables to show in the report. For more information, see the function focus By default, NULL i.e. all variables are taken.}
 
-\item{nmin}{integer - minimum number of profiles in the seleected class. For more information, see the function focus.}
+\item{nmin}{integer - minimum number of profiles in the selected class. For more information, see the function focus.}
 
 \item{criteria}{character - By default, the value is index.max.index. For more information, see the function focus.}
 
-\item{min_criteria}{- By default NULL. If it's speciefied, only the observations which have criteria >= min_criteria.}
+\item{min_criteria}{- By default NULL. If it's specified, only the observations which have criteria >= min_criteria.}
 
 \item{metadata}{data.frame - if metadata is  loaded in R environment, label of the variables can be used. Default value (NULL) corresponds to no metadata available.
 The label will be used for the title and the x-axis of the graph.}
 
-\item{force_vars}{- character, list of variables that will be kept and then won't never be filterered.}
+\item{force_vars}{- character, list of variables that will be kept and then won't never be filtered.}
 
 \item{output_format}{- By default it's html. For a pdf, output_format="pdf_document" and for a word, output_format="word_document".}
 
