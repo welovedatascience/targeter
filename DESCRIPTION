@@ -2,7 +2,7 @@ Package: targeter
 Type: Package
 Title: The Another Report Generation Engine for Target Exploration in R
 Version: 0.5.1
-Author@R: c(
+Authors@R: c(
     person("Eric","Lecoutre",email = "eric.lecoutre@welovedatascience.com", role = c("aut", "cre")),
     person("Emilie", "Lejeune", email = "emilie.lejeune@welovedatscience.com", role = "aut")
     person("WeLoveDataScience", role = c("cph", "fnd")))
