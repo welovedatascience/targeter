@@ -721,7 +721,7 @@ plot_woe <- function(x,metadata = NULL,
 #' The label will be used for the title and the x-axis of the graph.
 #' @param max_ncat maximum number of values/categories that will be displayed ( additional will be collapsed) - default: 15
 #' @param print_NA boolean: whether to display or not the NA possible category (default: TRUE)
-#' @param title either boolean or character. If boolean: do we plot (default generated ) title, if character, provided title wil be used
+#' @param title either boolean or character. If boolean: do we plot (default generated ) title, if character, provided title will be used
 #'
 #' @return The function returns a graph.
 #'

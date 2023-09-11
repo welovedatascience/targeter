@@ -38,7 +38,7 @@
 #' \item The value "ifany" takes in consideration the missing values if there are any.
 #' \item The value "no" doesn't take in consideration the missing values in any case.
 #' }
-#' @param verbose - boolean (default FALSE). If TRUE some more information is displayed in console. Could be usefull
+#' @param verbose - boolean (default FALSE). If TRUE some more information is displayed in console. Could be useful
 #' when using package on big data.
 #' @param dec - integer : the number of decimal for numeric variable. By default, the value is 2.
 #' @param order_label character - this option output an order used for the plot function. The parameter can only take the following values:
