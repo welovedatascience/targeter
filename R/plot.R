@@ -49,7 +49,7 @@ plot.crossvar_binary <- function(x,...){
 #' @param show character - determine on which data considered. By default, the value is "counts".
 #'  This parameter can only take the following values:
 #' \itemize{
-#' \item "counts" : the data used is the contigency table created by the function crossvar.
+#' \item "counts" : the data used is the contingency table created by the function crossvar.
 #' \item "props" : the data used is the proportion table created by the function crossvar.
 #' \item "index" : the data used is the index table created by the function crossvar.
 #' }

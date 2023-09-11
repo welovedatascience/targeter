@@ -240,7 +240,7 @@ fullplot <- function(x,
       }
     }
   } else {
-    stop("target type not handled by autoplot")
+    stop("target type not handled by fullplot")
   }
   expr <- paste("g", which_plot, sep = "", collapse = ",")
   expr <- paste0("patchwork::wrap_plots(", expr, ")")

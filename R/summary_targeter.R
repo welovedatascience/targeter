@@ -6,7 +6,7 @@
 #' @param ... additional parameters (currently not used)
 #' @return a data.table summary table
 #' @details summary method invoked on a targeter object loops over all individual profiles/crossvar/associations and derive statistics (cf \code{\link{summary.crossvar}}).
-#' Returned table contains thus one row per explanatory variable analysed in targeter and columns for associations measures / metrics.
+#' Returned table contains thus one row per explanatory variable analyzed in targeter and columns for associations measures / metrics.
 #'
 #' @examples
 #' data(adult)
