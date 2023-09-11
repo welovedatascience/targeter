@@ -48,13 +48,8 @@
 #'
 #' CN <- crossvar(adult, target = "AGE", var = "SEX")
 #' fullplot(CN, title = "this is my title", subtitle = FALSE)
-#'
-#' t <- targeter(adult, target = "ABOVE50K")
-#' fullplot(t, var = "AGE", numvar_as = "bin")
+#' fullplot(CN, which_plot = 1:4)
 
-#' t <- targeter(adult, target = "ABOVE50K")
-#' fullplot(t, var = "AGE", numvar_as = "bin", which_plot = 1:4)
-#' fullplot(t, var = "EDUCATION", numvar_as = "bin", which_plot = 2:3)
 
 #' @export
 fullplot <- function(x,
