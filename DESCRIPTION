@@ -1,7 +1,7 @@
 Package: targeter
 Type: Package
 Title: The Another Report Generation Engine for Target Exploration in R
-Version: 0.4
+Version: 0.5
 Author: WeLoveDataScience
 Maintainer: Eric Lecoutre <eric.lecoutre@welovedatascience.com>
 Description: Automated Explaratory Data Analysis (EDA) for targets exploration. Describes a target (binary/nominal/continuous) by crossing
