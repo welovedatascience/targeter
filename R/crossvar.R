@@ -7,11 +7,11 @@
 #' @param data data.frame or data.table
 #' @param target character - name of the target variable of interest
 #' @param var character - name of the candidate variable to be crossed with target
-#' @param ... Additional parameter to be passeed to \code{\link[targeter]{targeter}}
+#' @param ... Additional parameter to be passed to \code{\link[targeter]{targeter}}
 
 #' @return returns an object of class crossvar
 #' @details content of returned object depends on the type of the target (binary/categorical/continuous.)
-#'  For more information, look at the documentation of the crosssvar class.
+#'  For more information, look at the documentation of the crossvar class.
 
 #' @examples
 #' \dontrun{

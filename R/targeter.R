@@ -8,10 +8,10 @@
 #'\item An index is calculated as the proportion of profiles per class and modality divided by the proportion of the modality of all profiles (=proportion / (sum of column counts/sum of all counts)).
 #'\itemize{
 #'\item If the value of the index is high (more than one), it implies that
-#'for this subpopulation is overrepresented for this variable.
-#'\item If the value of the index is equal to 1, the criterium is not signifiant
+#'for this subpopulation is over-represented for this variable.
+#'\item If the value of the index is equal to 1, the criterium is not significant
 #'\item If the value of the index is less than 1, it implies that
-#'for this subpopulation is subrepresented for this variable.
+#'for this subpopulation is sub-represented for this variable.
 #'}
 #'\item Weight of Evidence and Information Value are derived for binary and continuous targets.
 #'}
@@ -19,8 +19,8 @@
 #' @param data data - data.table or data.frame.
 #' @param description_data text on the description of data.
 #' @param target character - name of the variable to explain.
-#' @param target_type charater: type of target - one of 'autoguess' (default), 'binary','categorical' (>2 modalities) or 'numeric'.
-#' ExpParameter expansion if applied so that one could also use 'a'or 'b','c' or 'n'
+#' @param target_type character: type of target - one of 'autoguess' (default), 'binary','categorical' (>2 modalities) or 'numeric'.
+#' ExpParameter expansion if applied so that one could also use 'a' or 'b','c' or 'n'
 #' @param target_reference_level character or numeric. For categorical or (especially) binary targets, level / value of special
 # interest. If `NULL``default` one will try to infer from target content. Typically, this would be values such as
 #' TRUE or 1 or 'bad' for binary targets.
@@ -38,7 +38,7 @@
 #' \item The value "ifany" takes in consideration the missing values if there are any.
 #' \item The value "no" doesn't take in consideration the missing values in any case.
 #' }
-#' @param verbose - boolean (default FALSE). If TRUE some more information is displayed in console. COuld be usefull
+#' @param verbose - boolean (default FALSE). If TRUE some more information is displayed in console. Could be usefull
 #' when using package on big data.
 #' @param dec - integer : the number of decimal for numeric variable. By default, the value is 2.
 #' @param order_label character - this option output an order used for the plot function. The parameter can only take the following values:
@@ -50,7 +50,7 @@
 #' \item "means : order decreasing by the target mean (continuous target)
 #' }
 #' @param cont_target_trim numeric (default 0.01). For continuous targets, it is desirable to trim
-#' extrem values before computing WOE. This is the trimming factor in percentage (between 0: no trim and <1).
+#' extreme values before computing WOE. This is the trimming factor in percentage (between 0: no trim and <1).
 #' @param bxp_factor (default) 1.5 for continuous target, coefficient to be used to compute boxplot whiskers.
 #' @param num_as_categorical_nval (default: 5). If a variable has less than num_as_categorical_nval distinct values,
 #' it will be considered and used as categorical and not numeric.

@@ -3,11 +3,11 @@
 #' @description This functions allows to add a label to var. It's useful for the graphics or the reports.
 #' Obviously, this function can be applied only if a metadata exists
 #'
-#' @param var character - the name of the var(s) that we want to remplace by the label, could be a vector
+#' @param var character - the name of the var(s) that we want to replace by the label, could be a vector
 #' @param metadata data.frame - if we have a metadata loaded in your R, you can use to take the label of the vars.
 #' @param var_field - character: name of the column in metadata that contains variable name (default: 'var')
 #' @param label_field - character: name of the column in metadata that contains variable label (default: 'LABEL')
-#' @param lang  character - the code for the language. It's useful if you have a metadata with different labels for differents languages.
+#' @param lang  character - the code for the language. It's useful if you have a metadata with different labels for different languages.
 #' By default, the value is NULL.
 #' @return a label
 #' @export label

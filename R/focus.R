@@ -25,9 +25,9 @@
 #' @param min_criteria - By default NULL. If it's specified,
 #' only the observations that have criteria >= min_criteria.
 #' @param force_vars - character, list of variables that will be
-#' kept and then won't never be filterered.
+#' kept and then won't never be filtered.
 #' @param summary_object - By default NULL. If provided, must be
-#'  precomputed summary on x callcross var object
+#'  pre-computed summary on x callcross var object
 #'
 #' @return It returns the filtered input object.
 #'

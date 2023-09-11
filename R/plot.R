@@ -579,7 +579,7 @@ plot.crossvar_categorical <- function(x,
 #' @param metadata data.frame - if metadata is  loaded in R environment, label of the variables can be used. Default value (NULL) corresponds to no metadata available.
 #' The label will be used for the title and the x-axis of the graph.
 #' @param print_NA boolean. Should we display WOE for NA values of the explanatory variable. Default: TRUE
-#' @param numvar_as character. How should continuous explanatorey variables be displayed:
+#' @param numvar_as character. How should continuous explanatory variables be displayed:
 #' #'\itemize{
 #'\item bin (default) - display WOE for adjacent binning without respecting variable raw values
 #'\item value - plot WOE using centers of binning classes, thus respecting variable raw values
@@ -719,7 +719,7 @@ plot_woe <- function(x,metadata = NULL,
 #' @param x object of class "crossvar"
 #' @param metadata data.frame - if metadata is  loaded in R environment, label of the variables can be used. Default value (NULL) corresponds to no metadata available.
 #' The label will be used for the title and the x-axis of the graph.
-#' @param max_ncat maximmum number of values/categories that will be displayed ( additional will be collapsed) - default: 15
+#' @param max_ncat maximum number of values/categories that will be displayed ( additional will be collapsed) - default: 15
 #' @param print_NA boolean: whether to display or not the NA possible category (default: TRUE)
 #' @param title either boolean or character. If boolean: do we plot (default generated ) title, if character, provided title wil be used
 #'

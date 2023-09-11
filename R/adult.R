@@ -58,7 +58,7 @@
 #' `Puerto-Rico`, `Scotland`, `South`, `Taiwan`,
 #' `Thailand`, `Trinadad&Tobago`, `United-States`,
 #' `Vietnam`, and `Yugoslavia`.}
-#' \item{ABOVE50K}{a binary integere (0/1) mentionning whether INCOME is above 50K or not.}
+#' \item{ABOVE50K}{a binary integer (0/1) mentioning whether INCOME is above 50K or not.}
 #' }
 #' @references A. Asuncion & D. J. Newman (2007): UCI Repository of Machine
 #' Learning Databases.  Irvine, CA: University of California, Department of

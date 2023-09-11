@@ -6,12 +6,12 @@
 #' @param summary_object an object of class "summary.targeter": pre-computed summary of object.
 #' @param browse by default TRUE : print in the browse the output.
 #' @param ntop integer - number of variables to show in the report. For more information, see the function focus By default, NULL i.e. all variables are taken.
-#' @param nmin integer - minimum number of profiles in the seleected class. For more information, see the function focus.
+#' @param nmin integer - minimum number of profiles in the selected class. For more information, see the function focus.
 #' @param criteria character - By default, the value is index.max.index. For more information, see the function focus.
-#' @param min_criteria - By default NULL. If it's speciefied, only the observations which have criteria >= min_criteria.
+#' @param min_criteria - By default NULL. If it's specified, only the observations which have criteria >= min_criteria.
 #' @param metadata data.frame - if metadata is  loaded in R environment, label of the variables can be used. Default value (NULL) corresponds to no metadata available.
 #' The label will be used for the title and the x-axis of the graph.
-#' @param force_vars - character, list of variables that will be kept and then won't never be filterered.
+#' @param force_vars - character, list of variables that will be kept and then won't never be filtered.
 #' @param  output_format - By default it's html. For a pdf, output_format="pdf_document" and for a word, output_format="word_document".
 #' @param output_file - name of the output file to be generated. If NULL (default) an, automated name will be generated.
 #' @param output_dir - output directory, default: tempdir().
