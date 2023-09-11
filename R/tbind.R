@@ -14,6 +14,8 @@ tbind <- function(list_targeters, check=TRUE){
   assertthat::assert_that(n>0, msg="list_targeter list is empty")
   all <- unlist(list_targeters, recursive = FALSE)
 
+  
+
 
   #https://stackoverflow.com/questions/18538977/combine-merge-lists-by-elements-names
   all <- list_targeters[[1]]

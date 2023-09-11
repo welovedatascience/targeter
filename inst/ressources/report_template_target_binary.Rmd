@@ -65,13 +65,14 @@ For every criteria, summary table presents its possible value (modality) having 
 ## Population description
 
 ```{r, ,results='asis'}
- if(!is.null(object$description_data)){
-   cat(object$description_data[[1]])}else{cat("No information on data have been provided during the analysis.")
-     }
+if (!is.null(object$description_data)){
+  cat(object$description_data[[1]])} else {
+    cat("No information on data have been provided during the analysis.")
+}
 
 stats <- setDT(object$profiles[[1]]$target_stats)
-Ntot <-stats[, sum(count)]
-cat("\n Analyzed population contains ",Ntot," records.")
+Ntot <- stats[, sum(count)]
+cat("\n Analyzed population contains ", Ntot, " records.")
 ```
 
 ## Target description
@@ -80,8 +81,9 @@ cat("\n Analyzed population contains ",Ntot," records.")
 ```{r,results='asis'}
 
 if(!is.null(object$description_target)) {
-  cat(object$description_target[[1]])} else{
-     cat("No description of the target has been provided during the analysis.")}
+  cat(object$description_target[[1]]) } else{
+     cat("No description of the target has been provided during the analysis.")
+     }
 
 cat("  \n Target statistics:")
 stats[, reference_level:=ifelse(as.character(value)==as.character(object$target_reference_level), "*","")]

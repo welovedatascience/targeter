@@ -2,6 +2,7 @@
 # library(miniUI)
 # library(ggplot2)
 
+
 #' @title explore
 #' @description shiny small app to explore a targeter object.
 #' @param object a targeter object
@@ -64,7 +65,6 @@ explore <- function(object, summary_object=NULL,metadata=NULL, display=c("dialog
 
   server <- function(input, output, session) {
     # Define reactive expressions, outputs, etc.
-
 
 
     output$dt_summary <- DT::renderDataTable({

@@ -18,40 +18,50 @@ focus(
 \arguments{
 \item{x}{an object of class "targeter".}
 
-\item{criteria}{character - sort the output according to (by default, order by decreasing index.max.index):
+\item{criteria}{character - sort the output according to
+ (by default, order by decreasing index.max.index):
 \itemize{
 \item "IV" - information value.
 \item "index.max.index" -value of the maximum index.
 \item "chisquare" - chi-square value.
 \item "pvalue" - p-value.
-\item "index.max.count" - number of observations in the class associated to the maximum index.
-\item "index.max.props" - proportion of the class associated to the maximum index.
+\item "index.max.count" - number of observations in the class
+associated to the maximum index.
+\item "index.max.props" - proportion of the class
+associated to the maximum index.
 }}
 
-\item{n}{integer - number of top variables to select. By default, n = 10.}
+\item{n}{integer - number of top variables to select.
+By default, n = 10.}
 
-\item{nmin}{integer - minimum number of profiles in the class. By default, 100.}
+\item{nmin}{integer - minimum number of profiles in the class.
+By default, 100.}
 
-\item{min_criteria}{- By default NULL. If it's specified, only the observations that have criteria >= min_criteria.}
+\item{min_criteria}{- By default NULL. If it's specified,
+only the observations that have criteria >= min_criteria.}
 
-\item{force_vars}{- character, list of variables that will be kept and then won't never be filterered.}
+\item{force_vars}{- character, list of variables that will be
+kept and then won't never be filterered.}
 
-\item{summary_object}{- By default NULL. If provided, must be precomputed summary on x callcross var object}
+\item{summary_object}{- By default NULL. If provided, must be
+precomputed summary on x callcross var object}
 }
 \value{
 It returns the filtered input object.
 }
 \description{
-The function subset the targeter object and retains the n top discriminant variables with regards to a criteria.
-It also allows filtering on minimum number of values within modality which is useful when using criteria index.max.index.
+The function subset the targeter object and retains the
+n top discriminant variables with regards to a criteria.
+It also allows filtering on minimum number of values within
+ modality which is useful when using criteria index.max.index.
 }
 \examples{
 data(adult)
-t <- targeter(adult,target ="ABOVE50K",analysis_name="Analyse")
+t <- targeter(adult, target = "ABOVE50K", analysis_name = "Analyse")
 focus(t)
-focus(t,n=3)
-focus(t, nmin=500, criteria="index.max.index")
-focus(t,criteria='chisquare')
+focus(t, n = 3)
+focus(t, nmin = 500, criteria = "index.max.index")
+focus(t, criteria = "chisquare")
 }
 \seealso{
 \itemize{

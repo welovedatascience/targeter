@@ -173,8 +173,6 @@ cat("\n__IV:", round(iprofile$IV,6),"__\n\n")
 print(fullplot(iprofile))
 
 cat('\\pagebreak')
- 
-#   
 }
 ```
 

@@ -21,7 +21,7 @@
 #' @param target character - name of the variable to explain.
 #' @param target_type charater: type of target - one of 'autoguess' (default), 'binary','categorical' (>2 modalities) or 'numeric'.
 #' ExpParameter expansion if applied so that one could also use 'a'or 'b','c' or 'n'
-#' @param target_reference_level character or numeric. For categorical or (espcially) binary targets, level / value of special
+#' @param target_reference_level character or numeric. For categorical or (especially) binary targets, level / value of special
 # interest. If `NULL``default` one will try to infer from target content. Typically, this would be values such as
 #' TRUE or 1 or 'bad' for binary targets.
 #' that
@@ -163,7 +163,7 @@ targeter <- function(data,
   useNA <- useNA[1]
   ## the variable useNA can only  accept the two values
   ##<todo>: introduce a yes or always
-  useNA <- match.arg(useNA,c("ifany","no"),several.ok=FALSE)
+  useNA <- match.arg(useNA, c("ifany", "no"), several.ok = FALSE)
 
   binning_method <- match.arg(binning_method,c("quantile","clustering","smart"),several.ok = FALSE)
   if (binning_method=="clustering") assertthat::assert_that(requireNamespace('Ckmeans.1d.dp', quietly = TRUE), msg = 'Ckmeans.1d.dp package required for clustering method.')
@@ -361,19 +361,19 @@ targeter <- function(data,
     findInterval(x,cutpoints, rightmost.closed=TRUE)
 
   }
-
+  ## binning > smart ----
   binning_smart <- function(x, nbins, variable){
     # if (verbose)cat("\n smart binning:", variable)
-    quantiles = seq(0, 1, length.out = 1+round(1/smart_quantile_by))
+    quantiles <- seq(0, 1, length.out = 1+round(1/smart_quantile_by))
     nqu <- length(quantiles)
-    qu_indices <- (1:nqu)%/% (nqu/nbins)
+    qu_indices <- (1:nqu) %/% (nqu/nbins)
     ## take the value of the quantile for the variable x
     qu <- quantile(x, quantiles, na.rm = TRUE)
     qmin <- qu[1]
     qmax <- qu[nqu]
 
-    qu[qu==-Inf] <- min(x[is.finite(x)], na.rm=TRUE)
-    qu[qu==Inf] <- max(x[is.finite(x)], na.rm=TRUE)
+    qu[qu == -Inf] <- min(x[is.finite(x)], na.rm=TRUE)
+    qu[qu == Inf] <- max(x[is.finite(x)], na.rm=TRUE)
 
     uqu <- qu[names(qu)[!duplicated(qu_indices)]]
     new_nbin <- min(c(length(unique(uqu)),nqu))
@@ -393,7 +393,7 @@ targeter <- function(data,
     clustering = binning_clustering,
     smart=binning_smart)
 
-  binning_foo <- binning_foos[[binning_method]]
+  binning_foo <- binning_foos[[binning_method]] 
 
   ## for numeric variables, we must to apply the function quickCut to cut the variable into classes.
   ## create a list called txt
@@ -657,7 +657,7 @@ targeter <- function(data,
                           var_interest = target,
                           var_cross = variable,
                           alternate_version = alternate_version,
-                          useNA=useNA,
+                          useNA = useNA,
                           woe_shift = woe_shift)
 
       WOE <- woe_iv$WOE[, c('variable', 'WOE'), with=FALSE]
@@ -728,7 +728,7 @@ targeter <- function(data,
         # print("Yes")
         # print(reflev)
         wh <- which(colnames(t1)==reflev)
-        TMP <<- t1
+        # TMP <<- t1
         # print(wh)
         orderlabel <- names(t1[,wh][order(-t1[,wh])]) # note: categorical: arbitrary ordered by second column
 

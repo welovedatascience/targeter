@@ -110,13 +110,14 @@ The function returns a list of class "targeter".
 This list is composed of this following elements:
 \itemize{
 \item dataname - name of the analyzed dataset.
-\item description_data text about the description of data
 \item target - name of the target.
-\item target_type - Target type, one of autoguess (default)/binary/numeric/categorical (text is expended so "b" also works for binary)
+\item description_data text about the description of data
 \item description_target text about the description of target
-\item analysis - name of the analysis.
-\item date - date of the analysis.
-\item profiles : list of elements containing the result the individual crossing per variable.
+\item target_type - Target type, one of autoguess (default)/binary/numeric/categorical (text is expended so "b" also works for binary)
+\item target_stats - summary statistics on target
+\item analysis - name of the analysis
+\item date - date of the analysis
+\item profiles : list of elements containing the result the individual crossing per variable
 See crossvar class documentation.
 }
 }
