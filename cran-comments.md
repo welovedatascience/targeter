@@ -1,5 +1,4 @@
-## TARGETER package 
-
+## R CMD check results
 
 ### 20230911 - NOTES
 
@@ -10,4 +9,6 @@ Maintainer: 'Eric Lecoutre <eric.lecoutre@welovedatascience.com>'
 
 * checking R code for possible problems ... NOTE
 
---> all due to usage of data.table syntax, for instance dt[,..selvars]
+--> all due to usage of data.table syntax, for instance dt[,..selvars]rs | 0 warnings | 1 note
+
+* This is a new release.
