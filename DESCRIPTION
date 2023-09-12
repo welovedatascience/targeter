@@ -44,5 +44,5 @@ Imports:
      utils
 Suggests:
      flextable
-URL: https://github.com/welovedatascience/targeter
+URL: https://github.com/welovedatascience/targeter, https://welovedatascience.github.io/targeter/
 BugReports: https://github.com/welovedatascience/targeter/issues
