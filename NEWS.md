@@ -1,6 +1,9 @@
-# targeter 0.5.1
+# targeter 1.0.0
 
 * First public version, version 20230911.
+
+
+# targeter 0.9.2
 
 ## Main changes
 
