@@ -1,6 +1,6 @@
 ## targeter
 
-## targeter 0.5.1 - NOTES
+## targeter 1.0.0 - NOTES
 
 * This is a new release: first public version
 
