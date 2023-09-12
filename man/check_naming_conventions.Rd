@@ -9,13 +9,18 @@ check_naming_conventions(data, test_target_type = FALSE)
 \arguments{
 \item{data}{data.table or data.frame}
 
-\item{test_target_type}{also check if any variable that should be a target through naming conventions (ie Z_) also has a target nature provided in name.}
+\item{test_target_type}{also check if any variable that should be a target
+through naming conventions (ie Z_) also has a target nature provided in name.}
 }
 \value{
-a table which contains two columns "ErrorType" and "ErrorTarget". Each row corresponds to a variable of the data.
-The column "ErrorType" == FALSE when the condition on the first letter is respected.
-The column "ErrorTarget" == FALSE when the condition on BIN/INT/ORD/CAT on the target is respected
+a table which contains two columns "ErrorType" and "ErrorTarget".
+Each row corresponds to a variable of the data.
+The column "ErrorType" == FALSE when the condition on the first letter is
+respected.
+The column "ErrorTarget" == FALSE when the condition on BIN/INT/ORD/CAT on
+the target is respected
 }
 \description{
-This function determines if the naming convention is respected for each column.
+This function checks that the naming convention used by WeLoveDataScience
+ are respected for each column.
 }
