@@ -16,7 +16,7 @@ Description: Automated Explanatory Data Analysis (EDA) for targets exploration,
  automated reports based on markdown and a shiny gadget for interactive
  explorations. Package is aimed at investigating big datasets, both in terms of
  records and variables through the usage of data.table package.
-License: file LICENSE
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Depends: 
