@@ -6,10 +6,11 @@
 
 * This is a new release: first public version
 
-* No specific references available for that package, I might add some generic 
-  references about Information Value usage if required.
-  The variant for numeric targets is a creation of mine, work in progress 
-  to analyze it (hopefully a student's master thesis so not for tomorrow...) 
+* A reference somewhat specific to the package is mentionned in README file. 
+  I might add some generic references about Information Value usage if required.
+  The adaptation for numeric targets is though a creation of mine,
+  work in progress to analyze it (hopefully a student's master thesis, so not
+  for tomorrow...) 
 
 
 ### Notes review 
