@@ -1,3 +1,14 @@
+# to prevent checks of data.table used variables
+# see:  ?globalVariables
+
+
+if(getRversion() >= "3.1.0") utils::globalVariables(
+  c(".", ".N", ":=", "vcount", "vsum", "WOE", "vperc",
+"cperc", "uniqueN", "..cn", "cn", "level", "value", "target", "bxp_min",
+"q25", "q75", "bxp_max", "avg", "N", "cluster", "Y", "color", "varname",
+"..select_vars", "percNA", "nNA", "count", "perc", "qrange", "<<-", "X")
+)
+
 #' @title report
 #' @description This function creates an automatic report according to a predefined template in the package or a user-generated template.
 #'

@@ -1,3 +1,14 @@
+# to prevent checks of data.table used variables
+# see:  ?globalVariables
+
+
+if(getRversion() >= "3.1.0") utils::globalVariables(
+  c(".", ".N", ":=", "vcount", "vsum", "WOE", "vperc",
+"cperc", "uniqueN", "..cn", "cn", "level", "value", "target", "bxp_min",
+"q25", "q75", "bxp_max", "avg", "N", "cluster", "Y", "color", "varname",
+"..select_vars", "percNA", "nNA", "count", "perc", "qrange", "<<-", "X")
+)
+
 #' @title targeter
 #' @description For each variable, the function crosses two variables: a target to be explained and an explanatory variable.
 #'For this purpose, these variables are converted in categorical variables by a binning process and the statistics
@@ -94,6 +105,9 @@
 #' targeter(adult,target ="ABOVE50K")
 #' @importFrom stats quantile median
 #' @importFrom data.table dcast
+#' @importFrom data.table .N
+#' @importFrom data.table uniqueN
+#' @importFrom data.table `:=`
 
 
 ## <idea> check for WOE monotonicity
@@ -669,7 +683,7 @@ targeter <- function(data,
       if (woe_post_cluster){
         var_nvalues <- dataCut[!is.na(get(variable)),uniqueN(get(variable))]
         if (woe_post_cluster_n < var_nvalues){
-          X <<- WOE[rownames(WOE)!='[Missing]',,drop=FALSE]
+          X <- WOE[rownames(WOE)!='[Missing]',,drop=FALSE]
 
           if (variable %in% num_vars){
             # numeric variable, use sequentially constrained clustering with package clustering.sc.dp

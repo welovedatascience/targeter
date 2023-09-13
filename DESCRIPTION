@@ -21,11 +21,11 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Depends: 
-     R (>= 3.5),
-     data.table
+     R (>= 3.5)
 RoxygenNote: 7.2.3
 NeedsCompilation: no
 Imports:
+     data.table,
      assertthat,
      ggplot2,
      gridExtra,

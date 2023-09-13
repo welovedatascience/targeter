@@ -1,4 +1,8 @@
-
+# to prevent checks of data.table used variables
+# see:  ?globalVariables
+if ( getRversion() >= "3.1.0") utils::globalVariables(
+  c(".N", ":=", "vcount", "vsum", "WOE", "vperc", "cperc")
+)
 
 #' @importFrom data.table setnames
 dt_WOE_IV <- function(data,

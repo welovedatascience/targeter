@@ -1,3 +1,10 @@
+
+# to prevent checks of data.table used variables
+# see:  ?globalVariables
+if(getRversion() >= "3.1.0") utils::globalVariables("..cn")
+
+
+
 #' @title explore
 #' @description shiny small app to explore a targeter object.
 #' @param object a targeter object
@@ -29,8 +36,6 @@
 #' @importFrom gridExtra grid.arrange
 #' @importFrom shinybusy show_modal_spinner
 #' @importFrom htmlwidgets JS
-
-
 explore <- function(
     object,
     summary_object = NULL,
