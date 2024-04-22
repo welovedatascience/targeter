@@ -115,15 +115,15 @@ targeter <- function(data,
                      description_data =NULL,
                      target,
                      target_type = c("autoguess","binary","categorical","numeric"),
-                     target_reference_level=NULL, # NULL: auto will check for 1, TRUE
+                     target_reference_level = NULL, # NULL: auto will check for 1, TRUE
                      description_target = NULL,
                      analysis_name=NULL,
                      select_vars=NULL,
                      exclude_vars=NULL,
                      nbins=12,
                      binning_method=c("quantile","clustering","smart"), # todo: tree (min size)+ constrained clustrering  https://cran.r-project.org/web/packages/scclust/scclust.pdf
-                     naming_conventions=getOption("targeter.use_naming_conventions"),
-                     useNA = getOption("targeter.useNA"), #option package by default
+                     naming_conventions=getOption("targeter.use_naming_conventions", default = FALSE),
+                     useNA = getOption("targeter.useNA", default = TRUE), #option package by default
                      verbose=FALSE,
                      dec = 2,
                      order_label = c("auto","alpha","count","props","means"),
@@ -672,7 +672,8 @@ targeter <- function(data,
                           var_cross = variable,
                           alternate_version = alternate_version,
                           useNA = useNA,
-                          woe_shift = woe_shift)
+                          woe_shift = woe_shift,
+                          target_reference_level = target_reference_level)
 
       WOE <- woe_iv$WOE[, c('variable', 'WOE'), with=FALSE]
     # print(variable)

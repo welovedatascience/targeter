@@ -10,7 +10,8 @@ dt_WOE_IV <- function(data,
                       var_cross,
                       alternate_version = FALSE,
                       woe_shift = 0.01,
-                      useNA=c("ifany","no")){
+                      useNA = c("ifany", "no"),
+                      target_reference_level = 1){
   ## parameters checks
   # if (!is.null(binary)){
   #   assertthat::assert_that(is.logical(binary),
@@ -29,13 +30,13 @@ dt_WOE_IV <- function(data,
 
   useNA <- match.arg(useNA, c("ifany", "no"), several.ok = FALSE)
 
-  vRANGE <- data[, range(get(var_interest), na.rm=TRUE)]
-
+  vRANGE <- data[, range(ifelse(get(var_interest)==target_reference_level,1,0), na.rm = TRUE)]
+  # print(vRANGE)
   if (useNA == "no") data <- data[!is.na(var_cross),]
 
-  agg <- data[, .(vcount=.N, vsum=sum(
-    (get(var_interest) - vRANGE[1]) / diff(vRANGE))),
-     by =c(var_cross)]
+  agg <- data[, .(vcount = .N, 
+   vsum = sum((ifelse(get(var_interest)==target_reference_level,1,0) - vRANGE[1]) / diff(vRANGE))), 
+   by =c(var_cross)]
   data.table::setnames(agg, var_cross, 'variable')
   if (!alternate_version){
     # replace count with "non-events 0" or numeric "opposite
