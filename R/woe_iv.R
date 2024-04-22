@@ -13,24 +13,29 @@ dt_WOE_IV <- function(data,
                       useNA=c("ifany","no")){
   ## parameters checks
   # if (!is.null(binary)){
-  #   assertthat::assert_that(is.logical(binary), msg= "binary must be logical")
+  #   assertthat::assert_that(is.logical(binary),
+  # msg= "binary must be logical")
   # }
-  assertthat::assert_that(inherits(data, "data.frame"), msg= "data must be a data frame or data table")
+  assertthat::assert_that(inherits(data, "data.frame"),
+                          msg = "data must be a data frame or data table")
   data.table::setDT(data)
   nm <- colnames(data)
-  assertthat::assert_that(var_interest %in% nm, msg= "varinterest is not an existing variable in data")
-  assertthat::assert_that(var_cross %in% nm, msg= "varcount is not an existing variable in data")
+  assertthat::assert_that(var_interest %in% nm,
+                          msg = "varinterest is not an existing 
+                          variable in data")
 
-  useNA <- match.arg( useNA,c("ifany","no"), several.ok = FALSE)
+  assertthat::assert_that(var_cross %in% nm,
+                          msg = "varcount is not an existing variable in data")
+
+  useNA <- match.arg(useNA, c("ifany", "no"), several.ok = FALSE)
 
   vRANGE <- data[, range(get(var_interest), na.rm=TRUE)]
 
   if (useNA == "no") data <- data[!is.na(var_cross),]
 
-  agg <- data[,.(vcount=.N, vsum=sum(
-    (get(var_interest) - vRANGE[1]) / diff(vRANGE)
-  )
-  ) ,by =c(var_cross)]
+  agg <- data[, .(vcount=.N, vsum=sum(
+    (get(var_interest) - vRANGE[1]) / diff(vRANGE))),
+     by =c(var_cross)]
   data.table::setnames(agg, var_cross, 'variable')
   if (!alternate_version){
     # replace count with "non-events 0" or numeric "opposite
