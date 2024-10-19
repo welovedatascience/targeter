@@ -4,6 +4,8 @@
 dt_vartype_autoguess_onevar <- function(data, var, num_as_nominal_nval=5,...){
   assertthat::assert_that(inherits(data,"data.table"), msg = "data is not a data table")
   if (inherits(data[,get(var)],c("logical"))) return("binary")
+  if (inherits(data[,get(var)],c("ordered","factor"))) return("ordinal")
+  
   ncat <- data[,uniqueN(get(var))]
   if (inherits(data[,get(var)],c("factor","character"))) {
       if (ncat==2) return("binary") else if (ncat==1) return("unimode") else return("categorical")
