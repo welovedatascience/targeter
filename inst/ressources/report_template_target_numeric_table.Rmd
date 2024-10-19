@@ -107,6 +107,15 @@ targeter.table <- function (x, ...)
         }
        out <- (x$stats)
     }
+  rn <- rownames(out)
+  setDT(out)
+  out[, varsum:=NULL]
+  out[, avg:=round(avg,4)]
+  out[, std:=round(std,4)]
+  out[, bxp_min:=NULL]
+  out[, bxp_max:=NULL]
+  out <- as.data.frame(out)
+  rownames(out) <- rn
    return(out)
 }
 
@@ -188,11 +197,15 @@ cat("\n\n### ",label(ivar, metadata=metadata),"\n")
 
 
 cat("\n__IV:", round(iprofile$IV,6),"__\n\n")
+tari <- targeter.table(iprofile)
+cat(kableExtra::kable_styling(kableExtra::kable(tari, kable_format ='html'),position = "left", full_width = FALSE))
 
-DT::datatable(targeter.table(iprofile), rownames = FALSE,  
-              selection="none", autoHideNavigation = TRUE, 
-              escape = -ifelse(is.null(metadata),1,2),
-              options=list(pageLength=10))
+
+# tab <- DT::datatable(tari, rownames = TRUE,  
+#               selection="none", autoHideNavigation = TRUE, 
+#               
+#               options=list(pageLength=10))
+
 
 print(fullplot(iprofile))
 
