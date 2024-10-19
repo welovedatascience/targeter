@@ -44,3 +44,34 @@ label <- function(var, metadata, var_field="var", label_field="LABEL",lang=NULL)
   return(labels)
 
 }
+
+
+table.crossvar <- function (x, round_digits = 3,...){
+    if (x$target_type %in% c("binary", "categorical")) {
+        cnts <- as.data.frame.matrix(x$counts)
+        colnames(cnts) <- paste("N", colnames(cnts))
+        
+        props <- as.data.frame.matrix(x$props)
+        rn <- rownames(props)
+        props <- as.data.frame(lapply(100*props, function(col) {
+          paste0(round(col, round_digits),"%")}))
+          colnames(props) <- paste("perc",colnames(props))
+        out <- cbind(cnts,props)
+        
+    }
+    else if (x$target_type %in% c("numeric")) {
+        if (!is.null(x$woe)) {
+            x$stats <- cbind(x$stats, x$woe)
+        }
+      rn <- rownames(out)
+      setDT(out)
+      out[, varsum:=NULL]
+      out[, avg:=round(avg,4)]
+      out[, std:=round(std,4)]
+      out[, bxp_min:=NULL]
+      out[, bxp_max:=NULL]
+      out <- as.data.frame(out)
+      rownames(out) <- rn
+    }
+   return(out)
+}
