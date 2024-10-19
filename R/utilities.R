@@ -63,6 +63,7 @@ table.crossvar <- function (x, round_digits = 3,...){
         if (!is.null(x$woe)) {
             x$stats <- cbind(x$stats, x$woe)
         }
+      out <- x$stats
       rn <- rownames(out)
       setDT(out)
       out[, varsum:=NULL]
