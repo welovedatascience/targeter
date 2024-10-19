@@ -21,7 +21,8 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Depends: 
-     R (>= 3.5)
+     R (>= 3.5),
+     kableExtra
 RoxygenNote: 7.2.3
 NeedsCompilation: no
 Imports:
