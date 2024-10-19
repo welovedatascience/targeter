@@ -329,7 +329,7 @@ plot.crossvar_categorical <- function(x,
   }
   if (x$target_type %in% c('binary','categorical')){
     target_ref <- as.character(x$target_reference_level)
-    if (is.na(target_ref)) target_ref<-'NA'
+    if (is.na(target_ref)) target_ref <- 'NA'
   }
 
   ## selection of the appropriate tables
@@ -512,10 +512,12 @@ plot.crossvar_categorical <- function(x,
                          min(dfm$level, na.rm=TRUE)+0.05*(max(dfm$level, na.rm=TRUE)-min(dfm$level, na.rm=TRUE)),
                          1)
 
-        p1 <- p1 + ggplot2::geom_text(
-          ggplot2::aes(
+
+##x$target_reference_level
+  
+        p1 <- p1 + ggplot2::annotate(geom = "text",
             y=round(target_ref_perc*100,2),
-            label=paste0(round(target_ref_perc*100,2)), x=x_text),
+            label=paste0(round(target_ref_perc*100,2)), x=x_text,
           colour="darkorchid", angle=0, vjust = 1.2, size=3.5)
       }
       if(lim_y == TRUE){p1 = p1 +ggplot2::ylim(c(0,100))}
