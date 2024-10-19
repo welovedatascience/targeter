@@ -197,7 +197,7 @@ targeter <- function(data,
   if(is.null(select_vars)){
     select_vars <- names(data)
     if(naming_conventions == TRUE){
-      select_vars <- select_vars[substr(select_vars,1,2) %in% c("L_","N_","M_","F_","J_", "C_","R_","P_")]
+      select_vars <- select_vars[substr(select_vars,1,2) %in% c("L_","N_","M_","F_","J_", "C_","R_","P_","O_")]
     }
   }
 
@@ -308,6 +308,8 @@ targeter <- function(data,
   ## numeric variables
   if(naming_conventions == TRUE){
     num_vars <- select_vars[substr(select_vars,1,2) %in% c("N_","M_","F_","J_","R_","P_")]
+    ord_vars <- select_vars[substr(select_vars,1,2) %in% c("O_")]
+    
   } else {
     if (autoguess_nrows==0) autoguess_nrows <- nrow(data)
     autoguess_nrows <- min(autoguess_nrows, nrow(data))
@@ -325,13 +327,13 @@ targeter <- function(data,
       }
     }
     num_vars <- names(data_types)[data_types == "numeric"]
-
+    ord_vars <- names(data_types)[data_types == "ordinal"]
   }
   ## character/catogerical/other variables
-  other_vars <- select_vars[!(select_vars %in% num_vars)]
+  other_vars <- select_vars[!(select_vars %in% c(num_vars))]
 
   # check: remaining variables (after naming conventions)
-  if (length(c(num_vars, other_vars))==0){
+  if (length(c(num_vars, other_vars, ord_vars))==0){
     cat("\n")
     cat(paste(names(msg),msg, sep=":" , collapse = "\n"))
     cat("\n")
@@ -630,9 +632,11 @@ targeter <- function(data,
     if(order_label == "auto"){
       if(variable %in% num_vars){
         order_label_ivar <- "alpha"
-      }else{
-        # cat("\ny:",order_label)
-        order_label_ivar <- "props"}
+      } else if (variable %in% ord_vars) {order_label_ivar <- "ordered"} else {
+        order_label_ivar <- "props"
+      }
+        
+        
     }
 
 
@@ -734,7 +738,9 @@ targeter <- function(data,
         t1 <- cbind(t1,rowSums(t1))
         colnames(t1)[ncol(t1)] <- "total"
         orderlabel <- colnames(t1[,"total"][order(-t1[,"total"])])
-      }else if (order_label_ivar %in% c("props","means"))
+      }else if (order_label_ivar %in% "ordered") {
+        orderlabel <- levels(data[[variable]])
+      } else if (order_label_ivar %in% c("props","means"))
       {
 
         t1 <- p
@@ -766,10 +772,11 @@ targeter <- function(data,
 
       if(order_label_ivar == "alpha"){
         orderlabel <- t1[order(t1)]
-      }else if (order_label_ivar == "count" ) {
+      } else if (order_label_ivar == "count" ) {
+        orderlabel <- levels(data[[ivar]])
+      } else if (order_label_ivar == "count" ) {
         orderlabel <- t1[order(-tab[,"count"])]
-      }else if (order_label_ivar %in% c("props","means"))
-      {
+      } else if (order_label_ivar %in% c("props","means")){
         orderlabel <- t1[order(-tab[,'avg'])] # note: categorical: arbitrary ordered by second column
       }
       cross$stats <- tab
