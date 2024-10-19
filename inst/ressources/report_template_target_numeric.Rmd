@@ -12,6 +12,15 @@ output:
   pdf_document:
     toc: true
 classoption: landscape
+params:
+  show_tables: 
+    label: "Display tables for each variable"
+    value: FALSE
+    input: checkbox
+  fullplot_which_plot:
+    value: "1:4"
+    label: "plots choices for fullplot function call"
+    input: text
 header-includes:
   - \usepackage{array}
   - \usepackage{booktabs}
@@ -96,19 +105,6 @@ if (format_tables=="word"){
 
 
 
-targeter.table <- function (x, ...) 
-{
-    if (x$target_type %in% c("binary", "categorical")) {
-        out <- (cbind(as.data.frame.matrix(x$counts), as.data.frame.matrix(x$props)))
-    }
-    else if (x$target_type %in% c("numeric")) {
-        if (!is.null(x$woe)) {
-            x$stats <- cbind(x$stats, x$woe)
-        }
-       out <- (x$stats)
-    }
-   return(out)
-}
 
 ```
 
@@ -168,35 +164,50 @@ DT::datatable(df2, rownames = FALSE, filter="top",
 varnames <- summary_object$varname
 
 for (i in seq_along(varnames)){
-  
-ivar <- varnames[i]
-ivar_label = label(ivar, metadata = metadata)
-iprofile <- object$profiles[[ivar]]
-# https://stackoverflow.com/questions/39281266/use-internal-links-in-rmarkdown-html-output
-# explicit link: you give a custom name to a header ## Test {#test} and later refer to it with a link syntax: see [the relevant section](#test).
-cat("\n\n\\newpage\n\n")
-if (format_tables=="html"){
-  
-  cat(paste0("<div id='var-",tolower(ivar),"'>\n\n## ",label(ivar, metadata=metadata), ifelse(ivar_label!=ivar, paste0(" (",ivar,")"),""),"\n</div>"))
-  
-} else {
-cat("\n\n### ",label(ivar, metadata=metadata),"\n")
-  
-}
+
+  ivar <- varnames[i]
+  ivar_label = label(ivar, metadata = metadata)
+  iprofile <- object$profiles[[ivar]]
+
+  # https://stackoverflow.com/questions/39281266/use-internal-links-in-rmarkdown-html-output
+  # explicit link: you give a custom name to a header ## Test {#test} and later refer to it with a link syntax: see [the relevant section](#test).
+
+  cat("\n\n\\newpage\n\n")
+
+  if (format_tables=="html"){
+    cat(paste0("<div id='var-",tolower(ivar),"'>\n\n## ",label(ivar, metadata=metadata), ifelse(ivar_label!=ivar, paste0(" (",ivar,")"),""),"\n</div>"))
+    
+    if (params$show_tables){
+      tari <- table.crossvar(iprofile)
+      cat(kableExtra::kable_styling(kableExtra::kable(
+        tari,
+        kable_format = "html"),
+        position = "left",
+        full_width = FALSE))
+    }
+    
+    
+  } else {
+  cat("\n\n### ",label(ivar, metadata=metadata),"\n")
+    
+  }
 
 
 
 
-cat("\n__IV:", round(iprofile$IV,6),"__\n\n")
+  cat("\n__IV:", round(iprofile$IV,6),"__\n\n")
 
-DT::datatable(targeter.table(iprofile), rownames = FALSE,  
-              selection="none", autoHideNavigation = TRUE, 
-              escape = -ifelse(is.null(metadata),1,2),
-              options=list(pageLength=10))
+  DT::datatable(targeter.table(iprofile), rownames = FALSE,  
+                selection="none", autoHideNavigation = TRUE, 
+                escape = -ifelse(is.null(metadata),1,2),
+                options=list(pageLength=10))
 
-print(fullplot(iprofile))
+  print(fullplot(iprofile, 
+    which_plot = eval(parse(
+        text = params$fullplot_which_plot)
+        )))
 
-cat('\\pagebreak')
+  cat('\\pagebreak')
 }
 ```
 

@@ -11,7 +11,15 @@ output:
     toc: true
   pdf_document:
     toc: true
-#classoption: landscape
+params:
+  show_tables: 
+    label: "Display tables for each variable"
+    value: FALSE
+    input: checkbox
+  fullplot_which_plot:
+    value: "1:4"
+    label: "plots choices for fullplot function call"
+    input: text
 header-includes:
   - \usepackage{array}
   - \usepackage{booktabs}
@@ -103,6 +111,8 @@ if (format_tables=="word"){
 
 \newpage
 
+
+
 ## Summary view
 
 
@@ -157,14 +167,25 @@ cat("\n\n\\newpage\n\n")
 if (format_tables=="html"){
   
   cat(paste0("<div id='var-",tolower(ivar),"'>\n\n## ",label(ivar, metadata=metadata), ifelse(ivar_label!=ivar, paste0(" (",ivar,")"),""),"\n</div>"))
-  
+     if (params$show_tables){
+      tari <- table.crossvar(iprofile)
+      cat(kableExtra::kable_styling(kableExtra::kable(
+        tari,
+        kable_format = "html"),
+        position = "left",
+        full_width = FALSE))
+    }
+ 
 } else {
 cat("\n\n### ",label(ivar, metadata=metadata),"\n")
   
 }
 
   cat("\n__IV:", round(iprofile$IV,3),"__\n\n")
-  print(fullplot(iprofile))
+  print(fullplot(iprofile, 
+    which_plot = eval(parse(
+        text = params$fullplot_which_plot)
+        )))
 }
 ```
 
