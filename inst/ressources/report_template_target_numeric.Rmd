@@ -197,10 +197,10 @@ for (i in seq_along(varnames)){
 
   cat("\n__IV:", round(iprofile$IV,6),"__\n\n")
 
-  DT::datatable(targeter.table(iprofile), rownames = FALSE,  
-                selection="none", autoHideNavigation = TRUE, 
-                escape = -ifelse(is.null(metadata),1,2),
-                options=list(pageLength=10))
+  # DT::datatable(targeter.table(iprofile), rownames = FALSE,  
+  #               selection="none", autoHideNavigation = TRUE, 
+  #               escape = -ifelse(is.null(metadata),1,2),
+  #               options=list(pageLength=10))
 
   print(fullplot(iprofile, 
     which_plot = eval(parse(
