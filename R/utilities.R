@@ -45,6 +45,22 @@ label <- function(var, metadata, var_field="var", label_field="LABEL",lang=NULL)
 
 }
 
+#' @title table.crossvar: build a meaningful table from a crossvar object.
+#'
+#' @description This functions builds a dataframe that gather most relevant
+#' information from a crossvar object. Useful in reports, associated with
+#' kableExtra or other tables output generating engine.
+#'
+#' @param x crossvar - crossvar object (stored in targeter$profiles slot).
+#' @param round_digits integer - number of digits to rounds some values.
+#' @return a data.frame
+#' @export table.crossvar
+#'
+#' @examples
+#' \dontrun{
+#' tar <- targeter(adult, target = 'ABOVE50K')
+#' table.crossvar(tar$profiles[['EDUCATION']])
+#' }
 
 table.crossvar <- function (x, round_digits = 3,...){
     if (x$target_type %in% c("binary", "categorical")) {
