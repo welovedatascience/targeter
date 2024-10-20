@@ -7,6 +7,7 @@
 report(
   object,
   template = NULL,
+  template_params = NULL,
   summary_object = NULL,
   browse = FALSE,
   ntop = NULL,
@@ -24,44 +25,67 @@ report(
 \arguments{
 \item{object}{an object of calss "targeter".}
 
-\item{template}{template file path. By default, it put to NULL and take the default template.}
+\item{template}{template file path. By default, it put to NULL and take the
+default template.}
 
-\item{summary_object}{an object of class "summary.targeter": pre-computed summary of object.}
+\item{template_params}{list of parameters passed to template used for report.
+ targeter paackage default template handles a parameter called 'show_tables'
+(default=TRUE). Your own template files might have other parameters.
+value "ask" is possible if template contains parameters with suitable
+definition for interactive user interface, user can explicitely require
+render to ask for parameters value --
+cf. https://bookdown.org/yihui/rmarkdown/params-knit.html}
+
+\item{summary_object}{an object of class "summary.targeter": pre-computed
+summary of object.}
 
 \item{browse}{by default TRUE : print in the browse the output.}
 
-\item{ntop}{integer - number of variables to show in the report. For more information, see the function focus By default, NULL i.e. all variables are taken.}
+\item{ntop}{integer - number of variables to show in the report. For more
+information, see the function focus By default, NULL i.e. all variables are
+ taken.}
 
-\item{nmin}{integer - minimum number of profiles in the selected class. For more information, see the function focus.}
+\item{nmin}{integer - minimum number of profiles in the selected class.
+For more information, see the function focus.}
 
-\item{criteria}{character - By default, the value is index.max.index. For more information, see the function focus.}
+\item{criteria}{character - By default, the value is index.max.index.
+For more information, see the function focus.}
 
-\item{min_criteria}{- By default NULL. If it's specified, only the observations which have criteria >= min_criteria.}
+\item{min_criteria}{- By default NULL. If it's specified, only the
+observations which have criteria >= min_criteria.}
 
-\item{metadata}{data.frame - if metadata is  loaded in R environment, label of the variables can be used. Default value (NULL) corresponds to no metadata available.
+\item{metadata}{data.frame - if metadata is  loaded in R environment,
+label of the variables can be used. Default value (NULL) corresponds to
+no metadata available.
 The label will be used for the title and the x-axis of the graph.}
 
-\item{force_vars}{- character, list of variables that will be kept and then won't never be filtered.}
+\item{force_vars}{- character, list of variables that will be kept and then
+won't never be filtered.}
 
-\item{output_format}{- By default it's html. For a pdf, output_format="pdf_document" and for a word, output_format="word_document".}
+\item{output_format}{- By default it's html co. For a pdf, output_format =
+"pdf_document" and for a word, output_format="word_document".}
 
-\item{output_file}{- name of the output file to be generated. If NULL (default) an, automated name will be generated.}
+\item{output_file}{- name of the output file to be generated. If NULL
+(default) an, automated name will be generated.}
 
 \item{output_dir}{- output directory, default: tempdir().}
 
 \item{...}{other parameter from the function render.}
 }
 \value{
-path to the generated report. Side effect would be to open a document, if \code{browse} is TRUE.
+path to the generated report. Side effect would be to open a 
+document, if \code{browse} is TRUE.
 }
 \description{
-This function creates an automatic report according to a predefined template in the package or a user-generated template.
+This function creates an automatic report according to a
+ predefined template in the package or a user-generated template.
 }
 \examples{
 \dontrun{
-t <- targeter(adult,target ="ABOVE50K",analysis_name="Analyse",naming_conventions=FALSE)
-report(t,output_format="pdf_document")
-report(ntop=5)
+t <- targeter(adult, target ="ABOVE50K", analysis_name="Analyse",
+naming_conventions=FALSE)
+report(t, output_format = "pdf_document")
+report(ntop = 5)
 }
 }
 \seealso{
