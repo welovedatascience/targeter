@@ -145,12 +145,13 @@ plot.crossvar_numeric <- function(x,
   }
 
   if (!is.numeric(dfm[['level']])){
-    dfm$level <- factor(dfm$level, levels=x$orderlabel)
+    dfm$level <- factor(dfm$level, levels = x$orderlabel)
   }
 
   plotValues <- function(dfm, forNA=FALSE){
     if (show == "boxplot"){
-      p1 <- ggplot2::ggplot(dfm,                              # Draw multiple ggplot2 boxplots
+      p1 <- ggplot2::ggplot(dfm,                              
+      # Draw multiple ggplot2 boxplots
                             ggplot2::aes(x = level,
                                          ymin = bxp_min,
                                          lower = q25,

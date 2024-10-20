@@ -314,6 +314,8 @@ targeter <- function(data,
     if (autoguess_nrows==0) autoguess_nrows <- nrow(data)
     autoguess_nrows <- min(autoguess_nrows, nrow(data))
     data_types <- dt_vartype_autoguess(data[1:autoguess_nrows,..select_vars], num_as_categorical_nval)
+    # print(data_types)
+
     cl <- sapply(data[,..select_vars], function(x)class(x)[1])
     to_convert <- names(data_types)[data_types!="numeric" & (cl %in% c("numeric","integer"))]
     # print(cl)
@@ -778,6 +780,8 @@ targeter <- function(data,
         orderlabel <- t1[order(-tab[,"count"])]
       } else if (order_label_ivar %in% c("props","means")){
         orderlabel <- t1[order(-tab[,'avg'])] # note: categorical: arbitrary ordered by second column
+      } else if (order_label_ivar %in% "ordered") {
+        orderlabel <- levels(data[[variable]])
       }
       cross$stats <- tab
       class(cross) <- c("crossvar",paste("crossvar", target_type, sep="_"), class(cross))
