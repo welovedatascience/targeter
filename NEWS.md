@@ -1,4 +1,12 @@
 
+
+# targeter 1.1.1
+
+* reverse back to correct WoE computing for binary/numeric targets; adaptation
+  for categorical targets to be done.
+    
+
+
 # targeter 1.1.0
 
 * default templates now have parameters to display tables or not and `report` 

@@ -1,7 +1,7 @@
 Package: targeter
 Type: Package
 Title: Efficient Visual Targets Exploration 
-Version: 1.1.0
+Version: 1.1.1
 Authors@R: c(
     person("Eric","Lecoutre", email = "eric.lecoutre@welovedatascience.com", 
     role = c("aut", "cre")),

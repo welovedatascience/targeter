@@ -136,16 +136,16 @@ report <- function(object,
                           "word" = "word",
                           "pdf" = "latex")
 
-  print(utils::head(metadata,2))
-  print(utils::head(summary_object,2))
+  # print(utils::head(metadata,2))
+  # print(utils::head(summary_object,2))
 
-  print(template_params)
+  # print(template_params)
   outfile <- rmarkdown::render(template,
                                output_format = paste(output_format,
                                "document", sep="_"),
                                output_file = output_file,
                                output_dir = output_dir,
-                               params = template_params,...)
+                               params = template_params, ...)
   if (browse) utils::browseURL(outfile)
   return(outfile)
 }
