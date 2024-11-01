@@ -25,7 +25,13 @@ params:
     label: "Display information for decision tree (if fitted)"
     value: FALSE
     input: checkbox
+  decision_tree_format:
+    label: "format for the decison tree"
+    input: select
+    value: static
+    choices: [static, interactive]
 header-includes:
+
   - \usepackage{array}
   - \usepackage{booktabs}
 ---
@@ -222,7 +228,7 @@ for (i in seq_along(varnames)){
 if (params$decision_tree){
   if (object$decision_tree && inherits(object$decision_tree_model, 'rpart')){
     cat('\n\n<h2>Decison Tree</h2>\n\n')
-    treeplot(object$decision_tree_model)
+    treeplot(object$decision_tree_model, format= params$decision_tree_format)
   }
 }
 
