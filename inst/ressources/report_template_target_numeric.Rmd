@@ -185,7 +185,7 @@ for (i in seq_along(varnames)){
   cat("\n\n\\newpage\n\n")
 
   if (format_tables=="html"){
-    cat(paste0("<div id='var-",tolower(ivar),"'>\n\n## ",label(ivar, metadata=metadata), ifelse(ivar_label!=ivar, paste0(" (",ivar,")"),""),"\n</div>"))
+    cat(paste0("<div id='var-",tolower(ivar),"'>\n\n### ",label(ivar, metadata=metadata), ifelse(ivar_label!=ivar, paste0(" (",ivar,")"),""),"\n</div>"))
     
     if (params$show_tables){
       tari <- table.crossvar(iprofile)

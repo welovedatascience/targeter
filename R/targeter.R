@@ -10,72 +10,111 @@ if(getRversion() >= "3.1.0") utils::globalVariables(
 )
 
 #' @title targeter
-#' @description For each variable, the function crosses two variables: a target to be explained and an explanatory variable.
-#'For this purpose, these variables are converted in categorical variables by a binning process and the statistics
+#' @description For each variable, the function crosses two variables: a target 
+#' to be explained and an explanatory variable.
+#'For this purpose, these variables are converted in categorical variables by a
+#' binning process and the statistics
 #'are derived.
 #'\itemize{
-#'\item The contingency table gives the counts of each class of the explanatory variable for each modality of the target.
-#'\item A proportion is calculated as the count of profiles per class and target modality is divided by the sum of profiles by class (=count/sum of row counts).
-#'\item An index is calculated as the proportion of profiles per class and modality divided by the proportion of the modality of all profiles (=proportion / (sum of column counts/sum of all counts)).
+#'\item The contingency table gives the counts of each class of the explanatory 
+#' variable for each modality of the target.
+#'\item A proportion is calculated as the count of profiles per class and target
+#' modality is divided by the sum of profiles by class 
+#' (=count/sum of row counts).
+#'\item An index is calculated as the proportion of profiles per class and
+#' modality divided by the proportion of the modality of all profiles
+#' (=proportion / (sum of column counts/sum of all counts)).
 #'\itemize{
 #'\item If the value of the index is high (more than one), it implies that
 #'for this subpopulation is over-represented for this variable.
-#'\item If the value of the index is equal to 1, the criterium is not significant
+#'\item If the value of the index is equal to 1, the criterium is not
+#' significant
 #'\item If the value of the index is less than 1, it implies that
 #'for this subpopulation is sub-represented for this variable.
 #'}
-#'\item Weight of Evidence and Information Value are derived for binary and continuous targets.
+#'\item Weight of Evidence and Information Value are derived for binary 
+#' and continuous targets.
 #'}
 #'
 #' @param data data - data.table or data.frame.
 #' @param description_data text on the description of data.
 #' @param target character - name of the variable to explain.
-#' @param target_type character: type of target - one of 'autoguess' (default), 'binary','categorical' (>2 modalities) or 'numeric'.
-#' ExpParameter expansion if applied so that one could also use 'a' or 'b','c' or 'n'
-#' @param target_reference_level character or numeric. For categorical or (especially) binary targets, level / value of special
-# interest. If `NULL``default` one will try to infer from target content. Typically, this would be values such as
-#' TRUE or 1 or 'bad' for binary targets.
-#' that
+#' @param target_type character: type of target - one of 'autoguess' (default),
+#' 'binary','categorical' (>2 modalities) or 'numeric'.
+#' @param target_reference_level character or numeric. For categorical or 
+#' (especially) binary targets, level / value of special
+#' interest. If `NULL``default` one will try to infer from target content.
+#' Typically, this would be values such as TRUE or 1 or 'bad' for
+#'  binary targets.
 #' @param description_target text on the description of target.
 #' @param analysis_name  name of the analysis.
-#' @param select_vars  a list of explanatory variables. By default, NULL and all columns are considered.
+#' @param select_vars  a list of explanatory variables. By default, NULL and 
+#' all columns are considered.
 #' @param exclude_vars  a list of variables to exclude from the analysis.
-#' @param naming_conventions boolean - by default TRUE. It means that a certain naming convention is respected.
-#' @param nbins The nbins is by default 10. It is the number of quantiles to be considered.
-#' @param binning_method character, one of 'quantile' (default) or 'clustering', 'smart' (parameter expansion usable).
-#' Method used to derive the `nbins` buckets for the continuous explanatory variables.
-#' @param useNA Two values are possible : "ifany" and "no". By default, the package option is "ifany".
+#' @param naming_conventions boolean - by default TRUE. It means that a certain 
+#' naming convention is respected.
+#' @param nbins The nbins is by default 10. It is the number of quantiles 
+#' to be considered.
+#' @param binning_method character, one of 'quantile' (default) or 
+#' 'clustering', 'smart' (parameter expansion usable).
+#' Method used to derive the `nbins` buckets for the continuous 
+#' explanatory variables.
+#' @param useNA Two values are possible : "ifany" and "no". By default, the
+#'  package option is "ifany".
 #' \itemize{
-#' \item The value "ifany" takes in consideration the missing values if there are any.
-#' \item The value "no" doesn't take in consideration the missing values in any case.
+#' \item The value "ifany" takes in consideration the missing values 
+#' if there are any.
+#' \item The value "no" doesn't take in consideration the missing values 
+#' in any case.
 #' }
-#' @param verbose - boolean (default FALSE). If TRUE some more information is displayed in console. Could be useful
+#' @param verbose - boolean (default FALSE). If TRUE some more information is
+#' displayed in console. Could be useful
 #' when using package on big data.
-#' @param dec - integer : the number of decimal for numeric variable. By default, the value is 2.
-#' @param order_label character - this option output an order used for the plot function. The parameter can only take the following values:
+#' @param dec - integer : the number of decimal for numeric variable.
+#' By default, the value is 2.
+#' @param order_label character - this option output an order used for the
+#' plot function. The parameter can only take the following values:
 #' \itemize{
-#' \item "auto": for the numeric variable, the order is alphabetic. For the categorical variable, the order is the count
+#' \item "auto": for the numeric variable, the order is alphabetic.
+#' For the categorical variable, the order is the count
 #' \item "alpha": order alphabetic
 #' \item "count": order decreasing of the number of observations by class
-#' \item "props : order decreasing by the proportion of the second value of the target
+#' \item "props : order decreasing by the proportion of the second value of
+#' the target
 #' \item "means : order decreasing by the target mean (continuous target)
 #' }
-#' @param cont_target_trim numeric (default 0.01). For continuous targets, it is desirable to trim
-#' extreme values before computing WOE. This is the trimming factor in percentage (between 0: no trim and <1).
-#' @param bxp_factor (default) 1.5 for continuous target, coefficient to be used to compute boxplot whiskers.
-#' @param num_as_categorical_nval (default: 5). If a variable has less than num_as_categorical_nval distinct values,
+#' @param cont_target_trim numeric (default 0.01). For continuous targets,
+#' it is desirable to trim
+#' extreme values before computing WOE. This is the trimming factor in
+#' percentage (between 0: no trim and <1).
+#' @param bxp_factor (default) 1.5 for continuous target, coefficient to be
+#' used to compute boxplot whiskers.
+#' @param num_as_categorical_nval (default: 5). If a variable has less than
+#' num_as_categorical_nval distinct values,
 #' it will be considered and used as categorical and not numeric.
-#' @param autoguess_nrows - integer (default 1000). Numbers of rows to be used to guess the variables types.
+#' @param autoguess_nrows - integer (default 1000). Numbers of rows to be used
+#' to guess the variables types.
 #' Special value 0 could be provided and then all rows be be used.
-#' @param woe_alternate_version character. Specify in which context WOE alternate definition will be used
-#' See vignette on  methodology. Possible values are 'if_continuous' (default) or 'always'.
-#' @param woe_shift numeric (default) 0.01. Shifting value in WOE computation to prevent issues when one bucket
-#' contains 0\% or 100\% of target. For binary target, some people also propose to use 0.5.
-#' @param woe_post_cluster boolean (default FALSE). Once WOE are computed, on could cluster values to see if this
-#'  this could be adequate to group together some modalities/buckets. Clusters would be used in graphics. See vignette on methodology.
-#' @param woe_post_cluster_n integer (default: 6). If woe_post_cluster is TRUE, number of clusters to be used.
-#' @param smart_quantile_by numeric, for binning method 'smart', quantile step - default y step of 0.01.
-
+#' @param woe_alternate_version character. Specify in which context WOE
+#' alternate definition will be used
+#' See vignette on  methodology. Possible values are 'if_continuous' (default)
+#' or 'always'.
+#' @param woe_shift numeric (default) 0.01. Shifting value in WOE computation
+#' to prevent issues when one bucket
+#' contains 0\% or 100\% of target. For binary target, some people also propose
+#' to use 0.5.
+#' @param woe_post_cluster boolean (default FALSE). Once WOE are computed, on
+#' could cluster values to see if this
+#'  this could be adequate to group together some modalities/buckets. Clusters
+#' would be used in graphics. See vignette on methodology.
+#' @param woe_post_cluster_n integer (default: 6). If woe_post_cluster is TRUE,
+#' number of clusters to be used.
+#' @param smart_quantile_by numeric, for binning method 'smart',
+#' quantile step - default y step of 0.01.
+#' @param decision_tree boolean (default FALSE). Should a decision tree be fit
+#' on source variables.
+#' @param decision_tree_maxdepth integer (default 3). Maximum depth for the 
+#' decision tree if one is fit.
 
 #'
 #'
@@ -85,11 +124,14 @@ if(getRversion() >= "3.1.0") utils::globalVariables(
 #' \item dataname - name of the analyzed dataset.
 #' \item description_data text about the description of data
 #' \item target - name of the target.
-#' \item target_type - Target type, one of autoguess (default)/binary/numeric/categorical (text is expended so "b" also works for binary)
+#' \item target_type - Target type, one of autoguess (default) / binary / 
+#' numeric / categorical (text is expended so "b" also works for binary)
 #' \item description_target text about the description of target
 #' \item analysis - name of the analysis.
 #' \item date - date of the analysis.
-#' \item profiles : list of elements containing the result the individual crossing per variable.
+#' \item decision_tree_model - the fitted decision tree by `rpart` (if asked so)
+#' \item profiles : list of elements containing the result the
+#' individual crossing per variable.
 #' See crossvar class documentation.
 #' }
 #'
@@ -112,52 +154,102 @@ if(getRversion() >= "3.1.0") utils::globalVariables(
 
 ## <idea> check for WOE monotonicity
 targeter <- function(data,
-                     description_data =NULL,
-                     target,
-                     target_type = c("autoguess","binary","categorical","numeric"),
-                     target_reference_level = NULL, # NULL: auto will check for 1, TRUE
-                     description_target = NULL,
-                     analysis_name=NULL,
-                     select_vars=NULL,
-                     exclude_vars=NULL,
-                     nbins=12,
-                     binning_method=c("quantile","clustering","smart"), # todo: tree (min size)+ constrained clustrering  https://cran.r-project.org/web/packages/scclust/scclust.pdf
-                     naming_conventions=getOption("targeter.use_naming_conventions", default = FALSE),
-                     useNA = getOption("targeter.useNA", default = TRUE), #option package by default
-                     verbose=FALSE,
-                     dec = 2,
-                     order_label = c("auto","alpha","count","props","means"),
-                     cont_target_trim=0.01,
-                     bxp_factor=1.5,
-                     num_as_categorical_nval = 5,
-                     autoguess_nrows = 1000, # 0: use all rows
-                     woe_alternate_version = c("if_continuous","always"),
-                     woe_shift=0.01,
-                     woe_post_cluster=FALSE,
-                     woe_post_cluster_n=6,
-                     smart_quantile_by=0.01,
-                     decision_tree = FALSE,
-                     decision_tree_maxdepth = 3,
-                     decision_tree_cp = 0
+  description_data =NULL,
+  target,
+  target_type = c("autoguess", "binary", "categorical", "numeric"),
+  target_reference_level = NULL, # NULL: auto will check for 1, TRUE
+  description_target = NULL,
+  analysis_name=NULL,
+  select_vars=NULL,
+  exclude_vars=NULL,
+  nbins=12,
+  binning_method=c("quantile", "clustering", "smart"),
+  # todo: tree (min size)+ constrained clustrering  https://cran.r-project.org/web/packages/scclust/scclust.pdf
+  naming_conventions=
+    getOption("targeter.use_naming_conventions", default = FALSE),
+  useNA = 
+    getOption("targeter.useNA", default = TRUE), #option package by default
+  verbose=FALSE,
+  dec = 2,
+  order_label = c("auto", "alpha", "count", "props", "means"),
+  cont_target_trim = 0.01,
+  bxp_factor = 1.5,
+  num_as_categorical_nval = 5,
+  autoguess_nrows = 1000, # 0: use all rows
+  woe_alternate_version = c("if_continuous", "always"),
+  woe_shift = 0.01,
+  woe_post_cluster = FALSE,
+  woe_post_cluster_n = 6,
+  smart_quantile_by = 0.01,
+  decision_tree = FALSE,
+  decision_tree_maxdepth = 3,
+  decision_tree_cp = 0
 ){
 
   ##test
-  assertthat::assert_that(inherits(data,"data.frame") | inherits(data, "data.table"), msg = "Data must to be a data.frame or a data.table")
-  assertthat::assert_that(inherits(target,"character"), msg = "Target must to be a character")
-  assertthat::assert_that(target %in% colnames(data), msg = "Target doesn't exist in the dataset")
-  assertthat::assert_that(length(target)==1,msg="Only one target is admitted")
-  assertthat::assert_that(length(unique(data[[target]])) > 1, msg = "The target contains only one value.")
-  assertthat::assert_that(inherits(select_vars,"character")| is.null(select_vars), msg = "select_vars must to be a character")
-  assertthat::assert_that(inherits(exclude_vars,"character")| is.null(exclude_vars), msg = "exclude_vars must to be a character")
-  assertthat::assert_that(inherits(analysis_name,"character")|is.null(analysis_name), msg = "analysis_name must to be a character")
-  assertthat::assert_that(inherits(naming_conventions,"logical"),msg = "The parameter naming_convetions accepts only TRUE and FALSE like values")
-  assertthat::assert_that(inherits(verbose,"logical"),msg="The parameter verbose accepts only TRUE and FALSE like values")
-  assertthat::assert_that(inherits(description_target,"character")|is.null(description_target), msg = "description_target must to be a character or NULL")
-  assertthat::assert_that(inherits(description_data,"character")|is.null(description_data), msg = "description_data must to be a character or NULL")
-  assertthat::assert_that(inherits(dec,"integer")| inherits(dec,"numeric"),msg ="The parameter dec must to be an integer")
-  assertthat::assert_that(inherits(order_label,"character"), msg = "The parameter order_label must to be character")
-  assertthat::assert_that(inherits(useNA,"character"), msg = "The parameter UseNA must to be character")
-  assertthat::assert_that(inherits(nbins,"numeric")|inherits(nbins,"integer"), msg = "The parameter nbins must to be numeric")
+  assertthat::assert_that(
+    inherits(data,"data.frame") | inherits(data, "data.table"),
+    msg = "Data must to be a data.frame or a data.table")
+
+  assertthat::assert_that(
+    inherits(target,"character"),
+    msg = "Target must to be a character")
+
+  assertthat::assert_that(
+    target %in% colnames(data),
+    msg = "Target doesn't exist in the dataset")
+
+  assertthat::assert_that(
+    length(target)==1,
+    msg="Only one target is admitted")
+
+  assertthat::assert_that(
+    length(unique(data[[target]])) > 1,
+    msg = "The target contains only one value.")
+
+  assertthat::assert_that(
+    inherits(select_vars,"character")| is.null(select_vars),
+    msg = "select_vars must to be a character")
+
+  assertthat::assert_that(
+    inherits(exclude_vars,"character")| is.null(exclude_vars),
+    msg = "exclude_vars must to be a character")
+
+  assertthat::assert_that(
+    inherits(analysis_name,"character")|is.null(analysis_name),
+    msg = "analysis_name must to be a character")
+
+  assertthat::assert_that(
+    inherits(naming_conventions,"logical"),
+    msg = "The parameter naming_convetions accepts only booleans")
+
+  assertthat::assert_that(
+    inherits(verbose,"logical"),
+    msg="The parameter verbose accepts only TRUE and FALSE like values")
+
+  assertthat::assert_that(
+    inherits(description_target,"character") | is.null(description_target),
+    msg = "description_target must to be a character or NULL")
+
+  assertthat::assert_that(
+    inherits(description_data,"character") | is.null(description_data),
+    msg = "description_data must to be a character or NULL")
+
+  assertthat::assert_that(
+    inherits(dec,"integer") | inherits(dec,"numeric"),
+    msg ="The parameter dec must to be an integer")
+
+  assertthat::assert_that(
+    inherits(order_label,"character"),
+    msg = "The parameter order_label must to be character")
+
+  assertthat::assert_that(
+    inherits(useNA,"character"),
+    msg = "The parameter UseNA must to be character")
+
+  assertthat::assert_that(
+    inherits(nbins,"numeric") | inherits(nbins,"integer"),
+    msg = "The parameter nbins must to be numeric")
   ## <todo>conditions on other parameters to be added : cont_target_trim....
   ##retrieve the name of the data
   dataname <- deparse(substitute(data))
@@ -170,12 +262,18 @@ targeter <- function(data,
     setnames(data,"target","...target")
     target <- "...target"
   }
-  target_type <- match.arg(target_type, c("autoguess","binary","categorical","numeric"), several.ok = FALSE)
-  woe_alternate_version <- match.arg(woe_alternate_version,c("if_continuous","always"), several.ok = FALSE)
+  target_type <- match.arg(
+    target_type, c("autoguess", "binary", "categorical", "numeric"),
+    several.ok = FALSE)
+  
+  woe_alternate_version <- match.arg(
+    woe_alternate_version, c("if_continuous", "always"),
+    several.ok = FALSE)
 
   ##analysis name
-  if (is.null(analysis_name)) analysis_name <- paste("Analysis of ", target, "on data:", dataname)
-
+  if (is.null(analysis_name)) {
+    analysis_name <- paste("Analysis of ", target, "on data:", dataname)
+  }
   ## By default, the variable NA take the value "ifany"
   useNA <- useNA[1]
   ## the variable useNA can only  accept the two values
@@ -246,9 +344,13 @@ targeter <- function(data,
     positions <- which(cn!=nn)
     info <- paste(cn[positions],nn[positions], sep='->', collapse = '\t')
     msg <- c(msg, list(WARNING=paste(
-      "silently changing some variables names to be valid unique R names:", info,'\n\tPlease note it might lead to issues with metadata and that unique valid R names should be used (see make.names(x, unique=TRUE))'))
+      "silently changing some variables names to be valid unique R names:",
+      info, '\n\tPlease note it might lead to issues with metadata and that
+      unique valid R names should be used (see make.names(x, unique=TRUE))'))
     )
-    colnames(data)[positions] <- new_names  # we don't use setnames as we might have duplicated names, setnames would raise a warning and not necessary do what we want
+    colnames(data)[positions] <- new_names  
+    # we don't use setnames as we might have duplicated names, setnames would
+    # raise a warning and not necessary do what we want
     select_vars <- nn
   }
   # target
@@ -259,7 +361,10 @@ targeter <- function(data,
     new_names <- nn[cn!=nn]
     info <- paste(cn,nn, sep='->', collapse = '\t')
     msg <- c(msg, list(WARNING=paste(
-      "silently changing target names to be valid  R name:", info, '\n\tPlease note it might lead to issues with metadata and that unique valid R names should be used (see make.names(x, unique=TRUE))'))
+      "silently changing target names to be valid  R name:",
+      info,
+      '\n\tPlease note it might lead to issues with metadata and that unique
+      valid R names should be used (see make.names(x, unique=TRUE))'))
     )
     setnames(data, old_names, new_names)
     target <- nn
@@ -426,7 +531,7 @@ targeter <- function(data,
   binning_foos <- list(
     quantile = binning_quantile,
     clustering = binning_clustering,
-    smart=binning_smart)
+    smart = binning_smart)
 
   binning_foo <- binning_foos[[binning_method]] 
 
@@ -606,43 +711,6 @@ targeter <- function(data,
       # ## we drop the column variable
       tab <- tab[, -1, drop=FALSE]
 
-      #   cutpoints_list[[variable]] <-
-      #   nb <- length(cutpoints_list[[variable]]) ## number of values
-      #   lab <- vector(length = nb-1) ##vector to stock label
-      #   let <- c(letters)[1:nb]
-      #   for(i in 1:nb -1 ){
-      #     if(i < nb-1){
-      #       lab[i] <- paste0("[",let[i],"] from ", cutpoints_list[[variable]][i], " to ",cutpoints_list[[variable]][i+1])
-      #     }else{
-      #       lab[i] <- paste0("[",let[i],"] from ", cutpoints_list[[variable]][i], " to ",cutpoints_list[[variable]][i+1])}}
-      #   ## to add the extreme label
-      #   #        label <- c(paste("[a] moins de",cutpoints_list[[variable]][1]),lab, paste("[",let[length(let)],"] plus de",cutpoints_list[[variable]][nb]))
-      #   ##combine label with numbers
-      #   label <- lab
-      #   if (length(label)==0){
-      #     label <- paste0("==",cutpoints_list[[variable]])
-      #     lab_all <- as.data.frame(cbind(0,label),stringsAsFactors = FALSE)
-      #   }
-      #   else {
-      #     lab_all <- as.data.frame(cbind(seq(1:(nb-1)),label),stringsAsFactors = FALSE)
-      #   }
-      #
-      #   ##associate the label to tab
-      #   tab <- merge(tab,lab_all,by.x="variable",by.y="V1",all.x=TRUE)
-      #   ##associate the good label
-      #   for(i in 1:length(rownames(tab))){
-      #     if(!is.na(tab$label[i])){
-      #       # rownames(tab)[i] = label[i]
-      #       rownames(tab)[i] = tab$label[i]
-      #     }else{ rownames(tab)[i] = tab$variable[i]}
-      #   }
-      #   tab <- tab[,-ncol(tab)]
-      #
-      # }
-      #
-      #
-      # ## we drop the column variable
-      # tab <- tab[,-1]
       rownames(tab)[rownames(tab)==''] <- '[empty]'
       return(tab)
     }
@@ -650,7 +718,7 @@ targeter <- function(data,
     tab <- treat_tab_labels(tab, variable, is_numeric=(variable %in% num_vars),cutpoints_list)
 
     order_label_ivar <- order_label
-    if(order_label == "auto"){
+    if (order_label == "auto"){
       if(variable %in% num_vars){
         order_label_ivar <- "alpha"
       } else if (variable %in% ord_vars) {order_label_ivar <- "ordered"} else {
@@ -663,13 +731,14 @@ targeter <- function(data,
 
     if (variable %in% num_vars){
       cross$variable_type <- 'numeric'
-      numcenters <-    cutcenter_list[[variable]]
+      numcenters <-    cutcenter_list[[variable]] 
       # print(numcenters)
       rn <- rownames(tab)
       rn <- rn[rn != '[Missing]']
       # print(rn)
       names(numcenters) <- rn
       cross$numcenters <- numcenters
+      cross$cutpoints <- cutpoints_list[[variable]]
 
     } else {
       cross$variable_type <- 'character'
@@ -835,11 +904,13 @@ targeter <- function(data,
 
   out$decision_tree <- decision_tree
   if (decision_tree){
-    assertthat::assert_that(system.file(package="visNetwork") != "", 
-    msg = "Package visNetwork is required for this functionality (suggested for targeter)")
+    assertthat::assert_that(system.file(package="rpart") != "", 
+    msg = "Package rpart is required for this functionality (suggested for targeter)")
     if (length(dt_vars_exp) < 2) {
-    cat("\n too few columns to grow decition tree.\n") } else {
 
+      msg <- c(msg, list(WARNING="too few columns to grow decition tree."))
+
+    
       formula_txt <- as.formula("L_TARGET~.")
 
         # from explore::explain_tree function
