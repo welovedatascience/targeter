@@ -240,5 +240,3 @@ fullplot <- function(x,
   )
   return(allplots)
 }
-
-

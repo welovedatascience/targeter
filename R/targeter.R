@@ -343,7 +343,75 @@ targeter <- function(data,
     cat("\n")
     cat(paste(names(msg),msg, sep=":" , collapse = "\n"))
     cat("\n")
-    stop("\nNo explanatory variable remaining. Check variables and naming conventions if used.")
+    stop("\nNo explanatory variable remaining. Check variables 
+    and naming conventions if used.")
+  }
+
+
+  ##function to cut in classes.
+  ## binning > quantile ----
+  binning_quantile <- function(x, nbins, variable) {
+    ## put a vector from 0 to 1 by 1/nbins
+    quantiles <- seq(0, 1, length.out = nbins+1)
+    ## take the value of the quantile for the variable x
+    cutpoints <- unname(unique(stats::quantile(x, quantiles, na.rm = TRUE)))
+
+    centers <- cutpoints[-length(cutpoints)] + diff(cutpoints / 2)
+    cutcenter_list[[variable]] <<- centers
+
+    ## values of the quantiles for the variables
+    cutpoints_list[[variable]] <<- cutpoints
+    ## find the interval containing each element of x in cutpoints
+    findInterval(x,cutpoints, rightmost.closed = TRUE)
+  }
+
+  ## binning > clustering ----
+  binning_clustering <- function(x, nbins, variable){
+    cl_centers <- Ckmeans.1d.dp::Ckmeans.1d.dp(x[!is.na(x)], k = nbins)$centers
+    cutcenter_list[[variable]] <<- cl_centers
+    cutpoints <- sort(
+      unique(
+        c(cl_centers[-length(cl_centers)] +
+            diff(cl_centers/2), range(x, na.rm = TRUE))
+      )
+    )
+
+    cutpoints_list[[variable]] <<- cutpoints
+    ## find the interval containing each element of x in cutpoints
+    findInterval(x,cutpoints, rightmost.closed=TRUE)
+  }
+
+  ## binning > smart ----
+  binning_smart <- function(x, nbins, variable){
+    # if (verbose)cat("\n smart binning:", variable)
+    quantiles <- seq(0, 1, length.out = 1 + round(1 / smart_quantile_by))
+    nqu <- length(quantiles)
+    qu_indices <- (1:nqu) %/% (nqu/nbins)
+    ## take the value of the quantile for the variable x
+    qu <- quantile(x, quantiles, na.rm = TRUE)
+    qmin <- qu[1]
+    qmax <- qu[nqu]
+
+    qu[qu == -Inf] <- min(x[is.finite(x)], na.rm = TRUE)
+    qu[qu == Inf] <- max(x[is.finite(x)], na.rm = TRUE)
+    #unique values
+    uqu <- qu[names(qu)[!duplicated(qu_indices)]]
+    new_nbin <- min(c(length(unique(uqu)),nqu))
+    # cl_centers <- 
+    #   Ckmeans.1d.dp::Ckmeans.1d.dp(x[!is.na(x)], k=new_nbin)$centers
+    cl_centers <- clustering.sc.dp::clustering.sc.dp(matrix(qu, ncol = 1),
+      k = new_nbin)$centers[,1]
+    cutcenter_list[[variable]] <<- cl_centers
+
+    cutpoints <- sort(
+      unique(
+        c(cl_centers[-length(cl_centers)] + diff(cl_centers / 2), qmin, qmax)
+      )
+    )
+
+    cutpoints_list[[variable]] <<- cutpoints
+    ## find the interval containing each element of x in cutpoints
+    findInterval(x,cutpoints, rightmost.closed = TRUE)
   }
 
 
@@ -354,61 +422,6 @@ targeter <- function(data,
   cutcenter_list <- vector(mode="list", length=length(num_vars))
   names(cutcenter_list) <- num_vars
 # print(cutcenter_list)
-
-  ##function to cut in classes.
-  ## binning > quantile ----
-  binning_quantile <- function(x, nbins, variable) {
-    ## put a vector from 0 to 1 by 1/nbins
-    quantiles = seq(0, 1, length.out = nbins+1)
-    ## take the value of the quantile for the variable x
-    cutpoints = unname(unique(stats::quantile(x, quantiles, na.rm = TRUE)))
-
-    centers <- cutpoints[-length(cutpoints)]+diff(cutpoints/2)
-    cutcenter_list[[variable]] <<- centers
-
-    ## values of the quantiles for the variables
-    cutpoints_list[[variable]] <<- cutpoints
-    ## find the interval containing each element of x in cutpoints
-    findInterval(x,cutpoints, rightmost.closed=TRUE)
-  }
-
-  ## binning > clustering ----
-  binning_clustering <- function(x, nbins, variable){
-
-    cl_centers <- Ckmeans.1d.dp::Ckmeans.1d.dp(x[!is.na(x)], k=nbins)$centers
-    cutcenter_list[[variable]] <<- cl_centers
-    cutpoints <- sort(unique(c(cl_centers[-length(cl_centers)]+diff(cl_centers/2), range(x, na.rm=TRUE))))
-    cutpoints_list[[variable]] <<- cutpoints
-    ## find the interval containing each element of x in cutpoints
-    findInterval(x,cutpoints, rightmost.closed=TRUE)
-
-  }
-  ## binning > smart ----
-  binning_smart <- function(x, nbins, variable){
-    # if (verbose)cat("\n smart binning:", variable)
-    quantiles <- seq(0, 1, length.out = 1+round(1/smart_quantile_by))
-    nqu <- length(quantiles)
-    qu_indices <- (1:nqu) %/% (nqu/nbins)
-    ## take the value of the quantile for the variable x
-    qu <- quantile(x, quantiles, na.rm = TRUE)
-    qmin <- qu[1]
-    qmax <- qu[nqu]
-
-    qu[qu == -Inf] <- min(x[is.finite(x)], na.rm=TRUE)
-    qu[qu == Inf] <- max(x[is.finite(x)], na.rm=TRUE)
-
-    uqu <- qu[names(qu)[!duplicated(qu_indices)]]
-    new_nbin <- min(c(length(unique(uqu)),nqu))
-    # cl_centers <- Ckmeans.1d.dp::Ckmeans.1d.dp(x[!is.na(x)], k=new_nbin)$centers
-    cl_centers <- clustering.sc.dp::clustering.sc.dp(matrix(qu,ncol=1), k=new_nbin)$centers[,1]
-    cutcenter_list[[variable]] <<- cl_centers
-    cutpoints <- sort(unique(c(cl_centers[-length(cl_centers)]+diff(cl_centers/2), qmin, qmax)))
-
-    cutpoints_list[[variable]] <<- cutpoints
-    ## find the interval containing each element of x in cutpoints
-    findInterval(x,cutpoints, rightmost.closed=TRUE)
-  }
-
 
   binning_foos <- list(
     quantile = binning_quantile,
@@ -422,7 +435,9 @@ targeter <- function(data,
   ## An element looks like this for variable1
   ## variable1 = quickCut(variable1, nbins = nbins, variable="variable1")
 
-  txtQuickcut <- paste0(paste0(num_vars,"=binning_foo(",num_vars,",nbins=",nbins,", variable='",num_vars,"')"), collapse=",")
+  txtQuickcut <- paste0(
+    paste0(num_vars, "=binning_foo(", num_vars, ",nbins=", nbins, 
+    ", variable='", num_vars, "')"), collapse=",")
 
   ## for character variables no pre treatment is needed
   ## we select only the variables
@@ -844,29 +859,29 @@ targeter <- function(data,
         prior <- n/sum(n)
       #  decision_tree_cp <- 0 # to be put as parametre
         if (all(weights == 1)) {
-                mod <- rpart::rpart(formula_txt, 
+                mod <- try(rpart::rpart(formula_txt, 
                   data = data[,unique(c("L_TARGET",dt_vars_exp)), with = FALSE], 
                   method = "class", 
                   parms = list(prior = prior), 
                   control = rpart::rpart.control(
                       maxdepth = decision_tree_maxdepth, 
                       minsplit = minsplit,
-                      cp = decision_tree_cp))
+                      cp = decision_tree_cp)))
             } else {
-                mod <- rpart::rpart(formula_txt, 
+                mod <- try(rpart::rpart(formula_txt, 
                 data = data[,unique(c("L_TARGET",dt_vars_exp)), with = FALSE],
                 method = "class", 
                     weights = weights, 
                     control = rpart::rpart.control(
                       maxdepth = decision_tree_maxdepth, 
                       minsplit = minsplit,
-                      cp = decision_tree_cp))
+                      cp = decision_tree_cp)))
             }
       } else {
         #numeric target
         minsplit <- 30
         data[, L_TARGET:=get(target)]
-        mod <- rpart::rpart(
+        mod <- try(rpart::rpart(
           formula_txt,
           model = TRUE,
           data = data[,unique(c("L_TARGET",dt_vars_exp)), with = FALSE], 
@@ -874,7 +889,7 @@ targeter <- function(data,
                 control = rpart::rpart.control(
                       maxdepth = decision_tree_maxdepth, 
                       minsplit = minsplit,
-                      cp = decision_tree_cp))
+                      cp = decision_tree_cp)))
         }
       out$decision_tree_model <- mod
     }

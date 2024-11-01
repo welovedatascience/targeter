@@ -218,20 +218,13 @@ for (i in seq_along(varnames)){
 
 ```{r, results='asis', echo=FALSE, fig.height=8, fig.width=9, fig.align='center'} 
 
+
 if (params$decision_tree){
-  if (object$decision_tree && class(object$decision_tree_model)=='rpart'){
+  if (object$decision_tree && inherits(object$decision_tree_model, 'rpart')){
     cat('\n\n<h2>Decison Tree</h2>\n\n')
-    # if (format_tables == "html"){ 
-    #   visNetwork::visTree(object$decision_tree_model)
-    # } else {
-      rpart.plot::rpart.plot(object$decision_tree_model,
-       prefix = "target = ", type = 2, 
-            yesno = 2, branch = 0, branch.type = 5, box.palette = "Blues", 
-            shadow.col = 0, cex = 0.7, left = FALSE)
-    # }
-
+    treeplot(object$decision_tree_model)
   }
-
 }
+
 ```
 
