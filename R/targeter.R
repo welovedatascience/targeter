@@ -135,7 +135,10 @@ targeter <- function(data,
                      woe_shift=0.01,
                      woe_post_cluster=FALSE,
                      woe_post_cluster_n=6,
-                     smart_quantile_by=0.01
+                     smart_quantile_by=0.01,
+                     decision_tree = FALSE,
+                     decision_tree_maxdepth = 3,
+                     decision_tree_cp = 0
 ){
 
   ##test
@@ -334,6 +337,7 @@ targeter <- function(data,
   ## character/catogerical/other variables
   other_vars <- select_vars[!(select_vars %in% c(num_vars))]
 
+  dt_vars_exp <- unique(c(num_vars, ord_vars, other_vars))
   # check: remaining variables (after naming conventions)
   if (length(c(num_vars, other_vars, ord_vars))==0){
     cat("\n")
@@ -813,6 +817,69 @@ targeter <- function(data,
   if (target_type %in% c('binary','categorical')){
     out$target_reference_level <- target_reference_level
   }
+
+  out$decision_tree <- decision_tree
+  if (decision_tree){
+    assertthat::assert_that(system.file(package="visNetwork") != "", 
+    msg = "Package visNetwork is required for this functionality (suggested for targeter)")
+    if (length(dt_vars_exp) < 2) {
+    cat("\n too few columns to grow decition tree.\n") } else {
+
+      formula_txt <- as.formula("L_TARGET~.")
+
+        # from explore::explain_tree function
+
+      if (target_type %in% c('binary')) { 
+        # look in function for categorical targets
+        
+        # we will use weight
+        data[, L_TARGET:=ifelse(get(target)==target_reference_level,1,0)]
+        
+        weights <- explore::weight_target(
+          data[,unique(c("L_TARGET",dt_vars_exp)), with = FALSE],
+          L_TARGET)
+        minsplit <- sum(weights)/10
+
+        n <- table(data[["L_TARGET"]])
+        prior <- n/sum(n)
+      #  decision_tree_cp <- 0 # to be put as parametre
+        if (all(weights == 1)) {
+                mod <- rpart::rpart(formula_txt, 
+                  data = data[,unique(c("L_TARGET",dt_vars_exp)), with = FALSE], 
+                  method = "class", 
+                  parms = list(prior = prior), 
+                  control = rpart::rpart.control(
+                      maxdepth = decision_tree_maxdepth, 
+                      minsplit = minsplit,
+                      cp = decision_tree_cp))
+            } else {
+                mod <- rpart::rpart(formula_txt, 
+                data = data[,unique(c("L_TARGET",dt_vars_exp)), with = FALSE],
+                method = "class", 
+                    weights = weights, 
+                    control = rpart::rpart.control(
+                      maxdepth = decision_tree_maxdepth, 
+                      minsplit = minsplit,
+                      cp = decision_tree_cp))
+            }
+      } else {
+        #numeric target
+        minsplit <- 30
+        data[, L_TARGET:=get(target)]
+        mod <- rpart::rpart(
+          formula_txt,
+          model = TRUE,
+          data = data[,unique(c("L_TARGET",dt_vars_exp)), with = FALSE], 
+                method = "anova",
+                control = rpart::rpart.control(
+                      maxdepth = decision_tree_maxdepth, 
+                      minsplit = minsplit,
+                      cp = decision_tree_cp))
+        }
+      out$decision_tree_model <- mod
+    }
+   } else  out$decision_tree_model <- NA 
+   
   ## assign class
   class(out) <- c("targeter",class(out))
 
