@@ -1,10 +1,15 @@
 
 
+# targeter 1.2
+
+* Added decision trees in computation (option) and default templates.  
+
+
 # targeter 1.1.1
 
 * reverse back to correct WoE computing for binary/numeric targets; adaptation
   for categorical targets to be done.
-    
+
 
 
 # targeter 1.1.0
