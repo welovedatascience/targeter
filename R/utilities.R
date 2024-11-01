@@ -25,7 +25,7 @@ label <- function(var, metadata, var_field="var", label_field="LABEL",lang=NULL)
   metadata <- as.data.frame(metadata)
   rownames(metadata) <- metadata[[var_field]]
   assertthat::assert_that(inherits(var,"character"), msg = "var must be character")
-  assertthat::assert_that(length(var)==1,msg="Only one var is admitted")
+  # assertthat::assert_that(length(var)==1,msg="Only one var is admitted")
 
   assertthat::assert_that(var_field %in% names(metadata), msg = paste("var_field ",var_field,"not present in metadata"))
 

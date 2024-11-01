@@ -22,7 +22,7 @@ params:
     input: text
   decision_tree:
     label: "Display information for decision tree (if fitted)"
-    value: FALSE
+    value: TRUE
     input: checkbox
   decision_tree_format:
     label: "format for the decison tree"
@@ -201,11 +201,39 @@ cat("\n\n### ",label(ivar, metadata=metadata),"\n")
 
 
 ```{r, results='asis', echo=FALSE, fig.height=8, fig.width=9, fig.align='center'} 
-
 if (params$decision_tree){
   if (object$decision_tree && inherits(object$decision_tree_model, 'rpart')){
-    cat('\n\n<h2>Decison Tree</h2>\n\n')
-    treeplot(object$decision_tree_model, format= params$decision_tree_format)
+
+    cat('\n\n## Decison Tree {.tabset .tabset-fade .tabset-pills}\n\n')
+    treeplot(object, format= params$decision_tree_format)
+
+    dt <- object$decision_tree_model
+    dt_vars <- dt$frame['var']
+    dt_vars <- unique(dt_vars[dt_vars != '<leaf>'])
+    vars_imp <- dt$variable.importance
+    vars_imp_df <- data.frame(var = names(vars_imp), importance=round(vars_imp))
+    vars_imp_df[['importance']] <- round(100 * vars_imp_df[['importance']] /
+      sum(vars_imp_df[['importance']]), 1)
+    vars_imp_df[['tree?']] <- ifelse(vars_imp_df[['var']]%in% dt_vars, '*','')
+    top10 <- head(rownames(vars_imp_df),10)
+    selvars <- unique(c(top10, dt_vars)) 
+    vars_imp_df_top <- vars_imp_df[selvars,]
+    in_profiles <- selvars %in% names(object$profiles)
+    txt_vars <- vars_imp_df_top[['var']]
+    vars_labels <-  label(txt_vars, metadata = metadata)
+    
+    if (identical(vars_labels, txt_vars)) vars_labels <- NULL
+    
+    # hyperlinks (when varibale in report):
+    txt_vars[which(in_profiles)] <- paste0('[',
+    vars_imp_df_top[['var']][which(in_profiles)], ']',
+    '(#var-',tolower(vars_imp_df_top[['var']][which(in_profiles)]) ,')')
+    
+    vars_imp_df_top[['var']] <- txt_vars
+    vars_imp_df_top[['label']] <- vars_labels
+    suppressWarnings(
+      kableExtra::kable_styling(
+        knitr::kable(vars_imp_df_top, format=format_tables, row.names = FALSE)))
   }
 }
 ```
