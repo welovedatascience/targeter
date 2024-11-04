@@ -23,7 +23,7 @@ params:
     input: text
   decision_tree:
     label: "Display information for decision tree (if fitted)"
-    value: FALSE
+    value: TRUE
     input: checkbox
   decision_tree_format:
     label: "format for the decison tree"
@@ -228,7 +228,7 @@ if (params$decision_tree){
   if (object$decision_tree && inherits(object$decision_tree_model, 'rpart')){
 
     cat('\n\n## Decison Tree {.tabset .tabset-fade .tabset-pills}\n\n')
-    treeplot(object, format= params$decision_tree_format)
+    targeter:::treeplot(object, format= params$decision_tree_format)
 
     dt <- object$decision_tree_model
     dt_vars <- dt$frame['var']
