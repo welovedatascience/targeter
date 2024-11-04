@@ -906,9 +906,8 @@ targeter <- function(data,
   if (decision_tree){
     assertthat::assert_that(system.file(package="rpart") != "", 
     msg = "Package rpart is required for this functionality (suggested for targeter)")
-    if (length(dt_vars_exp) < 2) {
-
-      msg <- c(msg, list(WARNING="too few columns to grow decition tree."))
+    if (length(dt_vars_exp) < 2) msg <- c(msg, 
+    list(WARNING="too few columns to grow decition tree.")) else {
 
     
       formula_txt <- as.formula("L_TARGET~.")
@@ -930,7 +929,7 @@ targeter <- function(data,
         prior <- n/sum(n)
       #  decision_tree_cp <- 0 # to be put as parametre
         if (all(weights == 1)) {
-                mod <- try(rpart::rpart(formula_txt, 
+                mod <- rpart::rpart(formula_txt, 
                   data = data[,unique(c("L_TARGET",dt_vars_exp)), with = FALSE], 
                   method = "class", 
                   model = TRUE,
@@ -938,9 +937,9 @@ targeter <- function(data,
                   control = rpart::rpart.control(
                       maxdepth = decision_tree_maxdepth, 
                       minsplit = minsplit,
-                      cp = decision_tree_cp)))
+                      cp = decision_tree_cp))
             } else {
-                mod <- try(rpart::rpart(formula_txt, 
+                mod <- rpart::rpart(formula_txt, 
                 data = data[,unique(c("L_TARGET",dt_vars_exp)), with = FALSE],
                 method = "class", 
                     weights = weights,
@@ -948,13 +947,13 @@ targeter <- function(data,
                     control = rpart::rpart.control(
                       maxdepth = decision_tree_maxdepth, 
                       minsplit = minsplit,
-                      cp = decision_tree_cp)))
+                      cp = decision_tree_cp))
             }
       } else {
         #numeric target
         minsplit <- 30
         data[, L_TARGET:=get(target)]
-        mod <- try(rpart::rpart(
+        mod <-rpart::rpart(
           formula_txt,
           model = TRUE,
           data = data[,unique(c("L_TARGET",dt_vars_exp)), with = FALSE], 
@@ -962,12 +961,12 @@ targeter <- function(data,
                 control = rpart::rpart.control(
                       maxdepth = decision_tree_maxdepth, 
                       minsplit = minsplit,
-                      cp = decision_tree_cp)))
+                      cp = decision_tree_cp))
         }
       out$decision_tree_model <- mod
-    }
-   } else  out$decision_tree_model <- NA 
-   
+      }
+     } else  out$decision_tree_model <- NA 
+  
   ## assign class
   class(out) <- c("targeter",class(out))
 
