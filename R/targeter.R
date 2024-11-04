@@ -341,7 +341,8 @@ targeter <- function(data,
   if (any(cn !=nn)){
     old_names <- cn[cn!=nn]
     new_names <- nn[cn!=nn]
-    positions <- which(cn!=nn)
+    # positions <- which(cn!=nn)
+    setnames(data, old_names, new_names)
     info <- paste(cn[positions],nn[positions], sep='->', collapse = '\t')
     msg <- c(msg, list(WARNING=paste(
       "silently changing some variables names to be valid unique R names:",
