@@ -11,7 +11,7 @@ kableExtra or other tables output generating engine."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">targeter</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.21</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -45,7 +45,7 @@ kableExtra or other tables output generating engine.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">table.crossvar</span><span class="op">(</span><span class="va">x</span>, round_digits <span class="op">=</span> <span class="fl">3</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">table.crossvar</span><span class="op">(</span><span class="va">x</span>, round_digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -71,6 +71,7 @@ kableExtra or other tables output generating engine.</p>
 <span class="r-in"><span><span class="va">tar</span> <span class="op">&lt;-</span> <span class="fu"><a href="targeter.html">targeter</a></span><span class="op">(</span><span class="va">adult</span>, target <span class="op">=</span> <span class="st">'ABOVE50K'</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">table.crossvar</span><span class="op">(</span><span class="va">tar</span><span class="op">$</span><span class="va">profiles</span><span class="op">[[</span><span class="st">'EDUCATION'</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
