@@ -1,7 +1,7 @@
 Package: targeter
 Type: Package
 Title: Efficient Visual Targets Exploration 
-Version: 1.2
+Version: 1.21
 Authors@R: c(
     person("Eric","Lecoutre", email = "eric.lecoutre@welovedatascience.com", 
     role = c("aut", "cre")),
@@ -22,29 +22,32 @@ Encoding: UTF-8
 LazyData: true
 Depends: 
      R (>= 3.5),
-     kableExtra
 RoxygenNote: 7.2.3
 NeedsCompilation: no
 Imports:
-     data.table,
-     assertthat,
-     ggplot2,
-     gridExtra,
-     scales,
-     ggrepel,
-     knitr,
-     rmarkdown,
-     clustering.sc.dp,
-     Ckmeans.1d.dp,
-     DT,
-     miniUI,
-     shiny,
-     shinybusy,
-     htmlwidgets,
-     patchwork,
-     utils
-Suggests:
-     flextable,
-     explore
+    data.table,
+    assertthat,
+    ggplot2,
+    gridExtra,
+    scales,
+    ggrepel,
+    knitr,
+    rmarkdown,
+    clustering.sc.dp,
+    Ckmeans.1d.dp,
+    DT,
+    miniUI,
+    shiny,
+    shinybusy,
+    htmlwidgets,
+    patchwork,
+    utils,
+    kableExtra
+Suggest:
+    flextable
+    rpart,
+    rpart.plot,
+    explore,
+    visNetwork,
 URL: https://github.com/welovedatascience/targeter, https://welovedatascience.github.io/targeter/
 BugReports: https://github.com/welovedatascience/targeter/issues

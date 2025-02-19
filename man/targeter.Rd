@@ -45,7 +45,7 @@ targeter(
 \item{target_type}{character: type of target - one of 'autoguess' (default),
 'binary','categorical' (>2 modalities) or 'numeric'.}
 
-\item{target_reference_level}{character or numeric. For categorical or 
+\item{target_reference_level}{character or numeric. For categorical or
 (especially) binary targets, level / value of special
 interest. If `NULL``default` one will try to infer from target content.
 Typically, this would be values such as TRUE or 1 or 'bad' for
@@ -55,28 +55,28 @@ Typically, this would be values such as TRUE or 1 or 'bad' for
 
 \item{analysis_name}{name of the analysis.}
 
-\item{select_vars}{a list of explanatory variables. By default, NULL and 
+\item{select_vars}{a list of explanatory variables. By default, NULL and
 all columns are considered.}
 
 \item{exclude_vars}{a list of variables to exclude from the analysis.}
 
-\item{nbins}{The nbins is by default 10. It is the number of quantiles 
+\item{nbins}{The nbins is by default 10. It is the number of quantiles
 to be considered.}
 
-\item{binning_method}{character, one of 'quantile' (default) or 
+\item{binning_method}{character, one of 'quantile' (default) or
 'clustering', 'smart' (parameter expansion usable).
-Method used to derive the `nbins` buckets for the continuous 
+Method used to derive the `nbins` buckets for the continuous
 explanatory variables.}
 
-\item{naming_conventions}{boolean - by default TRUE. It means that a certain 
+\item{naming_conventions}{boolean - by default TRUE. It means that a certain
 naming convention is respected.}
 
 \item{useNA}{Two values are possible : "ifany" and "no". By default, the
  package option is "ifany".
 \itemize{
-\item The value "ifany" takes in consideration the missing values 
+\item The value "ifany" takes in consideration the missing values
 if there are any.
-\item The value "no" doesn't take in consideration the missing values 
+\item The value "no" doesn't take in consideration the missing values
 in any case.
 }}
 
@@ -139,8 +139,11 @@ quantile step - default y step of 0.01.}
 \item{decision_tree}{boolean (default FALSE). Should a decision tree be fit
 on source variables.}
 
-\item{decision_tree_maxdepth}{integer (default 3). Maximum depth for the 
+\item{decision_tree_maxdepth}{integer (default 3). Maximum depth for the
 decision tree if one is fit.}
+
+\item{decision_tree_cp}{numeric (default 0). Value for `cp` parameter in
+rpart.control.}
 }
 \value{
 The function returns a list of class "targeter".
@@ -149,7 +152,7 @@ This list is composed of this following elements:
 \item dataname - name of the analyzed dataset.
 \item description_data text about the description of data
 \item target - name of the target.
-\item target_type - Target type, one of autoguess (default) / binary / 
+\item target_type - Target type, one of autoguess (default) / binary /
 numeric / categorical (text is expended so "b" also works for binary)
 \item description_target text about the description of target
 \item analysis - name of the analysis.
@@ -161,16 +164,16 @@ See crossvar class documentation.
 }
 }
 \description{
-For each variable, the function crosses two variables: a target 
+For each variable, the function crosses two variables: a target
 to be explained and an explanatory variable.
 For this purpose, these variables are converted in categorical variables by a
 binning process and the statistics
 are derived.
 \itemize{
-\item The contingency table gives the counts of each class of the explanatory 
+\item The contingency table gives the counts of each class of the explanatory
 variable for each modality of the target.
 \item A proportion is calculated as the count of profiles per class and target
-modality is divided by the sum of profiles by class 
+modality is divided by the sum of profiles by class
 (=count/sum of row counts).
 \item An index is calculated as the proportion of profiles per class and
 modality divided by the proportion of the modality of all profiles
@@ -183,7 +186,7 @@ significant
 \item If the value of the index is less than 1, it implies that
 for this subpopulation is sub-represented for this variable.
 }
-\item Weight of Evidence and Information Value are derived for binary 
+\item Weight of Evidence and Information Value are derived for binary
 and continuous targets.
 }
 }

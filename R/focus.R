@@ -46,19 +46,25 @@
 #' focus(t, n = 3)
 #' focus(t, nmin = 500, criteria = "index.max.index")
 #' focus(t, criteria = "chisquare")
-focus <- function(x,
-                  criteria = c(
-                    "IV", "index.max.index", "chisquare",
-                    "pvalue", "index.max.count", "index.max.props"
-                  ),
-                  n = 10,
-                  nmin = NULL,
-                  min_criteria = NULL,
-                  force_vars = character(),
-                  summary_object = NULL) {
-
+focus <- function(
+  x,
+  criteria = c(
+    "IV",
+    "index.max.index",
+    "chisquare",
+    "pvalue",
+    "index.max.count",
+    "index.max.props"
+  ),
+  n = 10,
+  nmin = NULL,
+  min_criteria = NULL,
+  force_vars = character(),
+  summary_object = NULL
+) {
   ## test
-  assertthat::assert_that(inherits(x, "targeter"),
+  assertthat::assert_that(
+    inherits(x, "targeter"),
     msg = "Error: x must be an object of class 'targeter'."
   )
   assertthat::assert_that(
@@ -77,10 +83,15 @@ focus <- function(x,
   )
 
   ## Verify that criteria has the good values
-  criteria <- match.arg(criteria[1],
+  criteria <- match.arg(
+    criteria[1],
     c(
-      "IV", "chisquare", "pvalue", "index.max.count",
-      "index.max.props", "index.max.index"
+      "IV",
+      "chisquare",
+      "pvalue",
+      "index.max.count",
+      "index.max.props",
+      "index.max.index"
     ),
     several.ok = FALSE
   )
@@ -89,14 +100,30 @@ focus <- function(x,
   if (!is.null(summary_object)) {
     ## <TODO> add checks for consistency between summary_object and x
     tmp <- summary_object
-    if (criteria %in% c("index.max.index", "chisquare", "pvalue",
-      "index.max.count", "index.max.props")) {
-      assertthat::assert_that(criteria %in% names(tmp), 
-      msg = "Criteria not in summary object. Did you use extra_stats?")
+    if (
+      criteria %in%
+        c(
+          "index.max.index",
+          "chisquare",
+          "pvalue",
+          "index.max.count",
+          "index.max.props"
+        )
+    ) {
+      assertthat::assert_that(
+        criteria %in% names(tmp),
+        msg = "Criteria not in summary object. Did you use extra_stats?"
+      )
     }
   } else {
-    extra_stats <- criteria %in% c("index.max.index", "chisquare",
-    "pvalue", "index.max.count", "index.max.props")
+    extra_stats <- criteria %in%
+      c(
+        "index.max.index",
+        "chisquare",
+        "pvalue",
+        "index.max.count",
+        "index.max.props"
+      )
     tmp <- summary.targeter(x, extra_stats = extra_stats)
   }
 
@@ -107,10 +134,12 @@ focus <- function(x,
   if (!is.null(min_criteria)) tmp <- tmp[tmp[[criteria]] >= min_criteria, ]
 
   ## reorder per selected criteria
-  tmp <- tmp[order(tmp[[criteria]],
-    decreasing =
-      ifelse(criteria %in% c("pvalue"), FALSE, TRUE)
-  ), ]
+  tmp <- tmp[
+    order(
+      tmp[[criteria]],
+      decreasing = ifelse(criteria %in% c("pvalue"), FALSE, TRUE)
+    ),
+  ]
 
   ## retrieve top n records corresponding variable names
   varnames <- utils::head(tmp[["varname"]], n)

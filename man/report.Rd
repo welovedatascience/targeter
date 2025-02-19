@@ -73,7 +73,7 @@ won't never be filtered.}
 \item{...}{other parameter from the function render.}
 }
 \value{
-path to the generated report. Side effect would be to open a 
+path to the generated report. Side effect would be to open a
 document, if \code{browse} is TRUE.
 }
 \description{

@@ -4,7 +4,7 @@
 \alias{table.crossvar}
 \title{table.crossvar: build a meaningful table from a crossvar object.}
 \usage{
-table.crossvar(x, round_digits = 3, ...)
+table.crossvar(x, round_digits = 3)
 }
 \arguments{
 \item{x}{crossvar - crossvar object (stored in targeter$profiles slot).}
@@ -24,4 +24,5 @@ kableExtra or other tables output generating engine.
 tar <- targeter(adult, target = 'ABOVE50K')
 table.crossvar(tar$profiles[['EDUCATION']])
 }
+
 }

@@ -1,13 +1,43 @@
 # to prevent checks of data.table used variables
 # see:  ?globalVariables
 
-
-if(getRversion() >= "3.1.0") utils::globalVariables(
-  c(".", ".N", ":=", "vcount", "vsum", "WOE", "vperc",
-"cperc", "uniqueN", "..cn", "cn", "level", "value", "target", "bxp_min",
-"q25", "q75", "bxp_max", "avg", "N", "cluster", "Y", "color", "varname",
-"..select_vars", "percNA", "nNA", "count", "perc", "qrange", "<<-", "X")
-)
+if (getRversion() >= "3.1.0")
+  utils::globalVariables(
+    c(
+      ".",
+      ".N",
+      ":=",
+      "vcount",
+      "vsum",
+      "WOE",
+      "vperc",
+      "cperc",
+      "uniqueN",
+      "..cn",
+      "cn",
+      "level",
+      "value",
+      "target",
+      "bxp_min",
+      "q25",
+      "q75",
+      "bxp_max",
+      "avg",
+      "N",
+      "cluster",
+      "Y",
+      "color",
+      "varname",
+      "..select_vars",
+      "percNA",
+      "nNA",
+      "count",
+      "perc",
+      "qrange",
+      "<<-",
+      "X"
+    )
+  )
 
 #' @title report
 #' @description This function creates an automatic report according to a
@@ -47,7 +77,7 @@ if(getRversion() >= "3.1.0") utils::globalVariables(
 #' (default) an, automated name will be generated.
 #' @param output_dir - output directory, default: tempdir().
 #' @param ... other parameter from the function render.
-#' @return path to the generated report. Side effect would be to open a 
+#' @return path to the generated report. Side effect would be to open a
 #' document, if \code{browse} is TRUE.
 #' @export report
 #'
@@ -66,90 +96,115 @@ if(getRversion() >= "3.1.0") utils::globalVariables(
 #' }
 #' @importFrom utils head
 
-
 # report(tar, template="/hackdata/share/code/R/packages/targeter/inst/ressources/report_template_target_numeric.Rmd", browse=FALSE, output_dir = "/hackdata/share/_tmp", template_params=list("show_tables"=FALSE))
 
-report <- function(object,
-                   template = NULL,
-                   template_params = NULL,
-                   summary_object = NULL,
-                   browse = FALSE,
-                   ntop = NULL,
-                   nmin = 20,
-                   criteria = c("IV"),
-                   min_criteria = NULL,
-                   metadata = NULL,
-                   force_vars = character(),
-                   output_format = c("html","pdf","word"),
-                   output_file = NULL,
-                   output_dir = tempdir(),
-                   ...){
-
-
+report <- function(
+  object,
+  template = NULL,
+  template_params = NULL,
+  summary_object = NULL,
+  browse = FALSE,
+  ntop = NULL,
+  nmin = 20,
+  criteria = c("IV"),
+  min_criteria = NULL,
+  metadata = NULL,
+  force_vars = character(),
+  output_format = c("html", "pdf", "word"),
+  output_file = NULL,
+  output_dir = tempdir(),
+  ...
+) {
   knitr::knit_meta(clean = TRUE) ## https://github.com/rstudio/rstudio/issues/2319
 
   ##test
   assertthat::assert_that(
     inherits(object, "targeter"),
-    msg ="The class of object must to be 'targeter'.")
+    msg = "The class of object must to be 'targeter'."
+  )
   assertthat::assert_that(
-    inherits(nmin,"numeric") |
-    inherits(nmin,"integer"),
-    msg="The parameter nmin must to be an integer or numeric")
-  assertthat::assert_that(inherits(ntop,"numeric")|inherits(ntop,"integer")|is.null(ntop), msg="The parameter ntop must to be an integer or numeric")
-  assertthat::assert_that(inherits(metadata,"data.frame")| is.null(metadata), msg = "The parameter metadata must be either NULL (no metadata) or a data.frame")
-  assertthat::assert_that(inherits(min_criteria,"numeric")|inherits(min_criteria,"integer")|is.null(min_criteria), msg="The parameter min_criteria must to be an integer or numeric")
+    inherits(nmin, "numeric") |
+      inherits(nmin, "integer"),
+    msg = "The parameter nmin must to be an integer or numeric"
+  )
+  assertthat::assert_that(
+    inherits(ntop, "numeric") | inherits(ntop, "integer") | is.null(ntop),
+    msg = "The parameter ntop must to be an integer or numeric"
+  )
+  assertthat::assert_that(
+    inherits(metadata, "data.frame") | is.null(metadata),
+    msg = "The parameter metadata must be either NULL (no metadata) or a data.frame"
+  )
+  assertthat::assert_that(
+    inherits(min_criteria, "numeric") |
+      inherits(min_criteria, "integer") |
+      is.null(min_criteria),
+    msg = "The parameter min_criteria must to be an integer or numeric"
+  )
 
-
-  output_format <- match.arg(output_format, c("html","pdf","word"), several.ok = FALSE)
+  output_format <- match.arg(
+    output_format,
+    c("html", "pdf", "word"),
+    several.ok = FALSE
+  )
   ## apply focus/top
-  if (is.null(summary_object)){
+  if (is.null(summary_object)) {
     # compute summary object
 
-    summary_object <- summary(object, nmin = nmin, criteria = criteria,
-                              min_criteria = min_criteria)
+    summary_object <- summary(
+      object,
+      nmin = nmin,
+      criteria = criteria,
+      min_criteria = min_criteria
+    )
   }
-  if(!is.null(ntop)){
-    object <- focus(object, n = ntop, force_vars = force_vars,
-                    summary_object = summary_object )
-
+  if (!is.null(ntop)) {
+    object <- focus(
+      object,
+      n = ntop,
+      force_vars = force_vars,
+      summary_object = summary_object
+    )
   }
 
-  summary_object<- summary_object[varname %in% names(object$profiles)]
+  summary_object <- summary_object[varname %in% names(object$profiles)]
   # attr(object, 'metadata') <- metadata
 
-  if (is.null(template)){
-
+  if (is.null(template)) {
     ## default template
     template <- file.path(
-      find.package("targeter", lib.loc=.libPaths()),
-      "ressources", paste0("report_template_target_", 
-      object$target_type, ".Rmd"))
+      find.package("targeter", lib.loc = .libPaths()),
+      "ressources",
+      paste0("report_template_target_", object$target_type, ".Rmd")
+    )
     # if (is.null(template_params)){
     #   template_params <- list("show_tables" = FALSE,
     #    "fullplot_which_plot"= 1:4)
     # }
   }
 
-  format_tables <- switch(output_format,
-                          "html" = "html",
-                          "word" = "word",
-                          "pdf" = "latex")
+  format_tables <- switch(
+    output_format,
+    "html" = "html",
+    "word" = "word",
+    "pdf" = "latex"
+  )
 
   # print(utils::head(metadata,2))
   # print(utils::head(summary_object,2))
 
   # print(template_params)
-  outfile <- rmarkdown::render(template,
-                               output_format = paste(output_format,
-                               "document", sep="_"),
-                               output_file = output_file,
-                               output_dir = output_dir,
-                               params = template_params, ...)
+  outfile <- rmarkdown::render(
+    template,
+    output_format = paste(output_format, "document", sep = "_"),
+    output_file = output_file,
+    output_dir = output_dir,
+    params = template_params,
+    ...
+  )
   if (browse) utils::browseURL(outfile)
   return(outfile)
 }
-
 
 # A <- targeter(adult, target="ABOVE50K",binning_method='clustering',woe_post_cluster=TRUE)
 # A <- targeter(adult, target="ABOVE50K",binning_method='smart',woe_post_cluster=TRUE)

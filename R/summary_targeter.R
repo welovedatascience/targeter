@@ -19,27 +19,57 @@
 #' @importFrom data.table rbindlist setorderv
 #' @export
 
-summary.targeter <- function(object,
-                             extra_stats=FALSE,
-                             criteria=c( "IV","index.max.index","chisquare", "pvalue", "index.max.count", "index.max.props"),...){
+summary.targeter <- function(
+  object,
+  extra_stats = FALSE,
+  criteria = c(
+    "IV",
+    "index.max.index",
+    "chisquare",
+    "pvalue",
+    "index.max.count",
+    "index.max.props"
+  ),
+  ...
+) {
+  assertthat::assert_that(
+    inherits(object, "targeter"),
+    msg = "The parameter object must to be an object of class targeter"
+  )
+  criteria <- match.arg(
+    criteria,
+    c(
+      "IV",
+      "index.max.index",
+      "chisquare",
+      "pvalue",
+      "index.max.count",
+      "index.max.props"
+    ),
+    several.ok = FALSE
+  )
 
-
-  assertthat::assert_that(inherits(object,"targeter"), msg = "The parameter object must to be an object of class targeter")
-  criteria <- match.arg(criteria, c( "IV","index.max.index","chisquare", "pvalue", "index.max.count", "index.max.props"), several.ok = FALSE)
-
-
-  if (criteria %in% c("chisquare","pvalue") & !extra_stats) stop("Sorting criteria requires extra_stats computations.")
-  if (object$target_type =="categorical" & criteria=="IV"){
+  if (criteria %in% c("chisquare", "pvalue") & !extra_stats)
+    stop("Sorting criteria requires extra_stats computations.")
+  if (object$target_type == "categorical" & criteria == "IV") {
     criteria <- "pvalue"
     extra_stats <- TRUE
-    cat("\ntarget is categorical, sorting criteria changed to p-value (extra stats activated)\n")
+    cat(
+      "\ntarget is categorical, sorting criteria changed to p-value (extra stats activated)\n"
+    )
   }
 
-  allstats <- lapply(object$profiles, summary.crossvar, extra_stats=extra_stats)
+  allstats <- lapply(
+    object$profiles,
+    summary.crossvar,
+    extra_stats = extra_stats
+  )
   out <- data.table::rbindlist(allstats)
-  data.table::setorderv(out, criteria, order=ifelse(criteria %in% c("pvalue"),1,-1))
+  data.table::setorderv(
+    out,
+    criteria,
+    order = ifelse(criteria %in% c("pvalue"), 1, -1)
+  )
 
   return(out)
-
-
 }

@@ -55,7 +55,7 @@ Default: 1:2}
 The function returns a ggplot graph
 }
 \description{
-autoplot method for crossvar OR targeter object 
+autoplot method for crossvar OR targeter object
 (with a variable specification).
 draws the combination of 4 selected plots/
 }

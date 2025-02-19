@@ -1,9 +1,6 @@
-
 # to prevent checks of data.table used variables
 # see:  ?globalVariables
-if(getRversion() >= "3.1.0") utils::globalVariables("..cn")
-
-
+if (getRversion() >= "3.1.0") utils::globalVariables("..cn")
 
 #' @title explore
 #' @description shiny small app to explore a targeter object.
@@ -37,11 +34,12 @@ if(getRversion() >= "3.1.0") utils::globalVariables("..cn")
 #' @importFrom shinybusy show_modal_spinner
 #' @importFrom htmlwidgets JS
 explore <- function(
-    object,
-    summary_object = NULL,
-    metadata = NULL,
-    display = c("dialog", "browser"),
-    ...) {
+  object,
+  summary_object = NULL,
+  metadata = NULL,
+  display = c("dialog", "browser"),
+  ...
+) {
   display <- match.arg(display, c("dialog", "browser"), several.ok = FALSE)
 
   if (is.null(summary_object)) {
@@ -49,11 +47,14 @@ explore <- function(
   }
   ui <- miniUI::miniPage(
     shiny::tags$head(
-      shiny::tags$style(shiny::HTML(
-        ".excluded { color: rgb(211,211,211); font-style: italic; }"
-      ))
+      shiny::tags$style(
+        shiny::HTML(
+          ".excluded { color: rgb(211,211,211); font-style: italic; }"
+        )
+      )
     ),
-    miniUI::gadgetTitleBar("targeter explorer",
+    miniUI::gadgetTitleBar(
+      "targeter explorer",
       left = miniUI::miniButtonBlock(
         miniUI::miniTitleBarButton("report_html", "html"),
         miniUI::miniTitleBarButton("report_pdf", "pdf"),
@@ -76,17 +77,30 @@ explore <- function(
     output$dt_summary <- DT::renderDataTable(
       {
         if (object$target_type == "binary") {
-          df2 <- as.data.frame(summary_object[
-            ,
-            c(
-              "varname", "vartype", "IV", "index.max.level", "index.max.count",
-              "index.max.props", "index.max.index"
-            )
-          ])
+          df2 <- as.data.frame(
+            summary_object[,
+              c(
+                "varname",
+                "vartype",
+                "IV",
+                "index.max.level",
+                "index.max.count",
+                "index.max.props",
+                "index.max.index"
+              )
+            ]
+          )
           df2$index.max.index <- round(df2$index.max.index, 2)
           df2$index.max.props <- round(df2$index.max.props * 100, 2)
-          colnames(df2) <- c("variable", "type", "IV", "Level",
-          "#Records", "%Records", "Index")
+          colnames(df2) <- c(
+            "variable",
+            "type",
+            "IV",
+            "Level",
+            "#Records",
+            "%Records",
+            "Index"
+          )
         } else {
           df2 <- summary_object
           cn <- colnames(df2)
@@ -95,9 +109,13 @@ explore <- function(
         }
         df2$IV <- round(df2$IV, 3)
         if (!is.null(metadata)) {
-          df2 <- cbind(data.frame(
-            Label = sapply(df2$variable, label, metadata = metadata),
-            stringsAsFactors = FALSE), df2)
+          df2 <- cbind(
+            data.frame(
+              Label = sapply(df2$variable, label, metadata = metadata),
+              stringsAsFactors = FALSE
+            ),
+            df2
+          )
         }
 
         ## https://www.r-bloggers.com/2019/06/useful-callbacks-for-dt-in-shiny/
@@ -105,8 +123,10 @@ explore <- function(
         colIndex <- as.integer(rowNames)
 
         callback <- c(
-          sprintf("table.on('click', 'td:nth-child(%d)', function(){",
-          colIndex + 1),
+          sprintf(
+            "table.on('click', 'td:nth-child(%d)', function(){",
+            colIndex + 1
+          ),
           "  var td = this;",
           "  var cell = table.cell(td);",
           "  if(cell.data() === 'ok'){",
@@ -148,10 +168,14 @@ explore <- function(
           "}"
         )
 
-        dat <- cbind(Selected = "ok", df2, 
-          id = paste0("row_", seq_len(nrow(df2))))
+        dat <- cbind(
+          Selected = "ok",
+          df2,
+          id = paste0("row_", seq_len(nrow(df2)))
+        )
 
-        DT::datatable(dat,
+        DT::datatable(
+          dat,
           rownames = rowNames,
           filter = "top",
           autoHideNavigation = TRUE,
@@ -160,10 +184,12 @@ explore <- function(
           callback = htmlwidgets::JS(callback),
           options = list(
             pageLength = 6,
-            rowId = htmlwidgets::JS(sprintf(
-              "function(data){return data[%d];}",
-              ncol(dat) - 1 + colIndex
-            )),
+            rowId = htmlwidgets::JS(
+              sprintf(
+                "function(data){return data[%d];}",
+                ncol(dat) - 1 + colIndex
+              )
+            ),
             columnDefs = list(
               list(visible = FALSE, targets = ncol(dat) - 1 + colIndex),
               list(className = "dt-center", targets = "_all"),
@@ -172,7 +198,8 @@ explore <- function(
             ),
             dom = "tp",
             buttons = list(
-              "copy", "csv",
+              "copy",
+              "csv",
               list(
                 extend = "collection",
                 text = "Select all",
@@ -195,13 +222,15 @@ explore <- function(
         iprofile <- object$profiles[[var]]
 
         if (iprofile$target_type %in% c("binary", "categorical")) {
-          g1 <- plot.crossvar(iprofile,
+          g1 <- plot.crossvar(
+            iprofile,
             metadata = metadata,
             print_NA = TRUE,
             numvar_as = "value"
           )
 
-          g2 <- plot.crossvar(iprofile,
+          g2 <- plot.crossvar(
+            iprofile,
             show = "props",
             type = "l",
             metadata = metadata,
@@ -211,14 +240,16 @@ explore <- function(
           )
         } else {
           # numeric target
-          g1 <- plot.crossvar(iprofile,
+          g1 <- plot.crossvar(
+            iprofile,
             show = "boxplot",
             metadata = metadata,
             print_NA = TRUE,
             numvar_as = "value"
           )
 
-          g2 <- plot.crossvar(iprofile,
+          g2 <- plot.crossvar(
+            iprofile,
             show = "count",
             type = "b",
             metadata = metadata,
@@ -245,8 +276,12 @@ explore <- function(
           }
         }
         if (iprofile$target_type == "numeric") {
-          g4 <- plot.crossvar(iprofile, show = "avg",
-            type = "l", print_NA = TRUE)
+          g4 <- plot.crossvar(
+            iprofile,
+            show = "avg",
+            type = "l",
+            print_NA = TRUE
+          )
         }
         gridExtra::grid.arrange(g3, g4, ncol = 2)
       }
@@ -260,7 +295,8 @@ explore <- function(
 
     shiny::observeEvent(input$report_html, {
       selvars <- summary_object[
-        setdiff(1:nrow(summary_object), input[["excludedRows"]]),][["varname"]]
+        setdiff(1:nrow(summary_object), input[["excludedRows"]]),
+      ][["varname"]]
       if (length(selvars) > 1) {
         summary_object <- summary_object[summary_object$varname %in% selvars, ]
         # S <<- summary_object
@@ -279,13 +315,15 @@ explore <- function(
       } else {
         shinybusy::report_failure(
           title = "Problem",
-          text = "No variable selected")
+          text = "No variable selected"
+        )
       }
     })
 
     shiny::observeEvent(input$report_pdf, {
       selvars <- summary_object[
-        setdiff(1:nrow(summary_object), input[["excludedRows"]]),][["varname"]]
+        setdiff(1:nrow(summary_object), input[["excludedRows"]]),
+      ][["varname"]]
       if (length(selvars) > 1) {
         summary_object <- summary_object[summary_object$varname %in% selvars, ]
         shinybusy::show_modal_spinner() # show the modal window
@@ -303,14 +341,15 @@ explore <- function(
       } else {
         shinybusy::report_failure(
           title = "Problem",
-          text = "No variable selected")
+          text = "No variable selected"
+        )
       }
     })
 
-
     shiny::observeEvent(input$report_word, {
       selvars <- summary_object[
-        setdiff(1:nrow(summary_object),input[["excludedRows"]]), ][["varname"]]
+        setdiff(1:nrow(summary_object), input[["excludedRows"]]),
+      ][["varname"]]
       if (length(selvars) > 1) {
         summary_object <- summary_object[summary_object$varname %in% selvars, ]
         shinybusy::show_modal_spinner() # show the modal window
@@ -328,14 +367,22 @@ explore <- function(
       } else {
         shinybusy::report_failure(
           title = "Problem",
-          text = "No variable selected")
+          text = "No variable selected"
+        )
       }
     })
   }
 
   display <- match.arg(display, c("dialog", "browser"))
 
-  shiny::runGadget(ui, server, viewer = shiny::dialogViewer("targeter-explore",
-  width = 2000, height = 1800))
+  shiny::runGadget(
+    ui,
+    server,
+    viewer = shiny::dialogViewer(
+      "targeter-explore",
+      width = 2000,
+      height = 1800
+    )
+  )
   # shiny::runGadget(ui, server, viewer = shiny::browserViewer())
 }

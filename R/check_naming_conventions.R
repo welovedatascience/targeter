@@ -41,9 +41,17 @@ check_naming_conventions <- function(data, test_target_type = FALSE) {
     type <- toupper(substr(ivar, 1, 2))
     cl <- class(data[[ivar]][1])
     if (
-      ((type %in% c("N_", "M_", "F_", "R_", "P_", "Y_", "J_")) & (cl %in% c("numeric", "integer"))) |                   #nolint
-        ((type %in% c("D_", "S_")) & (cl %in% c("Date", "POSIXct", "POSIXlt"))) |                                       #nolint
-        ((type %in% c("C_", "T_", "L_")) & (cl %in% c("factor", "character", "logical", "integer", "numeric"))) |       #nolint
+      (
+        (type %in% c("N_", "M_", "F_", "R_", "P_", "Y_", "J_")) &
+          (cl %in% c("numeric", "integer"))
+      ) | #nolint
+        (
+          (type %in% c("D_", "S_")) & (cl %in% c("Date", "POSIXct", "POSIXlt"))
+        ) | #nolint
+        (
+          (type %in% c("C_", "T_", "L_")) &
+            (cl %in% c("factor", "character", "logical", "integer", "numeric"))
+        ) | #nolint
         ((type %in% c("E_", "I_", "A_", "O_", "X_", "Z_", "K_", "W_", "Q_")))
     ) {
       out[ivar, "ErrorType"] <- FALSE

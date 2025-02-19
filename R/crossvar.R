@@ -32,31 +32,61 @@
 #' @importFrom assertthat assert_that
 #' @importFrom data.table as.data.table
 
-crossvar <- function(data, target, var, ...){
-  assertthat::assert_that(inherits(data,"data.frame") | inherits(data, "data.table"), msg = "Data must to be a data.frame or a data.table")
-  assertthat::assert_that(inherits(target,"character"), msg = "Target must  be a character")
-  assertthat::assert_that(inherits(var,"character"), msg = "var must be a character")
-  assertthat::assert_that(var %in% names(data), msg = "var is not present in data")
-  assertthat::assert_that(target %in% names(data), msg = "target is not present in data")
-  assertthat::assert_that(requireNamespace('data.table', quietly = TRUE), msg='data.table package required')
-  data_sel <- data.table::as.data.table(data)[,c(target, var), with=FALSE]
-  targeter(data_sel, target=target, select_vars=var,...)$profiles[[var]]
+crossvar <- function(data, target, var, ...) {
+  assertthat::assert_that(
+    inherits(data, "data.frame") | inherits(data, "data.table"),
+    msg = "Data must to be a data.frame or a data.table"
+  )
+  assertthat::assert_that(
+    inherits(target, "character"),
+    msg = "Target must  be a character"
+  )
+  assertthat::assert_that(
+    inherits(var, "character"),
+    msg = "var must be a character"
+  )
+  assertthat::assert_that(
+    var %in% names(data),
+    msg = "var is not present in data"
+  )
+  assertthat::assert_that(
+    target %in% names(data),
+    msg = "target is not present in data"
+  )
+  assertthat::assert_that(
+    requireNamespace('data.table', quietly = TRUE),
+    msg = 'data.table package required'
+  )
+  data_sel <- data.table::as.data.table(data)[, c(target, var), with = FALSE]
+  targeter(data_sel, target = target, select_vars = var, ...)$profiles[[var]]
 }
 
 #' @method print crossvar
 #' @export
-print.crossvar <- function(x,...){
+print.crossvar <- function(x, ...) {
   cat("\nTargeter crossvar profiling object with following properties:")
   cat(paste0("\n\tTarget:"), x$targetname, " of type:", x$target_type)
-  if (x$target_type == 'binary') cat(paste0("  (target level:", x$target_reference_level),")")
-  cat(paste0("\n\tCrossed with variable: ", x$varname, " of type: ", x$variable_type,"\n\n"))
-  if (x$target_type %in% c("binary","categorical")){
+  if (x$target_type == 'binary')
+    cat(paste0("  (target level:", x$target_reference_level), ")")
+  cat(
+    paste0(
+      "\n\tCrossed with variable: ",
+      x$varname,
+      " of type: ",
+      x$variable_type,
+      "\n\n"
+    )
+  )
+  if (x$target_type %in% c("binary", "categorical")) {
     print(cbind(as.data.frame.matrix(x$counts), as.data.frame.matrix(x$props)))
-  } else if (x$target_type %in% c("numeric")){
-    if (!is.null(x$woe)) { x$stats <- cbind(x$stats, x$woe)}
+  } else if (x$target_type %in% c("numeric")) {
+    if (!is.null(x$woe)) {
+      x$stats <- cbind(x$stats, x$woe)
+    }
     print(x$stats)
   }
-  if (!is.null(x$IV)) cat(paste0("\nInfomation value: ", round(x$IV,6),"\n"))
-  cat("\nThere is a `summary` method available as well as various `plot` function.")
-
+  if (!is.null(x$IV)) cat(paste0("\nInfomation value: ", round(x$IV, 6), "\n"))
+  cat(
+    "\nThere is a `summary` method available as well as various `plot` function."
+  )
 }

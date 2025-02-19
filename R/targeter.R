@@ -1,25 +1,55 @@
 # to prevent checks of data.table used variables
 # see:  ?globalVariables
 
-
-if(getRversion() >= "3.1.0") utils::globalVariables(
-  c(".", ".N", ":=", "vcount", "vsum", "WOE", "vperc",
-"cperc", "uniqueN", "..cn", "cn", "level", "value", "target", "bxp_min",
-"q25", "q75", "bxp_max", "avg", "N", "cluster", "Y", "color", "varname",
-"..select_vars", "percNA", "nNA", "count", "perc", "qrange", "<<-", "X")
-)
+if (getRversion() >= "3.1.0")
+  utils::globalVariables(
+    c(
+      ".",
+      ".N",
+      ":=",
+      "vcount",
+      "vsum",
+      "WOE",
+      "vperc",
+      "cperc",
+      "uniqueN",
+      "..cn",
+      "cn",
+      "level",
+      "value",
+      "target",
+      "bxp_min",
+      "q25",
+      "q75",
+      "bxp_max",
+      "avg",
+      "N",
+      "cluster",
+      "Y",
+      "color",
+      "varname",
+      "..select_vars",
+      "percNA",
+      "nNA",
+      "count",
+      "perc",
+      "qrange",
+      "<<-",
+      "X"
+    )
+  )
 
 #' @title targeter
-#' @description For each variable, the function crosses two variables: a target 
+#' @description For each variable, the function crosses two variables: a target
 #' to be explained and an explanatory variable.
 #'For this purpose, these variables are converted in categorical variables by a
 #' binning process and the statistics
 #'are derived.
 #'\itemize{
-#'\item The contingency table gives the counts of each class of the explanatory 
+#'\item The contingency table gives the counts of each class of the explanatory
 #' variable for each modality of the target.
 #'\item A proportion is calculated as the count of profiles per class and target
-#' modality is divided by the sum of profiles by class 
+#' modality is divided by the sum of profiles by class
 #' (=count/sum of row counts).
 #'\item An index is calculated as the proportion of profiles per class and
 #' modality divided by the proportion of the modality of all profiles
@@ -32,7 +62,7 @@ if(getRversion() >= "3.1.0") utils::globalVariables(
 #'\item If the value of the index is less than 1, it implies that
 #'for this subpopulation is sub-represented for this variable.
 #'}
-#'\item Weight of Evidence and Information Value are derived for binary 
+#'\item Weight of Evidence and Information Value are derived for binary
 #' and continuous targets.
 #'}
 #'
@@ -41,30 +71,30 @@ if(getRversion() >= "3.1.0") utils::globalVariables(
 #' @param target character - name of the variable to explain.
 #' @param target_type character: type of target - one of 'autoguess' (default),
 #' 'binary','categorical' (>2 modalities) or 'numeric'.
-#' @param target_reference_level character or numeric. For categorical or 
+#' @param target_reference_level character or numeric. For categorical or
 #' (especially) binary targets, level / value of special
 #' interest. If `NULL``default` one will try to infer from target content.
 #' Typically, this would be values such as TRUE or 1 or 'bad' for
 #'  binary targets.
 #' @param description_target text on the description of target.
 #' @param analysis_name  name of the analysis.
-#' @param select_vars  a list of explanatory variables. By default, NULL and 
+#' @param select_vars  a list of explanatory variables. By default, NULL and
 #' all columns are considered.
 #' @param exclude_vars  a list of variables to exclude from the analysis.
-#' @param naming_conventions boolean - by default TRUE. It means that a certain 
+#' @param naming_conventions boolean - by default TRUE. It means that a certain
 #' naming convention is respected.
-#' @param nbins The nbins is by default 10. It is the number of quantiles 
+#' @param nbins The nbins is by default 10. It is the number of quantiles
 #' to be considered.
-#' @param binning_method character, one of 'quantile' (default) or 
+#' @param binning_method character, one of 'quantile' (default) or
 #' 'clustering', 'smart' (parameter expansion usable).
-#' Method used to derive the `nbins` buckets for the continuous 
+#' Method used to derive the `nbins` buckets for the continuous
 #' explanatory variables.
 #' @param useNA Two values are possible : "ifany" and "no". By default, the
 #'  package option is "ifany".
 #' \itemize{
-#' \item The value "ifany" takes in consideration the missing values 
+#' \item The value "ifany" takes in consideration the missing values
 #' if there are any.
-#' \item The value "no" doesn't take in consideration the missing values 
+#' \item The value "no" doesn't take in consideration the missing values
 #' in any case.
 #' }
 #' @param verbose - boolean (default FALSE). If TRUE some more information is
@@ -113,9 +143,10 @@ if(getRversion() >= "3.1.0") utils::globalVariables(
 #' quantile step - default y step of 0.01.
 #' @param decision_tree boolean (default FALSE). Should a decision tree be fit
 #' on source variables.
-#' @param decision_tree_maxdepth integer (default 3). Maximum depth for the 
+#' @param decision_tree_maxdepth integer (default 3). Maximum depth for the
 #' decision tree if one is fit.
-
+#' @param decision_tree_cp numeric (default 0). Value for `cp` parameter in
+#' rpart.control.
 #'
 #'
 #' @return The function returns a list of class "targeter".
@@ -124,7 +155,7 @@ if(getRversion() >= "3.1.0") utils::globalVariables(
 #' \item dataname - name of the analyzed dataset.
 #' \item description_data text about the description of data
 #' \item target - name of the target.
-#' \item target_type - Target type, one of autoguess (default) / binary / 
+#' \item target_type - Target type, one of autoguess (default) / binary /
 #' numeric / categorical (text is expended so "b" also works for binary)
 #' \item description_target text about the description of target
 #' \item analysis - name of the analysis.
@@ -145,31 +176,39 @@ if(getRversion() >= "3.1.0") utils::globalVariables(
 #' }
 #' @examples
 #' targeter(adult,target ="ABOVE50K")
-#' @importFrom stats quantile median
+
+
+#' @importFrom stats quantile median as.formula
 #' @importFrom data.table dcast
 #' @importFrom data.table .N
 #' @importFrom data.table uniqueN
 #' @importFrom data.table `:=`
+# @importFrom rpart rpart rpart.control
+# @importFrom explore weight_target
+
+
 
 
 ## <idea> check for WOE monotonicity
-targeter <- function(data,
-  description_data =NULL,
+targeter <- function(
+  data,
+  description_data = NULL,
   target,
   target_type = c("autoguess", "binary", "categorical", "numeric"),
   target_reference_level = NULL, # NULL: auto will check for 1, TRUE
   description_target = NULL,
-  analysis_name=NULL,
-  select_vars=NULL,
-  exclude_vars=NULL,
-  nbins=12,
-  binning_method=c("quantile", "clustering", "smart"),
+  analysis_name = NULL,
+  select_vars = NULL,
+  exclude_vars = NULL,
+  nbins = 12,
+  binning_method = c("quantile", "clustering", "smart"),
   # todo: tree (min size)+ constrained clustrering  https://cran.r-project.org/web/packages/scclust/scclust.pdf
-  naming_conventions=
-    getOption("targeter.use_naming_conventions", default = FALSE),
-  useNA = 
-    getOption("targeter.useNA", default = TRUE), #option package by default
-  verbose=FALSE,
+  naming_conventions = getOption(
+    "targeter.use_naming_conventions",
+    default = FALSE
+  ),
+  useNA = getOption("targeter.useNA", default = TRUE), #option package by default
+  verbose = FALSE,
   dec = 2,
   order_label = c("auto", "alpha", "count", "props", "means"),
   cont_target_trim = 0.01,
@@ -184,91 +223,113 @@ targeter <- function(data,
   decision_tree = FALSE,
   decision_tree_maxdepth = 3,
   decision_tree_cp = 0
-){
-
+) {
   ##test
   assertthat::assert_that(
-    inherits(data,"data.frame") | inherits(data, "data.table"),
-    msg = "Data must to be a data.frame or a data.table")
+    inherits(data, "data.frame") | inherits(data, "data.table"),
+    msg = "Data must to be a data.frame or a data.table"
+  )
 
   assertthat::assert_that(
-    inherits(target,"character"),
-    msg = "Target must to be a character")
+    inherits(target, "character"),
+    msg = "Target must to be a character"
+  )
 
   assertthat::assert_that(
     target %in% colnames(data),
-    msg = "Target doesn't exist in the dataset")
+    msg = "Target doesn't exist in the dataset"
+  )
 
   assertthat::assert_that(
-    length(target)==1,
-    msg="Only one target is admitted")
+    length(target) == 1,
+    msg = "Only one target is admitted"
+  )
 
   assertthat::assert_that(
     length(unique(data[[target]])) > 1,
-    msg = "The target contains only one value.")
+    msg = "The target contains only one value."
+  )
 
   assertthat::assert_that(
-    inherits(select_vars,"character")| is.null(select_vars),
-    msg = "select_vars must to be a character")
+    inherits(select_vars, "character") | is.null(select_vars),
+    msg = "select_vars must to be a character"
+  )
 
   assertthat::assert_that(
-    inherits(exclude_vars,"character")| is.null(exclude_vars),
-    msg = "exclude_vars must to be a character")
+    inherits(exclude_vars, "character") | is.null(exclude_vars),
+    msg = "exclude_vars must to be a character"
+  )
 
   assertthat::assert_that(
-    inherits(analysis_name,"character")|is.null(analysis_name),
-    msg = "analysis_name must to be a character")
+    inherits(analysis_name, "character") | is.null(analysis_name),
+    msg = "analysis_name must to be a character"
+  )
 
   assertthat::assert_that(
-    inherits(naming_conventions,"logical"),
-    msg = "The parameter naming_convetions accepts only booleans")
+    inherits(naming_conventions, "logical"),
+    msg = "The parameter naming_convetions accepts only booleans"
+  )
 
   assertthat::assert_that(
-    inherits(verbose,"logical"),
-    msg="The parameter verbose accepts only TRUE and FALSE like values")
+    inherits(verbose, "logical"),
+    msg = "The parameter verbose accepts only TRUE and FALSE like values"
+  )
 
   assertthat::assert_that(
-    inherits(description_target,"character") | is.null(description_target),
-    msg = "description_target must to be a character or NULL")
+    inherits(description_target, "character") | is.null(description_target),
+    msg = "description_target must to be a character or NULL"
+  )
 
   assertthat::assert_that(
-    inherits(description_data,"character") | is.null(description_data),
-    msg = "description_data must to be a character or NULL")
+    inherits(description_data, "character") | is.null(description_data),
+    msg = "description_data must to be a character or NULL"
+  )
 
   assertthat::assert_that(
-    inherits(dec,"integer") | inherits(dec,"numeric"),
-    msg ="The parameter dec must to be an integer")
+    inherits(dec, "integer") | inherits(dec, "numeric"),
+    msg = "The parameter dec must to be an integer"
+  )
 
   assertthat::assert_that(
-    inherits(order_label,"character"),
-    msg = "The parameter order_label must to be character")
+    inherits(order_label, "character"),
+    msg = "The parameter order_label must to be character"
+  )
 
   assertthat::assert_that(
-    inherits(useNA,"character"),
-    msg = "The parameter UseNA must to be character")
+    inherits(useNA, "character"),
+    msg = "The parameter UseNA must to be character"
+  )
 
   assertthat::assert_that(
-    inherits(nbins,"numeric") | inherits(nbins,"integer"),
-    msg = "The parameter nbins must to be numeric")
+    inherits(nbins, "numeric") | inherits(nbins, "integer"),
+    msg = "The parameter nbins must to be numeric"
+  )
   ## <todo>conditions on other parameters to be added : cont_target_trim....
   ##retrieve the name of the data
   dataname <- deparse(substitute(data))
   data <- data.table::setDT(data)
-  msg <- vector(mode='list')
+  msg <- vector(mode = 'list')
 
   # <20210322> rename target if variable name=="target" (trouble with dt get(target))
-  if (target=="target"){
-    msg <- c(msg, c("INFO"="Silently renaming reserved word target as `...target`"))
-    setnames(data,"target","...target")
+  if (target == "target") {
+    msg <- c(
+      msg,
+      c("INFO" = "Silently renaming reserved word target as `...target`")
+    )
+    setnames(data, "target", "...target")
     target <- "...target"
   }
   target_type <- match.arg(
-    target_type, c("autoguess", "binary", "categorical", "numeric"),
-    several.ok = FALSE)
-  
+    target_type,
+    c("autoguess", "binary", "categorical", "numeric"),
+    several.ok = FALSE
+  )
+
   woe_alternate_version <- match.arg(
-    woe_alternate_version, c("if_continuous", "always"),
-    several.ok = FALSE)
+    woe_alternate_version,
+    c("if_continuous", "always"),
+    several.ok = FALSE
+  )
 
   ##analysis name
   if (is.null(analysis_name)) {
@@ -280,76 +341,113 @@ targeter <- function(data,
   ##<todo>: introduce a yes or always
   useNA <- match.arg(useNA, c("ifany", "no"), several.ok = FALSE)
 
-  binning_method <- match.arg(binning_method,c("quantile","clustering","smart"),several.ok = FALSE)
-  if (binning_method=="clustering") assertthat::assert_that(requireNamespace('Ckmeans.1d.dp', quietly = TRUE), msg = 'Ckmeans.1d.dp package required for clustering method.')
+  binning_method <- match.arg(
+    binning_method,
+    c("quantile", "clustering", "smart"),
+    several.ok = FALSE
+  )
+  if (binning_method == "clustering")
+    assertthat::assert_that(
+      requireNamespace('Ckmeans.1d.dp', quietly = TRUE),
+      msg = 'Ckmeans.1d.dp package required for clustering method.'
+    )
   if (woe_post_cluster) {
-    assertthat::assert_that(requireNamespace('Ckmeans.1d.dp', quietly = TRUE), msg = 'Ckmeans.1d.dp package required for WOE post clustering.')
-    assertthat::assert_that(requireNamespace('clustering.sc.dp', quietly = TRUE), msg = 'clustering.sc.dp package required for WOE post clustering.')
-
+    assertthat::assert_that(
+      requireNamespace('Ckmeans.1d.dp', quietly = TRUE),
+      msg = 'Ckmeans.1d.dp package required for WOE post clustering.'
+    )
+    assertthat::assert_that(
+      requireNamespace('clustering.sc.dp', quietly = TRUE),
+      msg = 'clustering.sc.dp package required for WOE post clustering.'
+    )
   }
   ## By default the variable order_label is equal to auto
   # order_label <- order_label[1]
   ## the variable order_lable can only accept this following values
-  order_label <- match.arg(order_label,c("auto","alpha","count","props","means"),several.ok = FALSE)
+  order_label <- match.arg(
+    order_label,
+    c("auto", "alpha", "count", "props", "means"),
+    several.ok = FALSE
+  )
   # cat("\n",order_label ,"\n")
 
   ## list all variables to cross with
 
-  if(is.null(select_vars)){
+  if (is.null(select_vars)) {
     select_vars <- names(data)
-    if(naming_conventions == TRUE){
-      select_vars <- select_vars[substr(select_vars,1,2) %in% c("L_","N_","M_","F_","J_", "C_","R_","P_","O_")]
+    if (naming_conventions == TRUE) {
+      select_vars <- select_vars[
+        substr(select_vars, 1, 2) %in%
+          c("L_", "N_", "M_", "F_", "J_", "C_", "R_", "P_", "O_")
+      ]
     }
   }
 
   ## exclude target in all ways
   select_vars <- select_vars[select_vars != target]
   ## exclude specific variables in input of the function
-  select_vars <- select_vars[!(select_vars %in%  exclude_vars)]
+  select_vars <- select_vars[!(select_vars %in% exclude_vars)]
 
   ## check1:  columns name in colnames(data)
-  check <- select_vars%in% colnames(data)
-  if(any(!check)){
+  check <- select_vars %in% colnames(data)
+  if (any(!check)) {
     vars <- select_vars[!check]
     varlist <- paste(vars, collapse = " ")
-    msg <- c(msg,
-             list(WARNING=
-                    paste("Some variables not present in dataframe -
-                          they are removed from analyses:",varlist)))
+    msg <- c(
+      msg,
+      list(
+        WARNING = paste(
+          "Some variables not present in dataframe -
+                          they are removed from analyses:",
+          varlist
+        )
+      )
+    )
     select_vars <- select_vars[check]
   }
 
-
   ## check 2 (if naming convention): do we respect naming conventions
-  if(naming_conventions){
-    check <- !check_naming_conventions(data[,..select_vars])[,1] ## first check on LETTER_
-    if(any(!check)){
+  if (naming_conventions) {
+    check <- !check_naming_conventions(data[, ..select_vars])[, 1] ## first check on LETTER_
+    if (any(!check)) {
       vars <- select_vars[!check]
       varlist <- paste(vars, collapse = " ")
-      msg <- c(msg,
-               list(
-                 WARNING=paste("Some variables do not respect naming conventions -
-                               they are removed from analyses:",varlist)))
-      select_vars <-select_vars[check]
-    }}
-
+      msg <- c(
+        msg,
+        list(
+          WARNING = paste(
+            "Some variables do not respect naming conventions -
+                               they are removed from analyses:",
+            varlist
+          )
+        )
+      )
+      select_vars <- select_vars[check]
+    }
+  }
 
   ## ensuring correct variables names (R valid for names in profiles slot + unique)
   # explanatory variables
   cn <- select_vars
   nn <- make.names(cn, unique = TRUE)
-  if (any(cn !=nn)){
-    old_names <- cn[cn!=nn]
-    new_names <- nn[cn!=nn]
+  if (any(cn != nn)) {
+    old_names <- cn[cn != nn]
+    new_names <- nn[cn != nn]
     # positions <- which(cn!=nn)
     setnames(data, old_names, new_names)
-    info <- paste(cn[positions],nn[positions], sep='->', collapse = '\t')
-    msg <- c(msg, list(WARNING=paste(
-      "silently changing some variables names to be valid unique R names:",
-      info, '\n\tPlease note it might lead to issues with metadata and that
-      unique valid R names should be used (see make.names(x, unique=TRUE))'))
+    info <- paste(cn[positions], nn[positions], sep = '->', collapse = '\t')
+    msg <- c(
+      msg,
+      list(
+        WARNING = paste(
+          "silently changing some variables names to be valid unique R names:",
+          info,
+          '\n\tPlease note it might lead to issues with metadata and that
+      unique valid R names should be used (see make.names(x, unique=TRUE))'
+        )
+      )
     )
-    colnames(data)[positions] <- new_names  
+    colnames(data)[positions] <- new_names
     # we don't use setnames as we might have duplicated names, setnames would
     # raise a warning and not necessary do what we want
     select_vars <- nn
@@ -357,84 +455,130 @@ targeter <- function(data,
   # target
   cn <- target
   nn <- make.names(target)
-  if (any(cn !=nn)){
-    old_names <- cn[cn!=nn]
-    new_names <- nn[cn!=nn]
-    info <- paste(cn,nn, sep='->', collapse = '\t')
-    msg <- c(msg, list(WARNING=paste(
-      "silently changing target names to be valid  R name:",
-      info,
-      '\n\tPlease note it might lead to issues with metadata and that unique
-      valid R names should be used (see make.names(x, unique=TRUE))'))
+  if (any(cn != nn)) {
+    old_names <- cn[cn != nn]
+    new_names <- nn[cn != nn]
+    info <- paste(cn, nn, sep = '->', collapse = '\t')
+    msg <- c(
+      msg,
+      list(
+        WARNING = paste(
+          "silently changing target names to be valid  R name:",
+          info,
+          '\n\tPlease note it might lead to issues with metadata and that unique
+      valid R names should be used (see make.names(x, unique=TRUE))'
+        )
+      )
     )
     setnames(data, old_names, new_names)
     target <- nn
   }
 
-
   ## target type
-  if (target_type == "autoguess"){
-    target_type <- dt_vartype_autoguess_onevar(data, target, num_as_categorical_nval)
-    if (target_type=="unimode") {
-      msg <- c(msg, list(ERROR="target has a unique value"))
+  if (target_type == "autoguess") {
+    target_type <- dt_vartype_autoguess_onevar(
+      data,
+      target,
+      num_as_categorical_nval
+    )
+    if (target_type == "unimode") {
+      msg <- c(msg, list(ERROR = "target has a unique value"))
       ## display messages and stop
-      cat(paste(names(msg),msg, sep=":" , collapse = "\n"))
+      cat(paste(names(msg), msg, sep = ":", collapse = "\n"))
       stop()
     }
-    if (target_type=="unknown") {
-      msg <- c(msg, list(ERROR="target has an unknown type"))
+    if (target_type == "unknown") {
+      msg <- c(msg, list(ERROR = "target has an unknown type"))
       ## display messages and stop
-      cat(paste(names(msg),msg, sep=":" , collapse = "\n"))
+      cat(paste(names(msg), msg, sep = ":", collapse = "\n"))
       stop()
     }
-    msg <- c(msg, list(INFO=paste("target",target,"detected as type:", target_type)))
+    msg <- c(
+      msg,
+      list(INFO = paste("target", target, "detected as type:", target_type))
+    )
   }
 
-  if (target_type=='binary' & is.null(target_reference_level)){
+  if (target_type == 'binary' & is.null(target_reference_level)) {
     cl <- class(data[[target]])[1]
-    if (cl=='logical'){
+    if (cl == 'logical') {
       target_reference_level <- TRUE
-      msg <- c(msg, list(INFO=paste("target is logical, automatic chosen level: TRUE; override using `target_reference_level`")))
-
-    } else if (cl %in% c('numeric','integer')) {
+      msg <- c(
+        msg,
+        list(
+          INFO = paste(
+            "target is logical, automatic chosen level: TRUE; override using `target_reference_level`"
+          )
+        )
+      )
+    } else if (cl %in% c('numeric', 'integer')) {
       target_reference_level <- 1
-      msg <- c(msg, list(INFO=paste("binary target contains number, automatic chosen level: 1; override using `target_reference_level`")))
-
-    } else if (cl %in% c('factor','character')){
+      msg <- c(
+        msg,
+        list(
+          INFO = paste(
+            "binary target contains number, automatic chosen level: 1; override using `target_reference_level`"
+          )
+        )
+      )
+    } else if (cl %in% c('factor', 'character')) {
       target_reference_level <- data[1, ][[target]]
-      msg <- c(msg, list(INFO=paste("target is character/factor, automatic chosen level: ", target_reference_level,"; override using `target_reference_level`")))
-
+      msg <- c(
+        msg,
+        list(
+          INFO = paste(
+            "target is character/factor, automatic chosen level: ",
+            target_reference_level,
+            "; override using `target_reference_level`"
+          )
+        )
+      )
     }
   }
-  if (target_type=='categorical' & is.null(target_reference_level)){
+  if (target_type == 'categorical' & is.null(target_reference_level)) {
     target_reference_level <- data[[target]][1] # totally arbitrary
-    msg <- c(msg, list(INFO=paste("target is categorical. As no target_reference_level was provided, one value is taken arbitrary:",target_reference_level," override using `target_reference_level`")))
+    msg <- c(
+      msg,
+      list(
+        INFO = paste(
+          "target is categorical. As no target_reference_level was provided, one value is taken arbitrary:",
+          target_reference_level,
+          " override using `target_reference_level`"
+        )
+      )
+    )
   }
-
 
   ##separation numeric/character variables
 
   ## numeric variables
-  if(naming_conventions == TRUE){
-    num_vars <- select_vars[substr(select_vars,1,2) %in% c("N_","M_","F_","J_","R_","P_")]
-    ord_vars <- select_vars[substr(select_vars,1,2) %in% c("O_")]
-    
+  if (naming_conventions == TRUE) {
+    num_vars <- select_vars[
+      substr(select_vars, 1, 2) %in% c("N_", "M_", "F_", "J_", "R_", "P_")
+    ]
+    ord_vars <- select_vars[substr(select_vars, 1, 2) %in% c("O_")]
   } else {
-    if (autoguess_nrows==0) autoguess_nrows <- nrow(data)
+    if (autoguess_nrows == 0) autoguess_nrows <- nrow(data)
     autoguess_nrows <- min(autoguess_nrows, nrow(data))
-    data_types <- dt_vartype_autoguess(data[1:autoguess_nrows,..select_vars], num_as_categorical_nval)
+    data_types <- dt_vartype_autoguess(
+      data[1:autoguess_nrows, ..select_vars],
+      num_as_categorical_nval
+    )
     # print(data_types)
 
-    cl <- sapply(data[,..select_vars], function(x)class(x)[1])
-    to_convert <- names(data_types)[data_types!="numeric" & (cl %in% c("numeric","integer"))]
+    cl <- sapply(data[, ..select_vars], function(x) class(x)[1])
+    to_convert <- names(data_types)[
+      data_types != "numeric" & (cl %in% c("numeric", "integer"))
+    ]
     # print(cl)
     # print(data_types)
     # print(to_convert)
-    if (length(to_convert)>0){
-      for (ivar in to_convert){
-        if (verbose){cat("\nconverting:", ivar, " as character.")}
-        data[,(ivar):=as.character(get(ivar))]
-
+    if (length(to_convert) > 0) {
+      for (ivar in to_convert) {
+        if (verbose) {
+          cat("\nconverting:", ivar, " as character.")
+        }
+        data[, (ivar) := as.character(get(ivar))]
       }
     }
     num_vars <- names(data_types)[data_types == "numeric"]
@@ -445,20 +589,21 @@ targeter <- function(data,
 
   dt_vars_exp <- unique(c(num_vars, ord_vars, other_vars))
   # check: remaining variables (after naming conventions)
-  if (length(c(num_vars, other_vars, ord_vars))==0){
+  if (length(c(num_vars, other_vars, ord_vars)) == 0) {
     cat("\n")
-    cat(paste(names(msg),msg, sep=":" , collapse = "\n"))
+    cat(paste(names(msg), msg, sep = ":", collapse = "\n"))
     cat("\n")
-    stop("\nNo explanatory variable remaining. Check variables 
-    and naming conventions if used.")
+    stop(
+      "\nNo explanatory variable remaining. Check variables 
+    and naming conventions if used."
+    )
   }
-
 
   ##function to cut in classes.
   ## binning > quantile ----
   binning_quantile <- function(x, nbins, variable) {
     ## put a vector from 0 to 1 by 1/nbins
-    quantiles <- seq(0, 1, length.out = nbins+1)
+    quantiles <- seq(0, 1, length.out = nbins + 1)
     ## take the value of the quantile for the variable x
     cutpoints <- unname(unique(stats::quantile(x, quantiles, na.rm = TRUE)))
 
@@ -468,31 +613,34 @@ targeter <- function(data,
     ## values of the quantiles for the variables
     cutpoints_list[[variable]] <<- cutpoints
     ## find the interval containing each element of x in cutpoints
-    findInterval(x,cutpoints, rightmost.closed = TRUE)
+    findInterval(x, cutpoints, rightmost.closed = TRUE)
   }
 
   ## binning > clustering ----
-  binning_clustering <- function(x, nbins, variable){
+  binning_clustering <- function(x, nbins, variable) {
     cl_centers <- Ckmeans.1d.dp::Ckmeans.1d.dp(x[!is.na(x)], k = nbins)$centers
     cutcenter_list[[variable]] <<- cl_centers
     cutpoints <- sort(
       unique(
-        c(cl_centers[-length(cl_centers)] +
-            diff(cl_centers/2), range(x, na.rm = TRUE))
+        c(
+          cl_centers[-length(cl_centers)] +
+            diff(cl_centers / 2),
+          range(x, na.rm = TRUE)
+        )
       )
     )
 
     cutpoints_list[[variable]] <<- cutpoints
     ## find the interval containing each element of x in cutpoints
-    findInterval(x,cutpoints, rightmost.closed=TRUE)
+    findInterval(x, cutpoints, rightmost.closed = TRUE)
   }
 
   ## binning > smart ----
-  binning_smart <- function(x, nbins, variable){
+  binning_smart <- function(x, nbins, variable) {
     # if (verbose)cat("\n smart binning:", variable)
     quantiles <- seq(0, 1, length.out = 1 + round(1 / smart_quantile_by))
     nqu <- length(quantiles)
-    qu_indices <- (1:nqu) %/% (nqu/nbins)
+    qu_indices <- (1:nqu) %/% (nqu / nbins)
     ## take the value of the quantile for the variable x
     qu <- quantile(x, quantiles, na.rm = TRUE)
     qmin <- qu[1]
@@ -502,11 +650,13 @@ targeter <- function(data,
     qu[qu == Inf] <- max(x[is.finite(x)], na.rm = TRUE)
     #unique values
     uqu <- qu[names(qu)[!duplicated(qu_indices)]]
-    new_nbin <- min(c(length(unique(uqu)),nqu))
-    # cl_centers <- 
+    new_nbin <- min(c(length(unique(uqu)), nqu))
+    # cl_centers <-
     #   Ckmeans.1d.dp::Ckmeans.1d.dp(x[!is.na(x)], k=new_nbin)$centers
-    cl_centers <- clustering.sc.dp::clustering.sc.dp(matrix(qu, ncol = 1),
-      k = new_nbin)$centers[,1]
+    cl_centers <- clustering.sc.dp::clustering.sc.dp(
+      matrix(qu, ncol = 1),
+      k = new_nbin
+    )$centers[, 1]
     cutcenter_list[[variable]] <<- cl_centers
 
     cutpoints <- sort(
@@ -517,24 +667,23 @@ targeter <- function(data,
 
     cutpoints_list[[variable]] <<- cutpoints
     ## find the interval containing each element of x in cutpoints
-    findInterval(x,cutpoints, rightmost.closed = TRUE)
+    findInterval(x, cutpoints, rightmost.closed = TRUE)
   }
 
-
-
   ##use to stock the values of the quantiles for each variable
-  cutpoints_list <- vector(mode="list", length=length(num_vars))
+  cutpoints_list <- vector(mode = "list", length = length(num_vars))
   names(cutpoints_list) <- num_vars
-  cutcenter_list <- vector(mode="list", length=length(num_vars))
+  cutcenter_list <- vector(mode = "list", length = length(num_vars))
   names(cutcenter_list) <- num_vars
-# print(cutcenter_list)
+  # print(cutcenter_list)
 
   binning_foos <- list(
     quantile = binning_quantile,
     clustering = binning_clustering,
-    smart = binning_smart)
+    smart = binning_smart
+  )
 
-  binning_foo <- binning_foos[[binning_method]] 
+  binning_foo <- binning_foos[[binning_method]]
 
   ## for numeric variables, we must to apply the function quickCut to cut the variable into classes.
   ## create a list called txt
@@ -542,74 +691,90 @@ targeter <- function(data,
   ## variable1 = quickCut(variable1, nbins = nbins, variable="variable1")
 
   txtQuickcut <- paste0(
-    paste0(num_vars, "=binning_foo(", num_vars, ",nbins=", nbins, 
-    ", variable='", num_vars, "')"), collapse=",")
+    paste0(
+      num_vars,
+      "=binning_foo(",
+      num_vars,
+      ",nbins=",
+      nbins,
+      ", variable='",
+      num_vars,
+      "')"
+    ),
+    collapse = ","
+  )
 
   ## for character variables no pre treatment is needed
   ## we select only the variables
   ## we add this element to the list txt created below
 
-  txt <- paste0("data[,.(",target )
+  txt <- paste0("data[,.(", target)
 
-  if (length(other_vars)>0){
-
-    txt <- paste0(txt,",", paste(other_vars, collapse=","))
+  if (length(other_vars) > 0) {
+    txt <- paste0(txt, ",", paste(other_vars, collapse = ","))
   }
-  if (length(num_vars)>0) txt <- paste0(txt,",",txtQuickcut)
-  txt <- paste0(txt,")]")
-  if (verbose) cat("\nCutting code:\n",txt,"\n\n")
-
+  if (length(num_vars) > 0) txt <- paste0(txt, ",", txtQuickcut)
+  txt <- paste0(txt, ")]")
+  if (verbose) cat("\nCutting code:\n", txt, "\n\n")
 
   ## evaluation of each comand in the list txt.
   ## dataCut is composed of character variables from data without modification
   ##and numeric variables but into classes
-  dataCut <- eval(parse(text=txt))
+  dataCut <- eval(parse(text = txt))
 
   # TMP<<- dataCut
-  if(verbose){cat("\nPreliminary cut performed\n")}
-
+  if (verbose) {
+    cat("\nPreliminary cut performed\n")
+  }
 
   ## target stats ----
 
-  if (target_type == "numeric"){
+  if (target_type == "numeric") {
     # compute target stats
-    probs <- c(seq(0.1, 0.9, by=0.1),0.01, 0.05, 0.25, 0.75, 0.95, 0.99)
+    probs <- c(seq(0.1, 0.9, by = 0.1), 0.01, 0.05, 0.25, 0.75, 0.95, 0.99)
     probs <- probs[order(probs)]
-    txt <- paste("data[,.(
+    txt <- paste(
+      "data[,.(
         avg=mean(get(target), na.rm = TRUE)
         ,std=sd(get(target), na.rm = TRUE)
         ,min=min(get(target), na.rm=TRUE)
-        ,"
-                 ,paste("q",round(100*probs),"=quantile(get(target),",probs, ",na.rm=TRUE)",
-                        sep="", collapse=","),
-                 ",max=max(get(target), na.rm=TRUE)
+        ,",
+      paste(
+        "q",
+        round(100 * probs),
+        "=quantile(get(target),",
+        probs,
+        ",na.rm=TRUE)",
+        sep = "",
+        collapse = ","
+      ),
+      ",max=max(get(target), na.rm=TRUE)
        ,sum=sum(get(target), na.rm=TRUE)
        ,count=.N
-       ,nNA=sum(is.na(get(target)))",")]")
-    target_stats <- eval(parse(text=txt))
-    target_stats[, percNA:=nNA/count]
-
-
+       ,nNA=sum(is.na(get(target)))",
+      ")]"
+    )
+    target_stats <- eval(parse(text = txt))
+    target_stats[, percNA := nNA / count]
   } else {
-
-
-    txt <- paste("data[,.(
+    txt <- paste(
+      "data[,.(
        count=.N
-       ,nNA=sum(is.na(get(target)))","), by=",target,"]")
-    target_stats <- eval(parse(text=txt))
-    target_stats[, percNA:=nNA/sum(count)]
-    target_stats[, perc:=count/sum(count)]
+       ,nNA=sum(is.na(get(target)))",
+      "), by=",
+      target,
+      "]"
+    )
+    target_stats <- eval(parse(text = txt))
+    target_stats[, percNA := nNA / sum(count)]
+    target_stats[, perc := count / sum(count)]
     setnames(target_stats, target, "value")
-
-
   }
 
-  crossvars <- vector(mode="list", length=length(select_vars))
+  crossvars <- vector(mode = "list", length = length(select_vars))
   names(crossvars) <- select_vars
 
-
-  for (variable in select_vars){
-
+  for (variable in select_vars) {
     if (verbose) cat("\nCrossing with:", variable)
 
     ## creation of the returned values in the vector out
@@ -621,22 +786,22 @@ targeter <- function(data,
     ## we count the number of observations for each target for each variables
     # txt <- paste0("all[,.(N=sum(N)),by=.(",variable,",",target,")]")
 
-    if (target_type %in% c("binary","categorical")){
+    if (target_type %in% c("binary", "categorical")) {
       # compute N
-      txt <- paste0("dataCut[,.(N=.N),by=.(",variable,",",target,")]")
-      x <- eval(parse(text=txt))
+      txt <- paste0("dataCut[,.(N=.N),by=.(", variable, ",", target, ")]")
+      x <- eval(parse(text = txt))
       ## we rename the columns by variable and target
-      colnames(x)[1:2] <- c(variable,target)
+      colnames(x)[1:2] <- c(variable, target)
       ## we have one column with all values for the target, but we want a table with one column for the first value of the target, a second column for the second value of the target and so on
       ## we transform the table to have the values of the target in column
-      tab=data.table::dcast(x, get(variable)~get(target),value.var="N")
+      tab = data.table::dcast(x, get(variable) ~ get(target), value.var = "N")
       # tab[, variable:=as.character(variable)]
       # tab <- as.data.frame(tab)
 
-
       ## if there is missing values in variable, we put it to missing instead of NA
-    } else if (target_type == "numeric"){
-      txt <- paste0("dataCut[,.(
+    } else if (target_type == "numeric") {
+      txt <- paste0(
+        "dataCut[,.(
                 count = .N,
                 varsum = sum(get(target), na.rm=TRUE),
                 avg = mean(get(target),na.rm=TRUE),
@@ -644,64 +809,68 @@ targeter <- function(data,
                 q25 = quantile(get(target), prob=c(0.25), na.rm=TRUE),
                 median = quantile(get(target), prob=c(0.5), na.rm=TRUE),
                 q75 = quantile(get(target), prob=c(0.75), na.rm=TRUE)),
-                by=.(",variable,")]")
-      tab <- eval(parse(text=txt))
+                by=.(",
+        variable,
+        ")]"
+      )
+      tab <- eval(parse(text = txt))
       setnames(tab, variable, "variable")
       # tab[, variable:=as.character(variable)]
-
-
-
-
     }
 
     ## option NA, applies for any type of target
-    if(useNA == "no"){
+    if (useNA == "no") {
       ## <!><20210315>moved here, previous position!! No object tab so far
-      tab <- tab[!is.na(tab$variable),]
+      tab <- tab[!is.na(tab$variable), ]
     }
 
-    if (target_type == "numeric"){
-
+    if (target_type == "numeric") {
       # first variables addition
-      tab[, `:=`(
-        qrange  = q75-q25   # IQ range
-      )]
+      tab[,
+        `:=`(
+          qrange = q75 - q25 # IQ range
+        )
+      ]
 
       # second variables addition
-      tab[, `:=`(
-        bxp_min = q25 - bxp_factor * qrange,
-        bxp_max = q75 + bxp_factor * qrange
-      )]
-
-
+      tab[,
+        `:=`(
+          bxp_min = q25 - bxp_factor * qrange,
+          bxp_max = q75 + bxp_factor * qrange
+        )
+      ]
     }
-    treat_tab_labels <- function(tab, variable, is_numeric, cutpoints_list){
-
+    treat_tab_labels <- function(tab, variable, is_numeric, cutpoints_list) {
       ## table labels, maintained as data.frame rownames
       # replace label for NA / /Missing
       ## derive names with intervals from object
-      if(is_numeric){
-        cp <- prettyNum(cutpoints_list[[variable]],digits=dec)
-        nbi <- length(cp)-1 ## number of intervals
-        if (nbi>0){
+      if (is_numeric) {
+        cp <- prettyNum(cutpoints_list[[variable]], digits = dec)
+        nbi <- length(cp) - 1 ## number of intervals
+        if (nbi > 0) {
           labels <- data.table::data.table(
-            val=1:nbi,
-            ...label=paste0('[',letters[1:nbi],'] from ', cp[1:(length(cp)-1)], ' to ',cp[2:length(cp)] )
+            val = 1:nbi,
+            ...label = paste0(
+              '[',
+              letters[1:nbi],
+              '] from ',
+              cp[1:(length(cp) - 1)],
+              ' to ',
+              cp[2:length(cp)]
+            )
           )
-
         } else {
           labels <- data.table::data.table(
-            val=0,
-            ...label=paste0('===', cp[1])
+            val = 0,
+            ...label = paste0('===', cp[1])
           )
-
         }
-        label_NA <- data.table::data.table(val=NA, ...label='[Missing]')
+        label_NA <- data.table::data.table(val = NA, ...label = '[Missing]')
         labels <- data.table::rbindlist(list(label_NA, labels))
-        tab <- merge(tab, labels, by.x='variable', by.y='val', all.x=TRUE)
+        tab <- merge(tab, labels, by.x = 'variable', by.y = 'val', all.x = TRUE)
         tab <- as.data.frame(tab)
         rownames(tab) <- tab$...label
-        tab <- tab[,-ncol(tab)] # remove ...label
+        tab <- tab[, -ncol(tab)] # remove ...label
         tab
       } else {
         tab <- as.data.frame(tab)
@@ -710,29 +879,33 @@ targeter <- function(data,
         rownames(tab) <- tab[[1]]
       }
       # ## we drop the column variable
-      tab <- tab[, -1, drop=FALSE]
+      tab <- tab[, -1, drop = FALSE]
 
-      rownames(tab)[rownames(tab)==''] <- '[empty]'
+      rownames(tab)[rownames(tab) == ''] <- '[empty]'
       return(tab)
     }
 
-    tab <- treat_tab_labels(tab, variable, is_numeric=(variable %in% num_vars),cutpoints_list)
+    tab <- treat_tab_labels(
+      tab,
+      variable,
+      is_numeric = (variable %in% num_vars),
+      cutpoints_list
+    )
 
     order_label_ivar <- order_label
-    if (order_label == "auto"){
-      if(variable %in% num_vars){
+    if (order_label == "auto") {
+      if (variable %in% num_vars) {
         order_label_ivar <- "alpha"
-      } else if (variable %in% ord_vars) {order_label_ivar <- "ordered"} else {
+      } else if (variable %in% ord_vars) {
+        order_label_ivar <- "ordered"
+      } else {
         order_label_ivar <- "props"
       }
-        
-        
     }
 
-
-    if (variable %in% num_vars){
+    if (variable %in% num_vars) {
       cross$variable_type <- 'numeric'
-      numcenters <-    cutcenter_list[[variable]] 
+      numcenters <- cutcenter_list[[variable]]
       # print(numcenters)
       rn <- rownames(tab)
       rn <- rn[rn != '[Missing]']
@@ -740,140 +913,162 @@ targeter <- function(data,
       names(numcenters) <- rn
       cross$numcenters <- numcenters
       cross$cutpoints <- cutpoints_list[[variable]]
-
     } else {
       cross$variable_type <- 'character'
     }
 
-    if (target_type %in% c("binary","numeric")){
-
+    if (target_type %in% c("binary", "numeric")) {
       alternate_version <- ifelse(
-        woe_alternate_version=="always", TRUE,    ## ALWAYS: alternate: TRUE
-        (target_type == "numeric"))             ## IF_CONTINUOUS: alternate: if target is numeric
+        woe_alternate_version == "always",
+        TRUE, ## ALWAYS: alternate: TRUE
+        (target_type == "numeric")
+      ) ## IF_CONTINUOUS: alternate: if target is numeric
 
-
-
-      if (cont_target_trim>0 & target_type=="numeric"){
+      if (cont_target_trim > 0 & target_type == "numeric") {
         # trim data to estimate WOE without outliers impacts
-        min_max <- quantile(data[[target]], probs=c(cont_target_trim, 1- cont_target_trim))
-        dataCut <- dataCut[get(target)>=min_max[1] & get(target)<=min_max[2],]
+        min_max <- quantile(
+          data[[target]],
+          probs = c(cont_target_trim, 1 - cont_target_trim)
+        )
+        dataCut <- dataCut[
+          get(target) >= min_max[1] & get(target) <= min_max[2],
+        ]
       }
 
       # DA <<- dataCut
       # VA <<- variable
       # TARGET <<- target
-      woe_iv <- dt_WOE_IV(dataCut,
-                          var_interest = target,
-                          var_cross = variable,
-                          alternate_version = alternate_version,
-                          useNA = useNA,
-                          woe_shift = woe_shift,
-                          target_reference_level = target_reference_level)
+      woe_iv <- dt_WOE_IV(
+        dataCut,
+        var_interest = target,
+        var_cross = variable,
+        alternate_version = alternate_version,
+        useNA = useNA,
+        woe_shift = woe_shift,
+        target_reference_level = target_reference_level
+      )
 
-      WOE <- woe_iv$WOE[, c('variable', 'WOE'), with=FALSE]
-    # print(variable)
-      WOE <- treat_tab_labels(WOE, variable, is_numeric=(variable %in% num_vars),cutpoints_list)
+      WOE <- woe_iv$WOE[, c('variable', 'WOE'), with = FALSE]
+      # print(variable)
+      WOE <- treat_tab_labels(
+        WOE,
+        variable,
+        is_numeric = (variable %in% num_vars),
+        cutpoints_list
+      )
       # print(WOE)
       IV <- woe_iv$IV
 
-      if (woe_post_cluster){
-        var_nvalues <- dataCut[!is.na(get(variable)),uniqueN(get(variable))]
-        if (woe_post_cluster_n < var_nvalues){
-          X <- WOE[rownames(WOE)!='[Missing]',,drop=FALSE]
+      if (woe_post_cluster) {
+        var_nvalues <- dataCut[!is.na(get(variable)), uniqueN(get(variable))]
+        if (woe_post_cluster_n < var_nvalues) {
+          X <- WOE[rownames(WOE) != '[Missing]', , drop = FALSE]
 
-          if (variable %in% num_vars){
+          if (variable %in% num_vars) {
             # numeric variable, use sequentially constrained clustering with package clustering.sc.dp
             # cat("\nvar:", variable)
-            cl <- clustering.sc.dp::clustering.sc.dp(as.matrix(X), k=woe_post_cluster_n)$cluster
+            cl <- clustering.sc.dp::clustering.sc.dp(
+              as.matrix(X),
+              k = woe_post_cluster_n
+            )$cluster
           } else {
             # cat var: use "normal" clustering
 
-            cl <- Ckmeans.1d.dp::Ckmeans.1d.dp(X$WOE, k=woe_post_cluster_n)$cluster
+            cl <- Ckmeans.1d.dp::Ckmeans.1d.dp(
+              X$WOE,
+              k = woe_post_cluster_n
+            )$cluster
           }
-          WOE[rownames(WOE)!='[Missing]','cluster'] <- cl
-          WOE[rownames(WOE)=='[Missing]','cluster'] <- 0
+          WOE[rownames(WOE) != '[Missing]', 'cluster'] <- cl
+          WOE[rownames(WOE) == '[Missing]', 'cluster'] <- 0
         } else {
           WOE$cluster <- 1
         }
       } else {
         WOE$cluster <- 1
       }
-      cross$woe_cluster <- (length(unique(WOE$cluster))>1) # has >1 cluster to be used for graphs
+      cross$woe_cluster <- (length(unique(WOE$cluster)) > 1) # has >1 cluster to be used for graphs
     } else {
-      WOE=NULL
+      WOE = NULL
       IV <- NULL
     }
 
-    if (target_type %in% c("binary","categorical")){
+    if (target_type %in% c("binary", "categorical")) {
       # tot <- rowSums(tab)
 
       tab[is.na(tab)] <- 0
 
-      p <- prop.table(as.table(as.matrix(tab)),margin=1)
+      p <- prop.table(as.table(as.matrix(tab)), margin = 1)
 
       ## calculation of the index
-      ind <- matrix( nrow = length(p[,1]),ncol = length(colnames(p)))
-      for(i in seq_along(colnames(p))){
-        avgpeni <- sum(tab[,i])/sum(tab)
-        ind[,i] <- p[,i]/avgpeni
+      ind <- matrix(nrow = length(p[, 1]), ncol = length(colnames(p)))
+      for (i in seq_along(colnames(p))) {
+        avgpeni <- sum(tab[, i]) / sum(tab)
+        ind[, i] <- p[, i] / avgpeni
       }
       colnames(ind) <- colnames(p)
       rownames(ind) <- rownames(p)
 
       ##creation of the vector order
-      if(order_label_ivar == "alpha"){
+      if (order_label_ivar == "alpha") {
         t1 <- rownames(tab)
         orderlabel <- t1[order(t1)]
-      }else if (order_label_ivar == "count" ) {
+      } else if (order_label_ivar == "count") {
         t1 <- tab
-        t1 <- cbind(t1,rowSums(t1))
+        t1 <- cbind(t1, rowSums(t1))
         colnames(t1)[ncol(t1)] <- "total"
-        orderlabel <- colnames(t1[,"total"][order(-t1[,"total"])])
-      }else if (order_label_ivar %in% "ordered") {
+        orderlabel <- colnames(t1[, "total"][order(-t1[, "total"])])
+      } else if (order_label_ivar %in% "ordered") {
         orderlabel <- levels(data[[variable]])
-      } else if (order_label_ivar %in% c("props","means"))
-      {
-
+      } else if (order_label_ivar %in% c("props", "means")) {
         t1 <- p
         reflev <- as.character(target_reference_level)
-        if (is.na(reflev))reflev<- "NA"
+        if (is.na(reflev)) reflev <- "NA"
         # print("Yes")
         # print(reflev)
-        wh <- which(colnames(t1)==reflev)
+        wh <- which(colnames(t1) == reflev)
         # TMP <<- t1
         # print(wh)
-        orderlabel <- names(t1[,wh][order(-t1[,wh])]) # note: categorical: arbitrary ordered by second column
+        orderlabel <- names(t1[, wh][order(-t1[, wh])]) # note: categorical: arbitrary ordered by second column
 
         # print(t1)
         # print(orderlabel)
       }
 
-
       cross$counts = tab
       cross$props = p
       cross$index = ind
 
-      if (target_type %in% c('binary','categorical')) cross$target_reference_level <-target_reference_level
+      if (target_type %in% c('binary', 'categorical'))
+        cross$target_reference_level <- target_reference_level
 
-      class(cross) <- c("crossvar",paste("crossvar", target_type, sep="_"), class(cross))
+      class(cross) <- c(
+        "crossvar",
+        paste("crossvar", target_type, sep = "_"),
+        class(cross)
+      )
     } else {
       # continuous / ordinal target
       ##creation of the vector order
       t1 <- rownames(tab)
 
-      if(order_label_ivar == "alpha"){
+      if (order_label_ivar == "alpha") {
         orderlabel <- t1[order(t1)]
-      } else if (order_label_ivar == "count" ) {
+      } else if (order_label_ivar == "count") {
         orderlabel <- levels(data[[ivar]])
-      } else if (order_label_ivar == "count" ) {
-        orderlabel <- t1[order(-tab[,"count"])]
-      } else if (order_label_ivar %in% c("props","means")){
-        orderlabel <- t1[order(-tab[,'avg'])] # note: categorical: arbitrary ordered by second column
+      } else if (order_label_ivar == "count") {
+        orderlabel <- t1[order(-tab[, "count"])]
+      } else if (order_label_ivar %in% c("props", "means")) {
+        orderlabel <- t1[order(-tab[, 'avg'])] # note: categorical: arbitrary ordered by second column
       } else if (order_label_ivar %in% "ordered") {
         orderlabel <- levels(data[[variable]])
       }
       cross$stats <- tab
-      class(cross) <- c("crossvar",paste("crossvar", target_type, sep="_"), class(cross))
+      class(cross) <- c(
+        "crossvar",
+        paste("crossvar", target_type, sep = "_"),
+        class(cross)
+      )
     }
 
     ## common slots
@@ -894,86 +1089,98 @@ targeter <- function(data,
     description_data = description_data,
     description_target = description_target,
     target_type = target_type,
-    target_stats = as.data.frame(target_stats) ,
+    target_stats = as.data.frame(target_stats),
     analysis = analysis_name,
     date = Sys.Date(),
     profiles = crossvars
   )
-  if (target_type %in% c('binary','categorical')){
+  if (target_type %in% c('binary', 'categorical')) {
     out$target_reference_level <- target_reference_level
   }
 
   out$decision_tree <- decision_tree
-  if (decision_tree){
-    assertthat::assert_that(system.file(package="rpart") != "", 
-    msg = "Package rpart is required for this functionality (suggested for targeter)")
-    if (length(dt_vars_exp) < 2) msg <- c(msg, 
-    list(WARNING="too few columns to grow decition tree.")) else {
-
-    
+  if (decision_tree) {
+    assertthat::assert_that(
+      system.file(package = "rpart") != "",
+      msg = "Package rpart is required for this functionality (suggested for targeter)"
+    )
+    if (length(dt_vars_exp) < 2)
+      msg <- c(
+        msg,
+        list(WARNING = "too few columns to grow decition tree.")
+      ) else {
       formula_txt <- as.formula("L_TARGET~.")
 
-        # from explore::explain_tree function
+      # from explore::explain_tree function
 
-      if (target_type %in% c('binary')) { 
+      if (target_type %in% c('binary')) {
         # look in function for categorical targets
-        
+
         # we will use weight
-        data[, L_TARGET:=ifelse(get(target)==target_reference_level,1,0)]
-        
+        data[, L_TARGET := ifelse(get(target) == target_reference_level, 1, 0)]
+
         weights <- explore::weight_target(
-          data[,unique(c("L_TARGET",dt_vars_exp)), with = FALSE],
-          L_TARGET)
-        minsplit <- sum(weights)/10
+          data[, unique(c("L_TARGET", dt_vars_exp)), with = FALSE],
+          L_TARGET
+        )
+        minsplit <- sum(weights) / 10
 
         n <- table(data[["L_TARGET"]])
-        prior <- n/sum(n)
-      #  decision_tree_cp <- 0 # to be put as parametre
+        prior <- n / sum(n)
+        #  decision_tree_cp <- 0 # to be put as parametre
         if (all(weights == 1)) {
-                mod <- rpart::rpart(formula_txt, 
-                  data = data[,unique(c("L_TARGET",dt_vars_exp)), with = FALSE], 
-                  method = "class", 
-                  model = TRUE,
-                  parms = list(prior = prior), 
-                  control = rpart::rpart.control(
-                      maxdepth = decision_tree_maxdepth, 
-                      minsplit = minsplit,
-                      cp = decision_tree_cp))
-            } else {
-                mod <- rpart::rpart(formula_txt, 
-                data = data[,unique(c("L_TARGET",dt_vars_exp)), with = FALSE],
-                method = "class", 
-                    weights = weights,
-                    model = TRUE, 
-                    control = rpart::rpart.control(
-                      maxdepth = decision_tree_maxdepth, 
-                      minsplit = minsplit,
-                      cp = decision_tree_cp))
-            }
+          mod <- rpart::rpart(
+            formula_txt,
+            data = data[, unique(c("L_TARGET", dt_vars_exp)), with = FALSE],
+            method = "class",
+            model = TRUE,
+            parms = list(prior = prior),
+            control = rpart::rpart.control(
+              maxdepth = decision_tree_maxdepth,
+              minsplit = minsplit,
+              cp = decision_tree_cp
+            )
+          )
+        } else {
+          mod <- rpart::rpart(
+            formula_txt,
+            data = data[, unique(c("L_TARGET", dt_vars_exp)), with = FALSE],
+            method = "class",
+            weights = weights,
+            model = TRUE,
+            control = rpart::rpart.control(
+              maxdepth = decision_tree_maxdepth,
+              minsplit = minsplit,
+              cp = decision_tree_cp
+            )
+          )
+        }
       } else {
         #numeric target
         minsplit <- 30
-        data[, L_TARGET:=get(target)]
-        mod <-rpart::rpart(
+        data[, L_TARGET := get(target)]
+        mod <- rpart::rpart(
           formula_txt,
           model = TRUE,
-          data = data[,unique(c("L_TARGET",dt_vars_exp)), with = FALSE], 
-                method = "anova",
-                control = rpart::rpart.control(
-                      maxdepth = decision_tree_maxdepth, 
-                      minsplit = minsplit,
-                      cp = decision_tree_cp))
-        }
-      out$decision_tree_model <- mod
+          data = data[, unique(c("L_TARGET", dt_vars_exp)), with = FALSE],
+          method = "anova",
+          control = rpart::rpart.control(
+            maxdepth = decision_tree_maxdepth,
+            minsplit = minsplit,
+            cp = decision_tree_cp
+          )
+        )
       }
-     } else  out$decision_tree_model <- NA 
-  
+      out$decision_tree_model <- mod
+    }
+  } else out$decision_tree_model <- NA
+
   ## assign class
-  class(out) <- c("targeter",class(out))
+  class(out) <- c("targeter", class(out))
 
   ## display messages
   cat("\n")
-  cat(paste(names(msg),msg, sep=":" , collapse = "\n"))
+  cat(paste(names(msg), msg, sep = ":", collapse = "\n"))
   cat("\n")
   ## return object
   return(out)
@@ -981,22 +1188,27 @@ targeter <- function(data,
 
 #' @method print targeter
 #' @importFrom utils head
-print.targeter <- function(x,...){
+print.targeter <- function(x, ...) {
   cat("\nTarget profiling object with following properties:")
   cat(paste0("\n\tTarget:"), x$target, " of type:", x$target_type)
-  if (x$target_type == 'binary') cat(paste0("  (target level:", x$target_reference_level),")")
+  if (x$target_type == 'binary')
+    cat(paste0("  (target level:", x$target_reference_level), ")")
   cat(paste0("\n\tRun on data:"), x$dataname, " the:", format(x$date))
   nprof <- length(x$profiles)
-  vars_profile <-  utils::head(names(x$profiles),5)
-  vars_profile <- paste(vars_profile, collapse=", ")
-  if (nprof>5) vars_profile <- paste0(vars_profile, "...")
-  cat(paste0("\n", length(x$profiles), " profiles available (",vars_profile,")"))
-  cat(paste0("\nYou can access each crossing using slot $profiles[[__variable__]]. Then on it use `plot` or `summary`"))
-  cat(paste0("\nYou can also directly invoke a global `summary` function on this object."))
-
+  vars_profile <- utils::head(names(x$profiles), 5)
+  vars_profile <- paste(vars_profile, collapse = ", ")
+  if (nprof > 5) vars_profile <- paste0(vars_profile, "...")
+  cat(
+    paste0("\n", length(x$profiles), " profiles available (", vars_profile, ")")
+  )
+  cat(
+    paste0(
+      "\nYou can access each crossing using slot $profiles[[__variable__]]. Then on it use `plot` or `summary`"
+    )
+  )
+  cat(
+    paste0(
+      "\nYou can also directly invoke a global `summary` function on this object."
+    )
+  )
 }
-
-
-
-
-

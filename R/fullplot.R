@@ -1,5 +1,5 @@
 #' @title fullplot
-#' @description autoplot method for crossvar OR targeter object 
+#' @description autoplot method for crossvar OR targeter object
 #' (with a variable specification).
 #' draws the combination of 4 selected plots/
 
@@ -35,7 +35,6 @@
 #' \item \code{\link{quadrant_plot}}
 #' }
 
-
 #' @importFrom assertthat assert_that
 #' @importFrom  ggplot2 ggplot
 #' @importFrom ggplot2 theme_void
@@ -46,32 +45,41 @@
 #' CN <- crossvar(adult, target = "AGE", var = "SEX")
 #' fullplot(CN, title = "this is my title", subtitle = FALSE,  which_plot = 1:4)
 #' @export
-fullplot <- function(x,
-                     var = NULL,
-                     numvar_as = c("value", "bin"),
-                     metadata = NULL,
-                     print_NA = TRUE,
-                     only_target_ref_level = TRUE,
-                     lim_y = TRUE,
-                     title = TRUE,
-                     subtitle = TRUE,
-                     which_plot = 1:2) {
-  assertthat::assert_that(inherits(x, what = c("crossvar", "targeter")),
+fullplot <- function(
+  x,
+  var = NULL,
+  numvar_as = c("value", "bin"),
+  metadata = NULL,
+  print_NA = TRUE,
+  only_target_ref_level = TRUE,
+  lim_y = TRUE,
+  title = TRUE,
+  subtitle = TRUE,
+  which_plot = 1:2
+) {
+  assertthat::assert_that(
+    inherits(x, what = c("crossvar", "targeter")),
     msg = "x must be a crossvar or a targeter object"
   )
 
-  numvar_as <- match.arg(numvar_as, choices = c("value", "bin"), several.ok = FALSE)
+  numvar_as <- match.arg(
+    numvar_as,
+    choices = c("value", "bin"),
+    several.ok = FALSE
+  )
 
   if (inherits(x, "targeter")) {
-    assertthat::assert_that(!is.null(var),
+    assertthat::assert_that(
+      !is.null(var),
       msg = "x being a targeter object, var must be provided"
     )
-    assertthat::assert_that(is.character(var),
+    assertthat::assert_that(
+      is.character(var),
       msg = "var must be a character parameter"
     )
 
-
-    assertthat::assert_that(var %in% names(x$profiles),
+    assertthat::assert_that(
+      var %in% names(x$profiles),
       msg = "var is not present in list of x profiles/crossvar"
     )
 
@@ -81,7 +89,8 @@ fullplot <- function(x,
   # var_label = label(var, metadata = metadata)
 
   if (x$target_type %in% c("binary", "categorical")) {
-    g1 <- plot(x,
+    g1 <- plot(
+      x,
       metadata = metadata,
       print_NA = print_NA,
       numvar_as = numvar_as,
@@ -89,7 +98,8 @@ fullplot <- function(x,
       do_plot = FALSE
     )
 
-    g2 <- plot(x,
+    g2 <- plot(
+      x,
       show = "props",
       type = "l",
       metadata = metadata,
@@ -100,12 +110,7 @@ fullplot <- function(x,
       do_plot = FALSE
     )
 
-
-    g3 <- plot_woe(x,
-      metadata = metadata,
-      title = FALSE,
-      do_plot = FALSE
-    )
+    g3 <- plot_woe(x, metadata = metadata, title = FALSE, do_plot = FALSE)
 
     if (x$variable_type %in% c("character")) {
       g4 <- quadrant_plot(x, metadata = metadata, title = FALSE)
@@ -117,8 +122,6 @@ fullplot <- function(x,
     }
 
     # g34 <- gridExtra::arrangeGrob(g3, g4, ncol=2)
-
-
 
     ## add title
     if (is.logical(title)) {
@@ -137,10 +140,10 @@ fullplot <- function(x,
         subtitle <- c()
         if (1 %in% which_plot) subtitle <- c(subtitle, "Frequencies (N)")
         if (2 %in% which_plot) {
-          subtitle <-  subtitle <- c(subtitle, "Percentages (%)")
+          subtitle <- subtitle <- c(subtitle, "Percentages (%)")
         }
         if (3 %in% which_plot) {
-          subtitle <-  subtitle <- c(subtitle, "WoE")
+          subtitle <- subtitle <- c(subtitle, "WoE")
         }
         if ((4 %in% which_plot) & L_quad) {
           subtitle <- subtitle <- c(subtitle, "Quadrant plot (N/%)")
@@ -150,47 +153,51 @@ fullplot <- function(x,
         subtitle <- NULL
       }
     }
-
-
   } else if (x$target_type %in% ("numeric")) {
-    g1 <- plot.crossvar(x,
+    g1 <- plot.crossvar(
+      x,
       show = "boxplot",
       metadata = metadata,
-      print_NA = TRUE, do_plot = FALSE,
+      print_NA = TRUE,
+      do_plot = FALSE,
       numvar_as = numvar_as,
       title = FALSE
     )
 
-
-    g2 <- plot.crossvar(x,
+    g2 <- plot.crossvar(
+      x,
       show = "count",
       type = "bars",
       metadata = metadata,
-      print_NA = TRUE, do_plot = FALSE,
+      print_NA = TRUE,
+      do_plot = FALSE,
       numvar_as = numvar_as,
       title = FALSE
     )
 
-    g3 <- plot.crossvar(x,
+    g3 <- plot.crossvar(
+      x,
       show = "woe",
       type = "bars",
       metadata = metadata,
-      print_NA = TRUE, do_plot = FALSE,
+      print_NA = TRUE,
+      do_plot = FALSE,
       numvar_as = numvar_as,
       title = FALSE
     )
-
 
     if (x$variable_type %in% c("character")) {
       g4 <- quadrant_plot(x, metadata = metadata, title = FALSE)
       L_quad <- TRUE
     } else {
       # g4 <- ggplot() + theme_void()
-      g4 <- plot.crossvar(x,
+      g4 <- plot.crossvar(
+        x,
         show = "avg",
         type = "line",
         metadata = metadata,
-        print_NA = TRUE, do_plot = FALSE,
+        print_NA = TRUE,
+        do_plot = FALSE,
         numvar_as = "value",
         title = FALSE
       )
@@ -211,7 +218,6 @@ fullplot <- function(x,
     }
     if (is.logical(subtitle)) {
       if (subtitle) {
-
         subtitle <- c()
         if (1 %in% which_plot) subtitle <- c(subtitle, "Boxplot")
         if (2 %in% which_plot) {
@@ -234,9 +240,10 @@ fullplot <- function(x,
   expr <- paste("g", which_plot, sep = "", collapse = ",")
   expr <- paste0("patchwork::wrap_plots(", expr, ")")
   allplots <- eval(parse(text = expr))
-  allplots <- allplots + patchwork::plot_annotation(
-    title = title,
-    subtitle = subtitle
-  )
+  allplots <- allplots +
+    patchwork::plot_annotation(
+      title = title,
+      subtitle = subtitle
+    )
   return(allplots)
 }
