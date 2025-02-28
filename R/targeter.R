@@ -608,6 +608,7 @@ targeter <- function(
     cutpoints <- unname(unique(stats::quantile(x, quantiles, na.rm = TRUE)))
 
     centers <- cutpoints[-length(cutpoints)] + diff(cutpoints / 2)
+    if (length(centers) == 0) centers <- cutpoints # unique value <20250228 issue>
     cutcenter_list[[variable]] <<- centers
 
     ## values of the quantiles for the variables
