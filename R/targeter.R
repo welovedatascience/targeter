@@ -177,7 +177,6 @@ if (getRversion() >= "3.1.0")
 #' @examples
 #' targeter(adult,target ="ABOVE50K")
 
-
 #' @importFrom stats quantile median as.formula
 #' @importFrom data.table dcast
 #' @importFrom data.table .N
@@ -185,9 +184,6 @@ if (getRversion() >= "3.1.0")
 #' @importFrom data.table `:=`
 # @importFrom rpart rpart rpart.control
 # @importFrom explore weight_target
-
-
-
 
 ## <idea> check for WOE monotonicity
 targeter <- function(
@@ -310,6 +306,12 @@ targeter <- function(
   data <- data.table::setDT(data)
   msg <- vector(mode = 'list')
 
+  vars <- data.table(
+    variable = sort(unique(c(select_vars, exclude_vars, names(data))))
+  )
+  vars[, is_in_data := (variable %in% names(data))]
+  vars[, is_target := (variable == target)]
+
   # <20210322> rename target if variable name=="target" (trouble with dt get(target))
   if (target == "target") {
     msg <- c(
@@ -378,15 +380,19 @@ targeter <- function(
     if (naming_conventions == TRUE) {
       select_vars <- select_vars[
         substr(select_vars, 1, 2) %in%
-          c("L_", "N_", "M_", "F_", "J_", "C_", "R_", "P_", "O_")
+          c("L_", "N_", "M_", "F_", "J_", "C_", "R_", "P_", "O_", "Z_")
       ]
+      #select_vars <- select_vars[select_vars != target]
+      vars[, keep_naming_convention := (variable %in% c(select_vars, target))]
     }
   }
 
-  ## exclude target in all ways
+  ## exclude target in all ways -  # we might use other targets Z_ present in file but not the one currently processed
   select_vars <- select_vars[select_vars != target]
   ## exclude specific variables in input of the function
   select_vars <- select_vars[!(select_vars %in% exclude_vars)]
+
+  vars[, is_in_exclude := (variable %in% exclude_vars)]
 
   ## check1:  columns name in colnames(data)
   check <- select_vars %in% colnames(data)
@@ -417,11 +423,13 @@ targeter <- function(
         list(
           WARNING = paste(
             "Some variables do not respect naming conventions -
-                               they are removed from analyses:",
-            varlist
+                               they are removed from analyses (check object$variables slot):",
+            head(varlist, 3)
           )
         )
       )
+      vars[, respect_naming_convention := !(variable %in% varlist)]
+
       select_vars <- select_vars[check]
     }
   }
@@ -434,6 +442,7 @@ targeter <- function(
     old_names <- cn[cn != nn]
     new_names <- nn[cn != nn]
     # positions <- which(cn!=nn)
+    vars[, silently_renamed := (variable %in% old_names)]
     setnames(data, old_names, new_names)
     info <- paste(cn[positions], nn[positions], sep = '->', collapse = '\t')
     msg <- c(
@@ -458,6 +467,10 @@ targeter <- function(
   if (any(cn != nn)) {
     old_names <- cn[cn != nn]
     new_names <- nn[cn != nn]
+    vars[
+      which(variable == target),
+      silently_renamed := (variable %in% old_names)
+    ]
     info <- paste(cn, nn, sep = '->', collapse = '\t')
     msg <- c(
       msg,
@@ -474,6 +487,9 @@ targeter <- function(
     target <- nn
   }
 
+  ## variables > types and filter -----
+  vars[, var_type := ""]
+
   ## target type
   if (target_type == "autoguess") {
     target_type <- dt_vartype_autoguess_onevar(
@@ -485,12 +501,14 @@ targeter <- function(
       msg <- c(msg, list(ERROR = "target has a unique value"))
       ## display messages and stop
       cat(paste(names(msg), msg, sep = ":", collapse = "\n"))
+      vars[which(variable == target), var_type := target_type]
       stop()
     }
     if (target_type == "unknown") {
       msg <- c(msg, list(ERROR = "target has an unknown type"))
       ## display messages and stop
       cat(paste(names(msg), msg, sep = ":", collapse = "\n"))
+      vars[which(variable == target), var_type := target_type]
       stop()
     }
     msg <- c(
@@ -548,7 +566,7 @@ targeter <- function(
       )
     )
   }
-
+  vars[which(variable == target), var_type := target_type]
   ##separation numeric/character variables
 
   ## numeric variables
@@ -584,8 +602,12 @@ targeter <- function(
     num_vars <- names(data_types)[data_types == "numeric"]
     ord_vars <- names(data_types)[data_types == "ordinal"]
   }
+  vars[which(variable %in% num_vars), var_type := "numeric"]
+  vars[which(variable %in% ord_vars), var_type := "ordinal"]
+
   ## character/catogerical/other variables
   other_vars <- select_vars[!(select_vars %in% c(num_vars))]
+  vars[which(variable %in% other_vars), var_type := "categorical"]
 
   dt_vars_exp <- unique(c(num_vars, ord_vars, other_vars))
   # check: remaining variables (after naming conventions)
@@ -593,6 +615,10 @@ targeter <- function(
     cat("\n")
     cat(paste(names(msg), msg, sep = ":", collapse = "\n"))
     cat("\n")
+    vars[
+      which(variable %in% c(num_vars, ord_vars, other_vars, target)),
+      keep_naming_convention := TRUE
+    ]
     stop(
       "\nNo explanatory variable remaining. Check variables 
     and naming conventions if used."
@@ -705,6 +731,7 @@ targeter <- function(
     collapse = ","
   )
 
+  ## compute > bin -------
   ## for character variables no pre treatment is needed
   ## we select only the variables
   ## we add this element to the list txt created below
@@ -728,7 +755,7 @@ targeter <- function(
     cat("\nPreliminary cut performed\n")
   }
 
-  ## target stats ----
+  ## compute > target stats ----
 
   if (target_type == "numeric") {
     # compute target stats
@@ -772,6 +799,7 @@ targeter <- function(
     setnames(target_stats, target, "value")
   }
 
+  ## compute > cross  --------
   crossvars <- vector(mode = "list", length = length(select_vars))
   names(crossvars) <- select_vars
 
@@ -885,7 +913,7 @@ targeter <- function(
       rownames(tab)[rownames(tab) == ''] <- '[empty]'
       return(tab)
     }
-
+    ## compute > cross > labels ------
     tab <- treat_tab_labels(
       tab,
       variable,
@@ -935,7 +963,7 @@ targeter <- function(
           get(target) >= min_max[1] & get(target) <= min_max[2],
         ]
       }
-
+      ## compute > WoE -------
       # DA <<- dataCut
       # VA <<- variable
       # TARGET <<- target
@@ -993,13 +1021,14 @@ targeter <- function(
       WOE = NULL
       IV <- NULL
     }
-
+    ## compute > cross > small tables (proportions) ----
     if (target_type %in% c("binary", "categorical")) {
       # tot <- rowSums(tab)
 
       tab[is.na(tab)] <- 0
 
       p <- prop.table(as.table(as.matrix(tab)), margin = 1)
+      p_col <- prop.table(as.table(as.matrix(tab)), margin = 2)
 
       ## calculation of the index
       ind <- matrix(nrow = length(p[, 1]), ncol = length(colnames(p)))
@@ -1039,6 +1068,7 @@ targeter <- function(
       cross$counts = tab
       cross$props = p
       cross$index = ind
+      cross$pcol <- p_col
 
       if (target_type %in% c('binary', 'categorical'))
         cross$target_reference_level <- target_reference_level
@@ -1071,7 +1101,7 @@ targeter <- function(
         class(cross)
       )
     }
-
+    ## output > crossvar > common slots -------
     ## common slots
     cross$orderlabel = orderlabel
     cross$levels = rownames(tab)
@@ -1084,6 +1114,19 @@ targeter <- function(
     crossvars[[variable]] <- cross
   }
 
+  ## compute > drop variables with only one value -----
+  vars_one_value <- sapply(crossvars, function(x) nrow(x$counts) == 1)
+  if (any(vars_one_value)) {
+    crossvars <- crossvars[which(!(vars_one_value))]
+    vars[,
+      dropped_one_single_value := (variable %in%
+        names(vars_one_value)[which(vars_one_value)])
+    ]
+  }
+  vars[, has_profile:=(variable %in% names(crossvars))]
+  print(vars)
+  # print(vars_one_value)
+  ## output > out object initialization ------
   out <- list(
     dataname = dataname,
     target = target,
@@ -1093,12 +1136,13 @@ targeter <- function(
     target_stats = as.data.frame(target_stats),
     analysis = analysis_name,
     date = Sys.Date(),
-    profiles = crossvars
+    profiles = crossvars,
+    variables = vars
   )
   if (target_type %in% c('binary', 'categorical')) {
     out$target_reference_level <- target_reference_level
   }
-
+  ## compute > decision tree ------
   out$decision_tree <- decision_tree
   if (decision_tree) {
     assertthat::assert_that(
@@ -1174,9 +1218,12 @@ targeter <- function(
       }
       out$decision_tree_model <- mod
     }
-  } else out$decision_tree_model <- NA
+  } else {
+    out$decision_tree_model <- NA
+  }
 
   ## assign class
+  ## output > final return ----------
   class(out) <- c("targeter", class(out))
 
   ## display messages

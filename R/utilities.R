@@ -100,7 +100,9 @@ label <- function(
 table.crossvar <- function(x, round_digits = 3) {
   if (x$target_type %in% c("binary", "categorical")) {
     cnts <- as.data.frame.matrix(x$counts)
-    colnames(cnts) <- paste("N", colnames(cnts))
+    vn <- colnames(cnts)
+    colnames(cnts) <- paste0("N", vn)
+    cnts[,  "Ntot"] <- apply(cnts, 2, sum)
 
     props <- as.data.frame.matrix(x$props)
     rn <- rownames(props)
@@ -109,8 +111,18 @@ table.crossvar <- function(x, round_digits = 3) {
         paste0(round(col, round_digits), "%")
       })
     )
-    colnames(props) <- paste("perc", colnames(props))
-    out <- cbind(cnts, props)
+    colnames(props) <- paste0("perc", vn)
+    pcol <- as.data.frame.matrix(x$pcol)
+    # names(pcol) <- c("colper0","colperc1")
+    # restrict to target
+    pcol <- pcol[, which(names(pcol)%in% as.character(x$target_reference_level)), drop = FALSE]
+    colnames(pcol) <- "target%"
+    pcol[,1] <- paste0(round(pcol[,1]*100, round_digits), "%")
+
+
+
+
+    out <- cbind(cnts, props, pcol)
   } else if (x$target_type %in% c("numeric")) {
     if (!is.null(x$woe)) {
       x$stats <- cbind(x$stats, x$woe)
