@@ -125,7 +125,7 @@ table_crossvar <- function(
     ]
     colnames(pcol) <- "target%"
     pcol[, 1] <- paste0(round(pcol[, 1] * 100, round_digits), "%")
-
+    out <- cnts
     if ("props" %in% counts_and) {
       out <- cbind(out, props)
     }
