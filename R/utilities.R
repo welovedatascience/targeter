@@ -106,7 +106,7 @@ table_crossvar <- function(
     cnts <- as.data.frame.matrix(x$counts)
     vn <- colnames(cnts)
     colnames(cnts) <- paste0("N", vn)
-    cnts[, "Ntot"] <- apply(cnts, 2, sum)
+    cnts[, "Ntot"] <- apply(cnts, 1, sum)
 
     props <- as.data.frame.matrix(x$props)
     rn <- rownames(props)
@@ -130,7 +130,7 @@ table_crossvar <- function(
       out <- cbind(out, props)
     }
 
-    if ("target*" %in% counts_and) {
+    if ("target%" %in% counts_and) {
       out <- cbind(out, pcol)
     }
   } else if (x$target_type %in% c("numeric")) {
