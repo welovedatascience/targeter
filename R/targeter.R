@@ -397,8 +397,8 @@ targeter <- function(
   ## check1:  columns name in colnames(data)
   check <- select_vars %in% colnames(data)
   if (any(!check)) {
-    vars <- select_vars[!check]
-    varlist <- paste(vars, collapse = " ")
+    
+    varlist <- paste(select_vars[!check], collapse = " ")
     msg <- c(
       msg,
       list(
