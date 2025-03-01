@@ -74,7 +74,7 @@ label <- function(
   return(labels)
 }
 
-#' @title table.crossvar: build a meaningful table from a crossvar object.
+#' @title table_crossvar: build a meaningful table from a crossvar object.
 #'
 #' @description This functions builds a dataframe that gather most relevant
 #' information from a crossvar object. Useful in reports, associated with
@@ -82,28 +82,31 @@ label <- function(
 #'
 #' @param x crossvar - crossvar object (stored in targeter$profiles slot).
 #' @param round_digits integer - number of digits to rounds some values.
-#' @param counts_and - character - output will always contain counts, we can add row percentages and column percentage for target (both always by default)
+#' @param counts_and - character - output will always contain counts, we can 
+#' add row percentages and column percentage for target (both always by default)
 #' @return a data.frame
 #' @export table.crossvar
 #'
 #' @examples
-#' \dontrun{
 #' tar <- targeter(adult, target = 'ABOVE50K')
-#' table.crossvar(tar$profiles[['EDUCATION']])
-#' }
-#' 
+#' table_crossvar(tar$profiles[['EDUCATION']])
+#'
 #' @importFrom data.table setDT
 #' @importFrom utils globalVariables
 
 # to prevent checks of data.table used variables
 # see:  ?globalVariables
 
-table.crossvar <- function(x, round_digits = 3, counts_and = c("props","target%")) {
+table_crossvar <- function(
+  x,
+  round_digits = 3,
+  counts_and = c("props", "target%")
+) {
   if (x$target_type %in% c("binary", "categorical")) {
     cnts <- as.data.frame.matrix(x$counts)
     vn <- colnames(cnts)
     colnames(cnts) <- paste0("N", vn)
-    cnts[,  "Ntot"] <- apply(cnts, 2, sum)
+    cnts[, "Ntot"] <- apply(cnts, 2, sum)
 
     props <- as.data.frame.matrix(x$props)
     rn <- rownames(props)
@@ -116,18 +119,20 @@ table.crossvar <- function(x, round_digits = 3, counts_and = c("props","target%"
     pcol <- as.data.frame.matrix(x$pcol)
     # names(pcol) <- c("colper0","colperc1")
     # restrict to target
-    pcol <- pcol[, which(names(pcol)%in% as.character(x$target_reference_level)), drop = FALSE]
+    pcol <- pcol[,
+      which(names(pcol) %in% as.character(x$target_reference_level)),
+      drop = FALSE
+    ]
     colnames(pcol) <- "target%"
-    pcol[,1] <- paste0(round(pcol[,1]*100, round_digits), "%")
+    pcol[, 1] <- paste0(round(pcol[, 1] * 100, round_digits), "%")
 
-    if ("props" %in% counts_and){
+    if ("props" %in% counts_and) {
       out <- cbind(out, props)
     }
 
-    if ("target*" %in% counts_and){
+    if ("target*" %in% counts_and) {
       out <- cbind(out, pcol)
     }
-  
   } else if (x$target_type %in% c("numeric")) {
     if (!is.null(x$woe)) {
       x$stats <- cbind(x$stats, x$woe)

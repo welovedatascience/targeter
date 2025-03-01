@@ -177,7 +177,7 @@ if (format_tables=="html"){
   
   cat(paste0("<div id='var-",tolower(ivar),"'>\n\n### ",label(ivar, metadata=metadata), ifelse(ivar_label!=ivar, paste0(" (",ivar,")"),""),"\n</div>"))
      if (params$show_tables){
-      tari <- table.crossvar(iprofile)
+      tari <- table_crossvar(iprofile)
       cat(kableExtra::kable_styling(kableExtra::kable(
         tari,
         kable_format = "html"),
