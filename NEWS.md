@@ -1,4 +1,10 @@
 
+# targeter 1.3
+
+* improve table for report (name changed to table_crossvar)
+* change binary report template default parameters
+* add tracking of variable usage/presence in targeter (new slot variables)
+* remove from computations variabels with a single value
 
 # targeter 1.2
 
