@@ -21,11 +21,20 @@
 #' @param nmin integer - minimum number of profiles in the class.
 #'  By default, 100.
 #' @param n integer - number of top variables to select.
-#' By default, n = 10.
+#' By default, n = 25.
 #' @param min_criteria - By default NULL. If it's specified,
 #' only the observations that have criteria >= min_criteria.
+#' @param max_criteria - By default NULL. If it's specified,
+#' only the observations that have criteria <= max_criteria. usefull to filter
+#' out suspicious variables having (too) high WoE due to high correlation with
+#' target.
 #' @param force_vars - character, list of variables that will be
 #' kept and then won't never be filtered.
+#' @param force_vars_groups - list - list of variables, for instance coming 
+#' from  a call of `split` on variables names (usually based on some metadata).
+#'  default: NULL.
+#' @param force_vars_groups_n - integer -  number of variables to be 
+#' retained/forced per group? Default: 1
 #' @param summary_object - By default NULL. If provided, must be
 #'  pre-computed summary on x callcross var object
 #'
@@ -48,6 +57,7 @@
 #' focus(t, criteria = "chisquare")
 focus <- function(
   x,
+  summary_object = NULL,
   criteria = c(
     "IV",
     "index.max.index",
@@ -56,11 +66,13 @@ focus <- function(
     "index.max.count",
     "index.max.props"
   ),
-  n = 10,
+  n = 25,
   nmin = NULL,
   min_criteria = NULL,
+  max_criteria = NULL,
   force_vars = character(),
-  summary_object = NULL
+  force_vars_groups = NULL,
+  force_vars_groups_n =1
 ) {
   ## test
   assertthat::assert_that(
@@ -127,11 +139,25 @@ focus <- function(
     tmp <- summary.targeter(x, extra_stats = extra_stats)
   }
 
+
+  tmp[, KEEP_CRITERIA := TRUE]
+
   ## filter on minimum number of records
-  if (!is.null(nmin)) tmp <- tmp[tmp$index.max.count >= nmin, ]
+  if (!is.null(nmin)){
+    tmp[which(index.max.count)<nmin, KEEP_CRITERIA:=FALSE]
+  } 
 
   ## minimum value for criteria
-  if (!is.null(min_criteria)) tmp <- tmp[tmp[[criteria]] >= min_criteria, ]
+  if (!is.null(min_criteria)){
+    tmp[get(criteria)<min_criteria, KEEP_CRITERIA:=FALSE]
+  } 
+
+  ## maximum value for criteria
+  if (!is.null(max_criteria)){
+    tmp[get(criteria)>max_criteria, KEEP_CRITERIA:=FALSE]
+  } 
+
+  # KEEP according to criteria
 
   ## reorder per selected criteria
   tmp <- tmp[
@@ -142,10 +168,12 @@ focus <- function(
   ]
 
   ## retrieve top n records corresponding variable names
-  varnames <- utils::head(tmp[["varname"]], n)
+  varnames_criteria <- utils::head(tmp[which(KEEP_CRITERIA)][["varname"]], n)
 
   # add forced variables
-  varnames <- unique(c(force_vars, varnames))
+  varnames <- unique(c(force_vars, varnames_criteria))
+
+  print(varnames)
 
   ## filter the object
   sub <- x$profiles[which(names(x$profiles) %in% varnames)]

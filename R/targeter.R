@@ -1124,7 +1124,7 @@ targeter <- function(
     ]
   }
   vars[, has_profile:=(variable %in% names(crossvars))]
-  print(vars)
+  # print(vars)
   # print(vars_one_value)
   ## output > out object initialization ------
   out <- list(
