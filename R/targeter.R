@@ -416,8 +416,7 @@ targeter <- function(
   if (naming_conventions) {
     check <- !check_naming_conventions(data[, ..select_vars])[, 1] ## first check on LETTER_
     if (any(!check)) {
-      vars <- select_vars[!check]
-      varlist <- paste(vars, collapse = " ")
+      varlist <- paste(select_vars[!check], collapse = " ")
       msg <- c(
         msg,
         list(
