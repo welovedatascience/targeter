@@ -82,9 +82,10 @@ For every criteria, summary table presents its possible value (modality) having 
 ## Population description
 
 ```{r, ,results='asis'}
-if (!is.null(object$description_data)){
-  cat(object$description_data[[1]])} else {
-    cat("No information on data have been provided during the analysis.")
+if (!is.null(object$description_data)) {
+  cat(object$description_data[[1]])
+} else {
+  cat("No information on data have been provided during the analysis.")
 }
 
 stats <- setDT(object$profiles[[1]]$target_stats)
@@ -96,26 +97,23 @@ cat("\n Analyzed population contains ", Ntot, " records.")
 
 
 ```{r,results='asis'}
-
-if(!is.null(object$description_target)) {
-  cat(object$description_target[[1]]) } else{
-     cat("No description of the target has been provided during the analysis.")
-     }
+if (!is.null(object$description_target)) {
+  cat(object$description_target[[1]])
+} else {
+  cat("No description of the target has been provided during the analysis.")
+}
 
 cat("  \n Target statistics:")
-stats[, reference_level:=ifelse(as.character(value)==as.character(object$target_reference_level), "*","")]
+stats[, reference_level := ifelse(as.character(value) == as.character(object$target_reference_level), "*", "")]
 # knitr::kable(stats, format=format_tables)
-if (format_tables=="word"){
-   flextable::set_flextable_defaults(font.size = 11)
+if (format_tables == "word") {
+  flextable::set_flextable_defaults(font.size = 11)
   flextable::qflextable(stats)
-  
-} else if (format_tables=="html") {
-  suppressWarnings(kableExtra::kable_styling(knitr::kable(stats, format=format_tables)))
-} else if (format_tables=="latex"){
-    knitr::kable(stats, format= "latex", booktabs = TRUE)
-    }
-
-
+} else if (format_tables == "html") {
+  suppressWarnings(kableExtra::kable_styling(knitr::kable(stats, format = format_tables)))
+} else if (format_tables == "latex") {
+  knitr::kable(stats, format = "latex", booktabs = TRUE)
+}
 ```
 
 \newpage
@@ -126,34 +124,39 @@ if (format_tables=="word"){
 
 
 ```{r summarytable}
-##filter df columns; remove varname (we have rownames) keep only: index.max.index, index.max.level, index.max.count,
-df2 <- as.data.frame(summary_object[,
-          c("varname","vartype","IV","index.max.level","index.max.count",
-            "index.max.props","index.max.index")])
-df2$index.max.index = round(df2$index.max.index,2)
-df2$index.max.props = round(df2$index.max.props *100, 2)
-colnames(df2) <- c("variable","type","IV","Level","#Records","%Records","Index")
-df2$IV <- round(df2$IV,3)
+## filter df columns; remove varname (we have rownames) keep only: index.max.index, index.max.level, index.max.count,
+df2 <- as.data.frame(summary_object[
+  ,
+  c(
+    "varname", "vartype", "IV", "index.max.level", "index.max.count",
+    "index.max.props", "index.max.index"
+  )
+])
+df2$index.max.index <- round(df2$index.max.index, 2)
+df2$index.max.props <- round(df2$index.max.props * 100, 2)
+colnames(df2) <- c("variable", "type", "IV", "Level", "#Records", "%Records", "Index")
+df2$IV <- round(df2$IV, 3)
 # [the relevant section](#test)
 
-if (!is.null(metadata)){
- df2 <- cbind(data.frame(Label=sapply(df2$variable,label, metadata=metadata),stringsAsFactors = FALSE),df2)
- rownames(df2) <- NULL
+if (!is.null(metadata)) {
+  df2 <- cbind(data.frame(Label = sapply(df2$variable, label, metadata = metadata), stringsAsFactors = FALSE), df2)
+  rownames(df2) <- NULL
 }
-if (format_tables=="latex"){
-  knitr::kable(df2, format= "latex", booktabs = TRUE)
-} else  if (format_tables=="html"){
-  df2$variable <- paste0("<a href='#var-",tolower(df2$variable),"'>",df2$variable,"</a>")
+if (format_tables == "latex") {
+  knitr::kable(df2, format = "latex", booktabs = TRUE)
+} else if (format_tables == "html") {
+  df2$variable <- paste0("<a href='#var-", tolower(df2$variable), "'>", df2$variable, "</a>")
   # kableExtra::kable_styling(knitr::kable(df2, format=format_tables))
-DT::datatable(df2, rownames = FALSE, filter="top", 
-              selection="none", autoHideNavigation = TRUE, 
-              escape = -ifelse(is.null(metadata),1,2),
-              options=list(pageLength=25))
-}  else  if (format_tables=="word") {
-# word 
+  DT::datatable(df2,
+    rownames = FALSE, filter = "top",
+    selection = "none", autoHideNavigation = TRUE,
+    escape = -ifelse(is.null(metadata), 1, 2),
+    options = list(pageLength = 25)
+  )
+} else if (format_tables == "word") {
+  # word
   flextable::qflextable(df2)
 }
-
 ```
 
 
@@ -165,75 +168,78 @@ DT::datatable(df2, rownames = FALSE, filter="top",
 # varnames <- sapply(object$profiles, function(x) x$varname)
 varnames <- summary_object$varname
 
-for (i in seq_along(varnames)){
-  
-ivar <- varnames[i]
-ivar_label = label(ivar, metadata = metadata)
-iprofile <- object$profiles[[ivar]]
-# https://stackoverflow.com/questions/39281266/use-internal-links-in-rmarkdown-html-output
-# explicit link: you give a custom name to a header ## Test {#test} and later refer to it with a link syntax: see [the relevant section](#test).
-cat("\n\n\\newpage\n\n")
-if (format_tables=="html"){
-  
-  cat(paste0("<div id='var-",tolower(ivar),"'>\n\n### ",label(ivar, metadata=metadata), ifelse(ivar_label!=ivar, paste0(" (",ivar,")"),""),"\n</div>"))
-     if (params$show_tables){
+for (i in seq_along(varnames)) {
+  ivar <- varnames[i]
+  ivar_label <- label(ivar, metadata = metadata)
+  iprofile <- object$profiles[[ivar]]
+  # https://stackoverflow.com/questions/39281266/use-internal-links-in-rmarkdown-html-output
+  # explicit link: you give a custom name to a header ## Test {#test} and later refer to it with a link syntax: see [the relevant section](#test).
+  cat("\n\n\\newpage\n\n")
+  if (format_tables == "html") {
+    cat(paste0("<div id='var-", tolower(ivar), "'>\n\n### ", label(ivar, metadata = metadata), ifelse(ivar_label != ivar, paste0(" (", ivar, ")"), ""), "\n</div>"))
+    if (params$show_tables) {
       tari <- table_crossvar(iprofile)
-      cat(kableExtra::kable_styling(kableExtra::kable(
-        tari,
-        kable_format = "html"),
+      cat(kableExtra::kable_styling(
+        kableExtra::kable(
+          tari,
+          kable_format = "html"
+        ),
         position = "left",
-        full_width = FALSE))
+        full_width = FALSE
+      ))
     }
- 
-} else {
-cat("\n\n### ",label(ivar, metadata=metadata),"\n")
-  
-}
+  } else {
+    cat("\n\n### ", label(ivar, metadata = metadata), "\n")
+  }
 
-  cat("\n__IV:", round(iprofile$IV,3),"__\n\n")
-  print(fullplot(iprofile, 
+  cat("\n__IV:", round(iprofile$IV, 3), "__\n\n")
+  print(fullplot(iprofile,
     which_plot = eval(parse(
-        text = params$fullplot_which_plot)
-        )))
+      text = params$fullplot_which_plot
+    ))
+  ))
 }
 ```
 
 
 
 ```{r, results='asis', echo=FALSE, fig.height=8, fig.width=9, fig.align='center'} 
-if (params$decision_tree){
-  if (object$decision_tree && inherits(object$decision_tree_model, 'rpart')){
-
-    cat('\n\n## Decison Tree {.tabset .tabset-fade .tabset-pills}\n\n')
-    treeplot(object, format= params$decision_tree_format)
+if (params$decision_tree) {
+  if (object$decision_tree && inherits(object$decision_tree_model, "rpart")) {
+    cat("\n\n## Decison Tree {.tabset .tabset-fade .tabset-pills}\n\n")
+    treeplot(object, format = params$decision_tree_format)
 
     dt <- object$decision_tree_model
-    dt_vars <- dt$frame['var']
-    dt_vars <- unique(dt_vars[dt_vars != '<leaf>'])
+    dt_vars <- dt$frame["var"]
+    dt_vars <- unique(dt_vars[dt_vars != "<leaf>"])
     vars_imp <- dt$variable.importance
-    vars_imp_df <- data.frame(var = names(vars_imp), importance=round(vars_imp))
-    vars_imp_df[['importance']] <- round(100 * vars_imp_df[['importance']] /
-      sum(vars_imp_df[['importance']]), 1)
-    vars_imp_df[['tree?']] <- ifelse(vars_imp_df[['var']]%in% dt_vars, '*','')
-    top10 <- head(rownames(vars_imp_df),10)
-    selvars <- unique(c(top10, dt_vars)) 
-    vars_imp_df_top <- vars_imp_df[selvars,]
+    vars_imp_df <- data.frame(var = names(vars_imp), importance = round(vars_imp))
+    vars_imp_df[["importance"]] <- round(100 * vars_imp_df[["importance"]] /
+      sum(vars_imp_df[["importance"]]), 1)
+    vars_imp_df[["tree?"]] <- ifelse(vars_imp_df[["var"]] %in% dt_vars, "*", "")
+    top10 <- head(rownames(vars_imp_df), 10)
+    selvars <- unique(c(top10, dt_vars))
+    vars_imp_df_top <- vars_imp_df[selvars, ]
     in_profiles <- selvars %in% names(object$profiles)
-    txt_vars <- vars_imp_df_top[['var']]
-    vars_labels <-  label(txt_vars, metadata = metadata)
-    
+    txt_vars <- vars_imp_df_top[["var"]]
+    vars_labels <- label(txt_vars, metadata = metadata)
+
     if (identical(vars_labels, txt_vars)) vars_labels <- NULL
-    
+
     # hyperlinks (when varibale in report):
-    txt_vars[which(in_profiles)] <- paste0('[',
-    vars_imp_df_top[['var']][which(in_profiles)], ']',
-    '(#var-',tolower(vars_imp_df_top[['var']][which(in_profiles)]) ,')')
-    
-    vars_imp_df_top[['var']] <- txt_vars
-    vars_imp_df_top[['label']] <- vars_labels
+    txt_vars[which(in_profiles)] <- paste0(
+      "[",
+      vars_imp_df_top[["var"]][which(in_profiles)], "]",
+      "(#var-", tolower(vars_imp_df_top[["var"]][which(in_profiles)]), ")"
+    )
+
+    vars_imp_df_top[["var"]] <- txt_vars
+    vars_imp_df_top[["label"]] <- vars_labels
     suppressWarnings(
       kableExtra::kable_styling(
-        knitr::kable(vars_imp_df_top, format=format_tables, row.names = FALSE)))
+        knitr::kable(vars_imp_df_top, format = format_tables, row.names = FALSE)
+      )
+    )
   }
 }
 ```
