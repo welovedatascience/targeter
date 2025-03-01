@@ -14,10 +14,10 @@ output:
 params:
   show_tables: 
     label: "Display tables for each variable"
-    value: FALSE
+    value: TRUE
     input: checkbox
   fullplot_which_plot:
-    value: "1:4"
+    value: "1:2"
     label: "plots choices for fullplot function call"
     input: text
   decision_tree:
