@@ -82,6 +82,7 @@ label <- function(
 #'
 #' @param x crossvar - crossvar object (stored in targeter$profiles slot).
 #' @param round_digits integer - number of digits to rounds some values.
+#' @param counts_and - character - output will always contain counts, we can add row percentages and column percentage for target (both always by default)
 #' @return a data.frame
 #' @export table.crossvar
 #'
@@ -97,7 +98,7 @@ label <- function(
 # to prevent checks of data.table used variables
 # see:  ?globalVariables
 
-table.crossvar <- function(x, round_digits = 3) {
+table.crossvar <- function(x, round_digits = 3, counts_and = c("props","target%")) {
   if (x$target_type %in% c("binary", "categorical")) {
     cnts <- as.data.frame.matrix(x$counts)
     vn <- colnames(cnts)
@@ -119,10 +120,14 @@ table.crossvar <- function(x, round_digits = 3) {
     colnames(pcol) <- "target%"
     pcol[,1] <- paste0(round(pcol[,1]*100, round_digits), "%")
 
+    if ("props" %in% counts_and){
+      out <- cbind(out, props)
+    }
 
-
-
-    out <- cbind(cnts, props, pcol)
+    if ("target*" %in% counts_and){
+      out <- cbind(out, pcol)
+    }
+  
   } else if (x$target_type %in% c("numeric")) {
     if (!is.null(x$woe)) {
       x$stats <- cbind(x$stats, x$woe)
