@@ -72,7 +72,7 @@ focus <- function(
   max_criteria = NULL,
   force_vars = character(),
   force_vars_groups = NULL,
-  force_vars_groups_n =1
+  force_vars_groups_n = 1 
 ) {
   ## test
   assertthat::assert_that(
@@ -160,12 +160,8 @@ focus <- function(
   # KEEP according to criteria
 
   ## reorder per selected criteria
-  tmp <- tmp[
-    order(
-      tmp[[criteria]],
-      decreasing = ifelse(criteria %in% c("pvalue"), FALSE, TRUE)
-    ),
-  ]
+  setorderv(tmp, criteria, order = ifelse(criteria %in% c("pvalue"), 1, -1))
+
 
   ## retrieve top n records corresponding variable names
   varnames_criteria <- utils::head(tmp[which(KEEP_CRITERIA)][["varname"]], n)
@@ -173,7 +169,37 @@ focus <- function(
   # add forced variables
   varnames <- unique(c(force_vars, varnames_criteria))
 
-  print(varnames)
+  ## if there are forced groups passed with force_vars_groups, add variables
+  if (!is.null(force_vars_groups)){
+    assertthat::assert_that(is.list(force_vars_groups), msg = "force_vars_groups must be a list (with variables names in slots)")
+    assertthat::assert_that(length(force_vars_groups)>1, msg = "force_vars_groups list size mut be greater or equal to 2")
+
+    if (is.null(names(force_vars_groups))) names(force_vars_groups) <- paste0("G", 1:length(force_vars_groups))
+
+
+    df_groups <- data.table(
+      group = rep(
+        names(force_vars_groups),
+        times = sapply(force_vars_groups, length)),
+      var = unlist(force_vars_groups)
+    )
+
+    assertthat::assert_that(any(df_groups$var %in% tmp$varname), msg = "No variable provided is in targeter object")
+
+    tmp <- merge(tmp, df_groups, by.x = "varname", by.y ="var", all.x = TRUE, all.y = FALSE)
+
+    in_scope <- tmp[!is.na(group)]
+    selected <- sapply(
+      split(in_scope, by = "group"),
+      function(grp) utils::head(grp[["varname"]], force_vars_groups_n))
+
+    # add forced variables introduced per subgroup
+    varnames <- unique(c(varnames,selected))
+
+
+  }
+
+  # print(varnames)
 
   ## filter the object
   sub <- x$profiles[which(names(x$profiles) %in% varnames)]
