@@ -5,6 +5,8 @@
 * change binary report template default parameters
 * add tracking of variable usage/presence in targeter (new slot variables)
 * remove from computations variabels with a single value
+* focus gained arguments to use a max value for criteria and to force variables 
+  per provided groups of variables.
 
 # targeter 1.2
 

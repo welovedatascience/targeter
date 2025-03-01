@@ -6,17 +6,23 @@
 \usage{
 focus(
   x,
+  summary_object = NULL,
   criteria = c("IV", "index.max.index", "chisquare", "pvalue", "index.max.count",
     "index.max.props"),
-  n = 10,
+  n = 25,
   nmin = NULL,
   min_criteria = NULL,
+  max_criteria = NULL,
   force_vars = character(),
-  summary_object = NULL
+  force_vars_groups = NULL,
+  force_vars_groups_n = 1
 )
 }
 \arguments{
 \item{x}{an object of class "targeter".}
+
+\item{summary_object}{- By default NULL. If provided, must be
+pre-computed summary on x callcross var object}
 
 \item{criteria}{character - sort the output according to
  (by default, order by decreasing index.max.index):
@@ -32,7 +38,7 @@ associated to the maximum index.
 }}
 
 \item{n}{integer - number of top variables to select.
-By default, n = 10.}
+By default, n = 25.}
 
 \item{nmin}{integer - minimum number of profiles in the class.
 By default, 100.}
@@ -40,11 +46,20 @@ By default, 100.}
 \item{min_criteria}{- By default NULL. If it's specified,
 only the observations that have criteria >= min_criteria.}
 
+\item{max_criteria}{- By default NULL. If it's specified,
+only the observations that have criteria <= max_criteria. usefull to filter
+out suspicious variables having (too) high WoE due to high correlation with
+target.}
+
 \item{force_vars}{- character, list of variables that will be
 kept and then won't never be filtered.}
 
-\item{summary_object}{- By default NULL. If provided, must be
-pre-computed summary on x callcross var object}
+\item{force_vars_groups}{- list - list of variables, for instance coming 
+from  a call of `split` on variables names (usually based on some metadata).
+ default: NULL.}
+
+\item{force_vars_groups_n}{- integer -  number of variables to be 
+retained/forced per group? Default: 1}
 }
 \value{
 It returns the filtered input object.
