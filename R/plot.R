@@ -37,6 +37,8 @@ plot.crossvar <- function(x, ...) {
   }
 }
 
+#' @method plot crossvar_binary
+
 plot.crossvar_binary <- function(x, ...) {
   plot.crossvar_categorical(x, ...)
 }
@@ -64,6 +66,8 @@ plot.crossvar_binary <- function(x, ...) {
 #' @param ... additional parameter
 #' @rdname plot.crossvar
 #'
+#' @method plot crossvar_numeric
+
 #' @importFrom data.table setnames
 
 plot.crossvar_numeric <- function(

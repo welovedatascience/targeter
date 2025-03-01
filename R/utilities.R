@@ -85,7 +85,7 @@ label <- function(
 #' @param counts_and - character - output will always contain counts, we can 
 #' add row percentages and column percentage for target (both always by default)
 #' @return a data.frame
-#' @export table.crossvar
+#' @export table_crossvar
 #'
 #' @examples
 #' tar <- targeter(adult, target = 'ABOVE50K')
