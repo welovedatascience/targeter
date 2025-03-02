@@ -397,7 +397,6 @@ targeter <- function(
   ## check1:  columns name in colnames(data)
   check <- select_vars %in% colnames(data)
   if (any(!check)) {
-    
     varlist <- paste(select_vars[!check], collapse = " ")
     msg <- c(
       msg,
@@ -1122,7 +1121,7 @@ targeter <- function(
         names(vars_one_value)[which(vars_one_value)])
     ]
   }
-  vars[, has_profile:=(variable %in% names(crossvars))]
+  vars[, has_profile := (variable %in% names(crossvars))]
   # print(vars)
   # print(vars_one_value)
   ## output > out object initialization ------
@@ -1221,7 +1220,7 @@ targeter <- function(
   } else {
     out$decision_tree_model <- NA
   }
-  
+
   ## assign class
   ## output > final return ----------
   class(out) <- c("targeter", class(out))

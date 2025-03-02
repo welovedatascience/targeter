@@ -11,7 +11,7 @@ table_crossvar(x, round_digits = 3, counts_and = c("props", "target\%"))
 
 \item{round_digits}{integer - number of digits to rounds some values.}
 
-\item{counts_and}{- character - output will always contain counts, we can 
+\item{counts_and}{- character - output will always contain counts, we can
 add row percentages and column percentage for target (both always by default)}
 }
 \value{
