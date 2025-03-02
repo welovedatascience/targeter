@@ -9,7 +9,8 @@
   op <- options()
   op.targeter <- list(
     targeter.use_naming_conventions = FALSE,
-    targeter.useNA = "ifany"
+    targeter.useNA = "ifany",
+    targeter.author = "welovedatascience targeter package"
   )
   toset <- !(names(op.targeter) %in% names(op))
   if (any(toset)) options(op.targeter[toset])

@@ -1,6 +1,6 @@
 ---
 title:  "`r object$analysis`"
-author: "targeter package"
+author: "`r getOption('targeter.author')`"
 date: "`r object$date`"
 output:
   html_document:
