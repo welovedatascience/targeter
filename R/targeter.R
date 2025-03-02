@@ -1136,7 +1136,8 @@ targeter <- function(
     analysis = analysis_name,
     date = Sys.Date(),
     profiles = crossvars,
-    variables = vars
+    variables = vars,
+    session = targeter_session_info()
   )
   if (target_type %in% c('binary', 'categorical')) {
     out$target_reference_level <- target_reference_level
@@ -1220,7 +1221,7 @@ targeter <- function(
   } else {
     out$decision_tree_model <- NA
   }
-
+  
   ## assign class
   ## output > final return ----------
   class(out) <- c("targeter", class(out))

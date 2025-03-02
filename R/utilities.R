@@ -82,7 +82,7 @@ label <- function(
 #'
 #' @param x crossvar - crossvar object (stored in targeter$profiles slot).
 #' @param round_digits integer - number of digits to rounds some values.
-#' @param counts_and - character - output will always contain counts, we can 
+#' @param counts_and - character - output will always contain counts, we can
 #' add row percentages and column percentage for target (both always by default)
 #' @return a data.frame
 #' @export table_crossvar
@@ -149,4 +149,12 @@ table_crossvar <- function(
     rownames(out) <- rn
   }
   return(out)
+}
+
+targeter_session_info <- function() {
+  list(
+    R_version = R.Version()$version.string,
+    os = osVersion,
+    targeter_package_version = packageVersion("targeter")
+  )
 }
