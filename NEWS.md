@@ -1,3 +1,8 @@
+# targeter 1.3.1
+
+* released on 20250302 
+* beta version of presentations generation (currently powerpoint, only unix,
+  few tests).
 
 # targeter 1.3
 
