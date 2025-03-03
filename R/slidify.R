@@ -55,7 +55,7 @@ slidify <- function(
   format = "pptx",
   template = NULL, # default QMD template for slides
   pptx_reference_doc = NULL, # for pptx format, default template,
-  revealjs_template = "", # <TODO> prepare a revealjs template
+  revealjs_template = "", # todo prepare a revealjs template
   output_dir = ".",
   output_file = NULL,
   delete_temporary_files = TRUE,

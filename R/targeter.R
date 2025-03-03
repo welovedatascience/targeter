@@ -425,10 +425,10 @@ if (decision_tree){
   ## By default, the variable NA take the value "ifany"
   useNA <- useNA[1]
   ## the variable useNA can only  accept the two values
-  ##<todo>: introduce a yes or always
+  ## todo: introduce a yes or always
   useNA <- match.arg(useNA, c("ifany", "no"), several.ok = FALSE)
 
-  
+
 
   ## By default the variable order_label is equal to auto
   # order_label <- order_label[1]
