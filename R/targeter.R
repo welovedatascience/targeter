@@ -44,7 +44,17 @@ if (getRversion() >= "3.1.0")
       "dropped_one_single_value",
       "var_type",
       "silently_renamed",
-      "has_profile"
+      "has_profile",
+      # optional methods
+      "Ckmeans.1d.dp",
+      "clustering.sc.dp", 
+      # decision trees
+      "visTree",
+      "rpart",
+      "clustering",
+      "rpart.control",
+      "rpart.plot",
+      "weight_target"
     )
   )
 
@@ -321,9 +331,15 @@ targeter <- function(
   #     msg = 'clustering.sc.dp package required for WOE post clustering.'
   #   )
   # }
+  binning_method <- match.arg(
+    binning_method,
+    c("quantile", "clustering", "smart"),
+    several.ok = FALSE
+  )
 
 
-## Checks > specific methods optional package dependencies -----
+
+## checks > specific methods optional package dependencies -----
   if (binning_method == "clustering"){
     
     deps <- c("Ckmeans.1d.dp")
@@ -357,6 +373,15 @@ if (woe_post_cluster){
     msg=paste('some of targeter following optional packages are not available:',
     paste(deps, collapse=",")))
 
+}
+if (decision_tree){
+  deps <- c("explore","rpart")
+  if (getOption("targeter.auto_install_deps", FALSE)){
+    pacman::p_load(deps)
+  }
+  assertthat::assert_that(pacman::p_load(deps, install = FALSE), 
+  msg=paste('some of targeter following optional packages required for decision trees are not available:',
+  paste(deps, collapse=",")))
 }
 
 ## analysis start -----------
@@ -403,13 +428,7 @@ if (woe_post_cluster){
   ##<todo>: introduce a yes or always
   useNA <- match.arg(useNA, c("ifany", "no"), several.ok = FALSE)
 
-  binning_method <- match.arg(
-    binning_method,
-    c("quantile", "clustering", "smart"),
-    several.ok = FALSE
-  )
-
-
+  
 
   ## By default the variable order_label is equal to auto
   # order_label <- order_label[1]
@@ -726,7 +745,7 @@ if (woe_post_cluster){
     new_nbin <- min(c(length(unique(uqu)), nqu))
     # cl_centers <-
     #   Ckmeans.1d.dp::Ckmeans.1d.dp(x[!is.na(x)], k=new_nbin)$centers
-    cl_centers <- clustering.sc.dp::clustering.sc.dp(
+    cl_centers <- clustering.sc.dp(
       matrix(qu, ncol = 1),
       k = new_nbin
     )$centers[, 1]
@@ -1198,20 +1217,10 @@ if (woe_post_cluster){
     out$target_reference_level <- target_reference_level
   }
   ## compute > decision tree ------
-  deps <- c("visNetwork","visTree","rpart.plot", "explore")
-  if (getOption("targeter.auto_install_deps", FALSE)){
-    pacman::p_load(deps)
-  }
-  assertthat::assert_that(pacman::p_load(deps, install = FALSE), 
-  msg=paste('some of targeter following optional packages required for decision trees are not available:',
-  paste(deps, collapse=",")))
-
+  
   out$decision_tree <- decision_tree
   if (decision_tree) {
-    assertthat::assert_that(
-      system.file(package = "rpart") != "",
-      msg = "Package rpart is required for this functionality (suggested for targeter)"
-    )
+    
     if (length(dt_vars_exp) < 2)
       msg <- c(
         msg,
@@ -1227,7 +1236,7 @@ if (woe_post_cluster){
         # we will use weight
         data[, L_TARGET := ifelse(get(target) == target_reference_level, 1, 0)]
 
-        weights <- explore::weight_target(
+        weights <- weight_target(
           data[, unique(c("L_TARGET", dt_vars_exp)), with = FALSE],
           L_TARGET
         )
@@ -1243,7 +1252,7 @@ if (woe_post_cluster){
             method = "class",
             model = TRUE,
             parms = list(prior = prior),
-            control = rpart::rpart.control(
+            control = rpart.control(
               maxdepth = decision_tree_maxdepth,
               minsplit = minsplit,
               cp = decision_tree_cp
@@ -1256,7 +1265,7 @@ if (woe_post_cluster){
             method = "class",
             weights = weights,
             model = TRUE,
-            control = rpart::rpart.control(
+            control = rpart.control(
               maxdepth = decision_tree_maxdepth,
               minsplit = minsplit,
               cp = decision_tree_cp
@@ -1272,7 +1281,7 @@ if (woe_post_cluster){
           model = TRUE,
           data = data[, unique(c("L_TARGET", dt_vars_exp)), with = FALSE],
           method = "anova",
-          control = rpart::rpart.control(
+          control = rpart.control(
             maxdepth = decision_tree_maxdepth,
             minsplit = minsplit,
             cp = decision_tree_cp

@@ -1,6 +1,39 @@
 # to prevent checks of data.table used variables
 # see:  ?globalVariables
-if (getRversion() >= "3.1.0") utils::globalVariables("..cn")
+
+if (getRversion() >= "3.1.0")
+  utils::globalVariables(
+    c(
+      "..cn",
+      "KEEP_CRITERIA",
+      "index.max.count",
+      "group",
+      "miniPage",
+      "tags",
+      "HTML",
+      "gadgetTitleBar",
+      "miniButtonBlock",
+      "miniTitleBarButton",
+      "miniContentPanel",
+      "fluidRow",
+      "column",
+      "DTOutput",
+      "plotOutput",
+      "renderDataTable",
+      "datatable",
+      "JS",
+      "renderPlot",
+      "observeEvent",
+      "stopApp",
+      "show_modal_spinner",
+      "remove_modal_spinner",
+      "report_failure",
+      "runGadget",
+      "dialogViewer"
+    )
+  )
+
+
 
 #' @title explore
 #' @description shiny small app to explore a targeter object.
@@ -34,15 +67,17 @@ explore <- function(
   display = c("dialog", "browser"),
   ...
 ) {
-
-
-  deps <- c("miniUI","shiny","DT","shinybusy", "htmlwidgets")
-  if (getOption("targeter.auto_install_deps", FALSE)){
+  deps <- c("miniUI", "shiny", "DT", "shinybusy", "htmlwidgets")
+  if (getOption("targeter.auto_install_deps", FALSE)) {
     pacman::p_load(deps, install = FALSE)
   }
-  assertthat::assert_that(pacman::p_load(deps), 
-  msg=paste('some of targeter following optional packages are not available:',
-  paste(deps, collapse=",")))
+  assertthat::assert_that(
+    pacman::p_load(deps),
+    msg = paste(
+      'some of targeter following optional packages are not available:',
+      paste(deps, collapse = ",")
+    )
+  )
 
   display <- match.arg(display, c("dialog", "browser"), several.ok = FALSE)
 
