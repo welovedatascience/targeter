@@ -1,6 +1,8 @@
 
-# @importFrom visNetwork visTree
-# @importFrom rpart.plot rpart.plot
+# ' @importFrom visNetwork visTree
+# ' @importFrom rpart.plot rpart.plot
+
+#' @importFrom pacman p_load
 
 treeplot <- function(
   x,
@@ -16,6 +18,16 @@ treeplot <- function(
   left = FALSE,
   ...
 ) {
+
+  deps <- c("visNetwork","visTree","rpart.plot")
+  if (getOption("targeter.auto_install_deps", FALSE)){
+    pacman::p_load(deps, install = FALSE)
+  }
+  assertthat::assert_that(pacman::p_load(deps), 
+  msg=paste('some of targeter following optional packages are not available:',
+  paste(deps, collapse=",")))
+  
+
   assertthat::assert_that(
     inherits(x, 'targeter'),
     msg = 'x is not a targeter object.'
@@ -32,7 +44,9 @@ treeplot <- function(
   dt <- x$decision_tree_model
   format <- match.arg(format, c("static", "interactive"), several.ok = FALSE)
   if (format == "static") {
-    rpart.plot::rpart.plot(
+    # rpart.plot::rpart.plot(
+    rpart.plot(
+    
       dt,
       prefix = prefix,
       type = type,
@@ -46,6 +60,7 @@ treeplot <- function(
       ...
     )
   } else {
-    visNetwork::visTree(dt, ...)
+    # visNetwork::visTree(dt, ...)
+    visTree(dt, ...)
   }
 }

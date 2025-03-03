@@ -1,7 +1,11 @@
+
+
+
 # to prevent checks of data.table used variables
 # see:  ?globalVariables
 if (getRversion() >= "3.1.0") {
-  utils::globalVariables(c("varsum", "std", "positions", "L_TARGET"))
+  utils::globalVariables(c("varsum", "std", "positions",
+  "L_TARGET","osVersion","packageVersion"))
 }
 
 #' @title label: add label to a var
@@ -92,7 +96,7 @@ label <- function(
 #' table_crossvar(tar$profiles[['EDUCATION']])
 #'
 #' @importFrom data.table setDT
-#' @importFrom utils globalVariables
+#' @importFrom utils globalVariables 
 
 # to prevent checks of data.table used variables
 # see:  ?globalVariables
@@ -151,6 +155,8 @@ table_crossvar <- function(
   return(out)
 }
 
+
+#' @importFrom utils osVersion packageVersion 
 targeter_session_info <- function() {
   list(
     R_version = R.Version()$version.string,

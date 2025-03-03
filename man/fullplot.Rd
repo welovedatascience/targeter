@@ -60,8 +60,8 @@ autoplot method for crossvar OR targeter object
 draws the combination of 4 selected plots/
 }
 \examples{
-CN <- crossvar(adult, target = "AGE", var = "SEX")
-fullplot(CN, title = "this is my title", subtitle = FALSE,  which_plot = 1:4)
+tar <- crossvar(adult, target = "AGE", var = "SEX")
+fullplot(tar, title = "this is my title", subtitle = FALSE,  which_plot = 1:4)
 }
 \seealso{
 \itemize{

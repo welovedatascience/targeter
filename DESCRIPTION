@@ -33,22 +33,23 @@ Imports:
     ggrepel,
     knitr,
     rmarkdown,
-    clustering.sc.dp,
-    Ckmeans.1d.dp,
+    patchwork,
+    utils,
+    kableExtra,
+    quarto,
+    pacman
+Suggest:
     DT,
     miniUI,
     shiny,
     shinybusy,
     htmlwidgets,
-    patchwork,
-    utils,
-    kableExtra,
-    quarto
-Suggest:
     flextable,
+    clustering.sc.dp,
+    Ckmeans.1d.dp,
     rpart,
     rpart.plot,
     explore,
-    visNetwork,
+    visNetwork
 URL: https://github.com/welovedatascience/targeter, https://welovedatascience.github.io/targeter/
 BugReports: https://github.com/welovedatascience/targeter/issues

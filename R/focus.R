@@ -1,3 +1,16 @@
+# to prevent checks of data.table used variables
+# see:  ?globalVariables
+
+if (getRversion() >= "3.1.0")
+  utils::globalVariables(
+    c(
+      "KEEP_CRITERIA",
+      "index.max.count",
+      "group"
+    )
+  )
+
+
 #' Function focus()
 #'
 #' The function subset the targeter object and retains the
@@ -47,6 +60,7 @@
 #' }
 #'
 #' @export focus
+#' @importFrom data.table data.table
 #'
 #' @examples
 #' data(adult)
@@ -176,7 +190,7 @@ focus <- function(
     if (is.null(names(force_vars_groups))) names(force_vars_groups) <- paste0("G", 1:length(force_vars_groups))
 
 
-    df_groups <- data.table(
+    df_groups <- data.table::data.table(
       group = rep(
         names(force_vars_groups),
         times = sapply(force_vars_groups, length)),

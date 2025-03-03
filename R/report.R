@@ -190,6 +190,17 @@ report <- function(
     "pdf" = "latex"
   )
 
+
+  if (output_format == "word"){
+      deps <- c("flextable")
+      if (getOption("targeter.auto_install_deps", FALSE)){
+        pacman::p_load(deps)
+    }
+    assertthat::assert_that(pacman::p_load(deps, install = FALSE), 
+    msg=paste('following optional packages are required for Office formats :',
+    paste(deps, collapse=",")))
+
+  }
   # print(utils::head(metadata,2))
   # print(utils::head(summary_object,2))
 

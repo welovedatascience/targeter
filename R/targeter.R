@@ -191,8 +191,7 @@ if (getRversion() >= "3.1.0")
 #' @importFrom data.table .N
 #' @importFrom data.table uniqueN
 #' @importFrom data.table `:=`
-# @importFrom rpart rpart rpart.control
-# @importFrom explore weight_target
+
 
 ## <idea> check for WOE monotonicity
 targeter <- function(
@@ -309,8 +308,60 @@ targeter <- function(
     inherits(nbins, "numeric") | inherits(nbins, "integer"),
     msg = "The parameter nbins must to be numeric"
   )
-  ## <todo>conditions on other parameters to be added : cont_target_trim....
-  ##retrieve the name of the data
+
+
+
+   #   if (woe_post_cluster) {
+  #   assertthat::assert_that(
+  #     requireNamespace('Ckmeans.1d.dp', quietly = TRUE),
+  #     msg = 'Ckmeans.1d.dp package required for WOE post clustering.'
+  #   )
+  #   assertthat::assert_that(
+  #     requireNamespace('clustering.sc.dp', quietly = TRUE),
+  #     msg = 'clustering.sc.dp package required for WOE post clustering.'
+  #   )
+  # }
+
+
+## Checks > specific methods optional package dependencies -----
+  if (binning_method == "clustering"){
+    
+    deps <- c("Ckmeans.1d.dp")
+    if (getOption("targeter.auto_install_deps", FALSE)){
+      pacman::p_load(deps, install = FALSE)
+    }
+    assertthat::assert_that(pacman::p_load(deps), 
+    msg=paste('some of targeter following optional packages are not available:',
+    paste(deps, collapse=",")))
+
+  }
+  
+  if (binning_method == "smart"){
+
+    deps <- c("clustering.sc.dp")
+    if (getOption("targeter.auto_install_deps", FALSE)){
+      pacman::p_load(deps, install = FALSE)
+    }
+    assertthat::assert_that(pacman::p_load(deps), 
+    msg=paste('some of targeter following optional packages are not available:',
+    paste(deps, collapse=",")))
+
+  }
+
+if (woe_post_cluster){
+  deps <- c("clustering.sc.dp","Ckmeans.1d.dp")
+    if (getOption("targeter.auto_install_deps", FALSE)){
+      pacman::p_load(deps, install = FALSE)
+    }
+    assertthat::assert_that(pacman::p_load(deps), 
+    msg=paste('some of targeter following optional packages are not available:',
+    paste(deps, collapse=",")))
+
+}
+
+## analysis start -----------
+
+ ##retrieve the name of the data
   dataname <- deparse(substitute(data))
   data <- data.table::setDT(data)
   msg <- vector(mode = 'list')
@@ -357,21 +408,9 @@ targeter <- function(
     c("quantile", "clustering", "smart"),
     several.ok = FALSE
   )
-  if (binning_method == "clustering")
-    assertthat::assert_that(
-      requireNamespace('Ckmeans.1d.dp', quietly = TRUE),
-      msg = 'Ckmeans.1d.dp package required for clustering method.'
-    )
-  if (woe_post_cluster) {
-    assertthat::assert_that(
-      requireNamespace('Ckmeans.1d.dp', quietly = TRUE),
-      msg = 'Ckmeans.1d.dp package required for WOE post clustering.'
-    )
-    assertthat::assert_that(
-      requireNamespace('clustering.sc.dp', quietly = TRUE),
-      msg = 'clustering.sc.dp package required for WOE post clustering.'
-    )
-  }
+
+
+
   ## By default the variable order_label is equal to auto
   # order_label <- order_label[1]
   ## the variable order_lable can only accept this following values
@@ -652,7 +691,7 @@ targeter <- function(
 
   ## binning > clustering ----
   binning_clustering <- function(x, nbins, variable) {
-    cl_centers <- Ckmeans.1d.dp::Ckmeans.1d.dp(x[!is.na(x)], k = nbins)$centers
+    cl_centers <- Ckmeans.1d.dp(x[!is.na(x)], k = nbins)$centers
     cutcenter_list[[variable]] <<- cl_centers
     cutpoints <- sort(
       unique(
@@ -718,6 +757,7 @@ targeter <- function(
   )
 
   binning_foo <- binning_foos[[binning_method]]
+ 
 
   ## for numeric variables, we must to apply the function quickCut to cut the variable into classes.
   ## create a list called txt
@@ -1003,14 +1043,14 @@ targeter <- function(
           if (variable %in% num_vars) {
             # numeric variable, use sequentially constrained clustering with package clustering.sc.dp
             # cat("\nvar:", variable)
-            cl <- clustering.sc.dp::clustering.sc.dp(
+            cl <- clustering.sc.dp(
               as.matrix(X),
               k = woe_post_cluster_n
             )$cluster
           } else {
             # cat var: use "normal" clustering
 
-            cl <- Ckmeans.1d.dp::Ckmeans.1d.dp(
+            cl <- Ckmeans.1d.dp(
               X$WOE,
               k = woe_post_cluster_n
             )$cluster
@@ -1158,6 +1198,14 @@ targeter <- function(
     out$target_reference_level <- target_reference_level
   }
   ## compute > decision tree ------
+  deps <- c("visNetwork","visTree","rpart.plot", "explore")
+  if (getOption("targeter.auto_install_deps", FALSE)){
+    pacman::p_load(deps)
+  }
+  assertthat::assert_that(pacman::p_load(deps, install = FALSE), 
+  msg=paste('some of targeter following optional packages required for decision trees are not available:',
+  paste(deps, collapse=",")))
+
   out$decision_tree <- decision_tree
   if (decision_tree) {
     assertthat::assert_that(
@@ -1189,7 +1237,7 @@ targeter <- function(
         prior <- n / sum(n)
         #  decision_tree_cp <- 0 # to be put as parametre
         if (all(weights == 1)) {
-          mod <- rpart::rpart(
+          mod <- rpart(
             formula_txt,
             data = data[, unique(c("L_TARGET", dt_vars_exp)), with = FALSE],
             method = "class",
@@ -1202,7 +1250,7 @@ targeter <- function(
             )
           )
         } else {
-          mod <- rpart::rpart(
+          mod <- rpart(
             formula_txt,
             data = data[, unique(c("L_TARGET", dt_vars_exp)), with = FALSE],
             method = "class",
@@ -1219,7 +1267,7 @@ targeter <- function(
         #numeric target
         minsplit <- 30
         data[, L_TARGET := get(target)]
-        mod <- rpart::rpart(
+        mod <- rpart(
           formula_txt,
           model = TRUE,
           data = data[, unique(c("L_TARGET", dt_vars_exp)), with = FALSE],

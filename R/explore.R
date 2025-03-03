@@ -25,14 +25,8 @@ if (getRversion() >= "3.1.0") utils::globalVariables("..cn")
 #'  \code{\link[targeter]{report}}
 #' @rdname explore
 #' @export
-#' @importFrom miniUI miniPage gadgetTitleBar miniButtonBlock
-#' miniTitleBarButton miniContentPanel
-#' @importFrom shiny fluidRow column plotOutput renderPlot
-#' observeEvent runGadget dialogViewer stopApp
-#' @importFrom DT DTOutput renderDataTable
+
 #' @importFrom gridExtra grid.arrange
-#' @importFrom shinybusy show_modal_spinner
-#' @importFrom htmlwidgets JS
 explore <- function(
   object,
   summary_object = NULL,
@@ -40,33 +34,43 @@ explore <- function(
   display = c("dialog", "browser"),
   ...
 ) {
+
+
+  deps <- c("miniUI","shiny","DT","shinybusy", "htmlwidgets")
+  if (getOption("targeter.auto_install_deps", FALSE)){
+    pacman::p_load(deps, install = FALSE)
+  }
+  assertthat::assert_that(pacman::p_load(deps), 
+  msg=paste('some of targeter following optional packages are not available:',
+  paste(deps, collapse=",")))
+
   display <- match.arg(display, c("dialog", "browser"), several.ok = FALSE)
 
   if (is.null(summary_object)) {
     summary_object <- summary(object, ...)
   }
-  ui <- miniUI::miniPage(
-    shiny::tags$head(
-      shiny::tags$style(
-        shiny::HTML(
+  ui <- miniPage(
+    tags$head(
+      tags$style(
+        HTML(
           ".excluded { color: rgb(211,211,211); font-style: italic; }"
         )
       )
     ),
-    miniUI::gadgetTitleBar(
+    gadgetTitleBar(
       "targeter explorer",
-      left = miniUI::miniButtonBlock(
-        miniUI::miniTitleBarButton("report_html", "html"),
-        miniUI::miniTitleBarButton("report_pdf", "pdf"),
-        miniUI::miniTitleBarButton("report_word", "word")
+      left = miniButtonBlock(
+        miniTitleBarButton("report_html", "html"),
+        miniTitleBarButton("report_pdf", "pdf"),
+        miniTitleBarButton("report_word", "word")
       ),
-      right = miniUI::miniTitleBarButton("done", "Stop", primary = TRUE)
+      right = miniTitleBarButton("done", "Stop", primary = TRUE)
     ),
-    miniUI::miniContentPanel(
-      shiny::fluidRow(shiny::column(width = 12, DT::DTOutput("dt_summary"))),
-      shiny::fluidRow(
-        shiny::column(width = 6, shiny::plotOutput(("plot_1"))),
-        shiny::column(width = 6, shiny::plotOutput(("plot_2")))
+    miniContentPanel(
+      fluidRow(column(width = 12, DTOutput("dt_summary"))),
+      fluidRow(
+        column(width = 6, plotOutput(("plot_1"))),
+        column(width = 6, plotOutput(("plot_2")))
       )
     )
   )
@@ -74,7 +78,7 @@ explore <- function(
 
   server <- function(input, output, session) {
     # Define reactive expressions, outputs, etc.
-    output$dt_summary <- DT::renderDataTable(
+    output$dt_summary <- renderDataTable(
       {
         if (object$target_type == "binary") {
           df2 <- as.data.frame(
@@ -174,17 +178,17 @@ explore <- function(
           id = paste0("row_", seq_len(nrow(df2)))
         )
 
-        DT::datatable(
+        datatable(
           dat,
           rownames = rowNames,
           filter = "top",
           autoHideNavigation = TRUE,
           extensions = c("Select", "Buttons"),
           selection = "single",
-          callback = htmlwidgets::JS(callback),
+          callback = JS(callback),
           options = list(
             pageLength = 6,
-            rowId = htmlwidgets::JS(
+            rowId = JS(
               sprintf(
                 "function(data){return data[%d];}",
                 ncol(dat) - 1 + colIndex
@@ -194,7 +198,7 @@ explore <- function(
               list(visible = FALSE, targets = ncol(dat) - 1 + colIndex),
               list(className = "dt-center", targets = "_all"),
               list(className = "notselectable", targets = colIndex),
-              list(targets = colIndex, render = htmlwidgets::JS(render))
+              list(targets = colIndex, render = JS(render))
             ),
             dom = "tp",
             buttons = list(
@@ -203,7 +207,7 @@ explore <- function(
               list(
                 extend = "collection",
                 text = "Select all",
-                action = htmlwidgets::JS(restore)
+                action = JS(restore)
               )
             ),
             select = list(
@@ -216,7 +220,7 @@ explore <- function(
       server = FALSE
     )
     #
-    output$plot_1 <- shiny::renderPlot({
+    output$plot_1 <- renderPlot({
       if (!is.null(input$dt_summary_row_last_clicked)) {
         var <- summary_object[input$dt_summary_row_last_clicked, ][["varname"]]
         iprofile <- object$profiles[[var]]
@@ -262,7 +266,7 @@ explore <- function(
       }
     })
 
-    output$plot_2 <- shiny::renderPlot({
+    output$plot_2 <- renderPlot({
       if (!is.null(input$dt_summary_row_last_clicked)) {
         var <- summary_object[input$dt_summary_row_last_clicked, ][["varname"]]
         iprofile <- object$profiles[[var]]
@@ -288,19 +292,19 @@ explore <- function(
     })
 
     # When the Done button is clicked, return a value
-    shiny::observeEvent(input$done, {
+    observeEvent(input$done, {
       returnValue <- "Done"
-      shiny::stopApp(returnValue)
+      stopApp(returnValue)
     })
 
-    shiny::observeEvent(input$report_html, {
+    observeEvent(input$report_html, {
       selvars <- summary_object[
         setdiff(1:nrow(summary_object), input[["excludedRows"]]),
       ][["varname"]]
       if (length(selvars) > 1) {
         summary_object <- summary_object[summary_object$varname %in% selvars, ]
         # S <<- summary_object
-        shinybusy::show_modal_spinner() # show the modal window
+        show_modal_spinner() # show the modal window
         targeter::report(
           object = object,
           template = NULL,
@@ -311,22 +315,22 @@ explore <- function(
           force_vars = selvars,
           output_format = "html"
         )
-        shinybusy::remove_modal_spinner()
+        remove_modal_spinner()
       } else {
-        shinybusy::report_failure(
+        report_failure(
           title = "Problem",
           text = "No variable selected"
         )
       }
     })
 
-    shiny::observeEvent(input$report_pdf, {
+    observeEvent(input$report_pdf, {
       selvars <- summary_object[
         setdiff(1:nrow(summary_object), input[["excludedRows"]]),
       ][["varname"]]
       if (length(selvars) > 1) {
         summary_object <- summary_object[summary_object$varname %in% selvars, ]
-        shinybusy::show_modal_spinner() # show the modal window
+        show_modal_spinner() # show the modal window
         targeter::report(
           object = object,
           template = NULL,
@@ -337,22 +341,22 @@ explore <- function(
           force_vars = selvars,
           output_format = "pdf"
         )
-        shinybusy::remove_modal_spinner()
+        remove_modal_spinner()
       } else {
-        shinybusy::report_failure(
+        report_failure(
           title = "Problem",
           text = "No variable selected"
         )
       }
     })
 
-    shiny::observeEvent(input$report_word, {
+    observeEvent(input$report_word, {
       selvars <- summary_object[
         setdiff(1:nrow(summary_object), input[["excludedRows"]]),
       ][["varname"]]
       if (length(selvars) > 1) {
         summary_object <- summary_object[summary_object$varname %in% selvars, ]
-        shinybusy::show_modal_spinner() # show the modal window
+        show_modal_spinner() # show the modal window
         targeter::report(
           object = object,
           template = NULL,
@@ -363,9 +367,9 @@ explore <- function(
           force_vars = selvars,
           output_format = "word"
         )
-        shinybusy::remove_modal_spinner()
+        remove_modal_spinner()
       } else {
-        shinybusy::report_failure(
+        report_failure(
           title = "Problem",
           text = "No variable selected"
         )
@@ -375,14 +379,14 @@ explore <- function(
 
   display <- match.arg(display, c("dialog", "browser"))
 
-  shiny::runGadget(
+  runGadget(
     ui,
     server,
-    viewer = shiny::dialogViewer(
+    viewer = dialogViewer(
       "targeter-explore",
       width = 2000,
       height = 1800
     )
   )
-  # shiny::runGadget(ui, server, viewer = shiny::browserViewer())
+  # runGadget(ui, server, viewer = browserViewer())
 }

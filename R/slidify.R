@@ -39,8 +39,9 @@
 #' @return inviisibly returns path to the generated presentation
 #' @export slidify
 #' @importFrom assertthat assert_that
-#' @importFrom quarto quarto_render
-
+## ' @importFrom quarto quarto_render
+## ' @importFrom qs qsave
+#' @importFrom pacman p_load
 #' @examples
 #' \dontrun{
 #' tar <- targeter(adult, target ="ABOVE50K", analysis_name="Analyse",
@@ -66,6 +67,7 @@ slidify <- function(
   ...
 ) {
   
+  pacman::p_load("quarto")
   # <TOCO> more test assert that on all parameters 
   assertthat::assert_that(is.character(format), msg = "format must be a character")
   format <- match.arg(format, c("pptx","revealjs","beamer"), several.ok = FALSE)
@@ -129,8 +131,8 @@ slidify <- function(
   tmp_file_outfile <- paste(temp, file_extension, sep = ".")
 
   # save tmp  object in tmpdir
-  tmp_file_object <- paste(temp, "tar.qs", sep = ".")
-  qs::qsave(object,  tmp_file_object)
+  tmp_file_object <- paste(temp, "tar.rds", sep = ".")
+  saveRDS(object,  tmp_file_object)
 
   # prepare tmp_quarto
   tmp_file_quarto <- paste(temp, "qmd", sep = ".")
