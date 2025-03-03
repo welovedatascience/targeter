@@ -73,10 +73,8 @@ It also allows filtering on minimum number of values within
 \examples{
 data(adult)
 t <- targeter(adult, target = "ABOVE50K", analysis_name = "Analyse")
-focus(t)
-focus(t, n = 3)
-focus(t, nmin = 500, criteria = "index.max.index")
-focus(t, criteria = "chisquare")
+tf <- focus(t, n = 3)
+tf <- focus(t, nmin = 500, criteria = "index.max.index", min_criteria = 1.2)
 }
 \seealso{
 \itemize{

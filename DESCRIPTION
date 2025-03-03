@@ -22,10 +22,10 @@ Encoding: UTF-8
 LazyData: true
 Depends: 
      R (>= 3.5),
+    data.table
 RoxygenNote: 7.3.2
 NeedsCompilation: no
 Imports:
-    data.table,
     assertthat,
     ggplot2,
     gridExtra,
@@ -42,10 +42,10 @@ Imports:
     htmlwidgets,
     patchwork,
     utils,
-    kableExtra
+    kableExtra,
+    quarto
 Suggest:
     flextable,
-    quarto,
     rpart,
     rpart.plot,
     explore,

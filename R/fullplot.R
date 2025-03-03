@@ -42,8 +42,8 @@
 #' @importFrom patchwork plot_annotation
 #'
 #' @examples
-#' CN <- crossvar(adult, target = "AGE", var = "SEX")
-#' fullplot(CN, title = "this is my title", subtitle = FALSE,  which_plot = 1:4)
+#' tar <- crossvar(adult, target = "AGE", var = "SEX")
+#' fullplot(tar, title = "this is my title", subtitle = FALSE,  which_plot = 1:4)
 #' @export
 fullplot <- function(
   x,

@@ -35,7 +35,16 @@ if (getRversion() >= "3.1.0")
       "perc",
       "qrange",
       "<<-",
-      "X"
+      "X",
+      "is_in_data",
+      "is_target",
+      "is_in_exclude",
+      "respect_naming_convention",
+      "keep_naming_convention",
+      "dropped_one_single_value",
+      "var_type",
+      "silently_renamed",
+      "has_profile"
     )
   )
 
@@ -1113,7 +1122,14 @@ targeter <- function(
   }
 
   ## compute > drop variables with only one value -----
-  vars_one_value <- sapply(crossvars, function(x) nrow(x$counts) == 1)
+  if (target_type %in% c("binary","categorical")){
+    vars_one_value <- sapply(crossvars, function(x) nrow(x$counts) == 1)
+  
+  } else if (target_type == "numeric"){
+    vars_one_value <- sapply(crossvars, function(x) nrow(x$stats) == 1)
+  
+  }
+  
   if (any(vars_one_value)) {
     crossvars <- crossvars[which(!(vars_one_value))]
     vars[,

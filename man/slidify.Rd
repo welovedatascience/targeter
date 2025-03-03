@@ -68,7 +68,8 @@ large.}
 package welovedatascience logo. If empty, no logo will be used. Only used
 by revealjs format.}
 
-\item{...}{- not yet used.}
+\item{...}{additional parameters to be passed to quarto, for instance
+allowing to pass/overwite any YAML set-up}
 }
 \value{
 inviisibly returns path to the generated presentation
@@ -81,6 +82,6 @@ powerpoint (other formats to come).
 \dontrun{
 tar <- targeter(adult, target ="ABOVE50K", analysis_name="Analyse",
 naming_conventions=FALSE)
-slidfy(tar)
+slidify(tar, format = "pptx", author = "this is me")
 }
 }

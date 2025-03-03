@@ -13,10 +13,8 @@ format:
     scrollable: true
     embed-resources: true
     logo: $TARGETER_PARAM_template_logo$
-    df-print: kable 
     template: $TARGETER_PARAM_template_revealjs$   # apparently can't be managed by params :(
   pptx: 
-    df-print: kable 
     reference-doc: $TARGETER_PARAM_template-pptx$  # apparently can't be managed by params :(
   beamer:
     toc: true

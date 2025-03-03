@@ -51,10 +51,9 @@
 #' @examples
 #' data(adult)
 #' t <- targeter(adult, target = "ABOVE50K", analysis_name = "Analyse")
-#' focus(t)
-#' focus(t, n = 3)
-#' focus(t, nmin = 500, criteria = "index.max.index")
-#' focus(t, criteria = "chisquare")
+#  tf <- focus(t)
+#' tf <- focus(t, n = 3)
+#' tf <- focus(t, nmin = 500, criteria = "index.max.index", min_criteria = 1.2)
 focus <- function(
   x,
   summary_object = NULL,
@@ -72,7 +71,7 @@ focus <- function(
   max_criteria = NULL,
   force_vars = character(),
   force_vars_groups = NULL,
-  force_vars_groups_n = 1 
+  force_vars_groups_n = 1
 ) {
   ## test
   assertthat::assert_that(
@@ -144,7 +143,7 @@ focus <- function(
 
   ## filter on minimum number of records
   if (!is.null(nmin)){
-    tmp[which(index.max.count)<nmin, KEEP_CRITERIA:=FALSE]
+    tmp[which(index.max.count<nmin), KEEP_CRITERIA:=FALSE]
   } 
 
   ## minimum value for criteria
