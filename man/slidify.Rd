@@ -6,51 +6,75 @@
 \usage{
 slidify(
   object,
+  metadata = NULL,
   format = "pptx",
   template = NULL,
   pptx_template = NULL,
-  generate_yaml = TRUE,
   output_dir = ".",
   output_file = NULL,
-  metadata = NULL,
+  tmpdir = tempdir(),
   delete_temporary_files = TRUE,
+  title = object$analysis,
+  author = getOption("targeter.author", "welovedatascience targeter"),
+  fullplot_which_plot = "1:2",
+  tables = FALSE,
+  logo = NULL,
   ...
 )
 }
 \arguments{
 \item{object}{- an object of class targeter}
 
-\item{format}{- character, default: pptx (currently the only format provided)}
+\item{metadata}{- not used currently}
 
-\item{template}{- character. path to a Quarto qmd document that will be used 
-to generate presentation. If NULL (default), we will use targeter package 
+\item{format}{- character, one of "pptx", "revealjs"}
+
+\item{template}{- character. path to a Quarto qmd document that will be used
+to generate presentation. If NULL (default), we will use targeter package
 default template.}
 
-\item{pptx_template}{- charcater. Path to a default PPTX that will be used
-as Quarto->>PPTX generation. If NULL (default), we will use targeter
-package default PPTX template.}
-
-\item{generate_yaml}{- boolean, defauly TRUE. For targeter defaults template
-we separated YAML header as we generate programmatically it (some values
-in YAML depend on parameters)}
-
-\item{output_dir}{- character. Output directory - default to working 
+\item{output_dir}{- character. Output directory - default to working
 directory}
 
 \item{output_file}{- character, name of output file (with extension). if NULL
 (default), slidify will generate a temporary name.}
 
-\item{metadata}{- not used currently}
+\item{tmpdir}{- path to a temporarry folder tp handle quarto rendering, 
+By default, a call to `tempdir()` is performed.}
 
 \item{delete_temporary_files}{- logical. Whether we delete temporary files or
-not once presentation  is generated. Default: TRUE. On might want to use 
+not once presentation  is generated. Default: TRUE. On might want to use
 FALSE for debugging purpose.}
+
+\item{title}{- character, title for the presentation. Overide default title
+that consists in taking title for targeter object 'analysis' slot.}
+
+\item{author}{- character: presentatiopn author.}
+
+\item{fullplot_which_plot}{- character, selection of plots (cf `fullplot`
+documentation)}
+
+\item{tables}{- logical whetheer to print tables in seprate slides in 
+addition of graphics. Might ot produce nice outputs as tables are usually
+large.}
+
+\item{logo}{- character: path to a logo file. If NULL (default), we will take
+package welovedatascience logo. If empty, no logo will be used. Only used
+by revealjs format.}
+
+\item{...}{- not yet used.}
+
+\item{reference_doc}{- character. Path to a default PPTX/reveal HTML template 
+that will be used as Quarto reference-doc
+(mostly for PPTX) If NULL (default), we will use targeter
+package default templates for PPTX and no template for revealjs
+If empty, default template will be used.}
 }
 \value{
 inviisibly returns path to the generated presentation
 }
 \description{
-This function generates a presentation (slides), currently targeting 
+This function generates a presentation (slides), currently targeting
 powerpoint (other formats to come).
 }
 \examples{

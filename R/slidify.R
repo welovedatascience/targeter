@@ -1,30 +1,46 @@
 #' Create a presentation from a targeter report object
-#' 
-#' This function generates a presentation (slides), currently targeting 
+#'
+#' This function generates a presentation (slides), currently targeting
 #' powerpoint (other formats to come).
-#' 
+#'
 #' @param object - an object of class targeter
-#' @param format - character, default: pptx (currently the only format provided)
-#' @param template - character. path to a Quarto qmd document that will be used 
-#' to generate presentation. If NULL (default), we will use targeter package 
+#' @param metadata - not used currently
+#' @param format - character, one of "pptx", "revealjs"
+#' @param template - character. path to a Quarto qmd document that will be used
+#' to generate presentation. If NULL (default), we will use targeter package
 #' default template.
-#' @param pptx_template - charcater. Path to a default PPTX that will be used
-#' as Quarto->>PPTX generation. If NULL (default), we will use targeter
-#' package default PPTX template.
-#' @param generate_yaml - boolean, defauly TRUE. For targeter defaults template
-#' we separated YAML header as we generate programmatically it (some values
-#' in YAML depend on parameters)
-#' @param output_dir - character. Output directory - default to working 
+#' @param pptx_reference_doc - character. Path to a default PPTX template 
+#' that will be used as Q"uarto reference-doc
+#' If NULL (default), we will use targeter
+#' package default templates for PPTX. 
+#' If empty string "", we won't use any template.
+#' @param revealjs_template - character. Path to a default revealjs
+#'  template If empty string (default), no revealjs template will be used.
+#' @param output_dir - character. Output directory - default to working
 #' directory
 #' @param output_file - character, name of output file (with extension). if NULL
 #' (default), slidify will generate a temporary name.
-#' @param metadata - not used currently
+#' @param tmpdir - path to a temporarry folder tp handle quarto rendering, 
+#' By default, a call to `tempdir()` is performed.
 #' @param delete_temporary_files - logical. Whether we delete temporary files or
-#' not once presentation  is generated. Default: TRUE. On might want to use 
+#' not once presentation  is generated. Default: TRUE. On might want to use
 #' FALSE for debugging purpose.
+#' @param title - character, title for the presentation. Overide default title
+#' that consists in taking title for targeter object 'analysis' slot.
+#' @param author - character: presentatiopn author.
+#' @param fullplot_which_plot - character, selection of plots (cf `fullplot`
+#' documentation) 
+#' @param tables - logical whetheer to print tables in seprate slides in 
+#' addition of graphics. Might ot produce nice outputs as tables are usually
+#' large.
+#' @param logo - character: path to a logo file. If NULL (default), we will take
+#' package welovedatascience logo. If empty, no logo will be used. Only used
+#' by revealjs format.
+#' @param ... - not yet used.
 #' @return inviisibly returns path to the generated presentation
 #' @export slidify
 #' @importFrom assertthat assert_that
+#' @importFrom quarto quarto_render
 
 #' @examples
 #' \dontrun{
@@ -35,32 +51,49 @@
 
 slidify <- function(
   object,
+  metadata = NULL,
   format = "pptx",
-  template = NULL, # default template
-  pptx_template = NULL, # for pptx format, default template
-  generate_yaml = TRUE, # for targeter default template we do generate a YAML
+  template = NULL, # default QMD template for slides
+  pptx_reference_doc = NULL, # for pptx format, default template,
+  revealjs_template = "", # <TODO> prepare a revealjs template
   output_dir = ".",
   output_file = NULL,
-  metadata = NULL,
+  tmpdir = tempdir(), # tmpdir = "/hackdata/share/_tmp"
   delete_temporary_files = TRUE,
+  title = object$analysis,
+  author = getOption("targeter.author", "welovedatascience targeter"),
+  fullplot_which_plot = "1:2",
+  tables = FALSE,
+  logo = NULL,
   ...
 ) {
-  ##test
-
-  if (is.null(pptx_template)) {
-    pptx_template <- file.path(
+  
+  ## handled default values 
+  default_pptx_template <- is.null(pptx_reference_doc)
+  if (is.null(pptx_reference_doc)) {
+    pptx_reference_doc <- file.path(
       find.package("targeter", lib.loc = .libPaths()),
       "ressources",
-      "targeter-report.pptx"
+      "slidify-pptx-targeter-template.pptx"
     )
   }
 
+
+
+  default_template <- is.null(template)
   if (is.null(template)) {
-    generate_yaml = TRUE
     template <- file.path(
       find.package("targeter", lib.loc = .libPaths()),
       "ressources",
-      "pptx-quarto.qmd"
+      "slidify-template.qmd"
+    )
+  }
+  if (is.null(logo)){
+    if (default_template)
+    logo <- file.path(
+      find.package("targeter", lib.loc = .libPaths()),
+      "ressources",
+      "wlds-logo.png"
     )
   }
   assertthat::assert_that(
@@ -73,8 +106,12 @@ slidify <- function(
   )
   if (format == "pptx") {
     assertthat::assert_that(
-      is.character(template),
-      msg = "template must be a character string giving the path of a powerpoint template"
+      is.character(pptx_template),
+      msg = "pptx template must be a character string giving the path of a powerpoint template"
+    )
+    assertthat::assert_that(
+      file.exists(pptx_template),
+      msg = "powerpoint template provided file does not exist"
     )
   }
   assertthat::assert_that(
@@ -82,97 +119,99 @@ slidify <- function(
     msg = "template file does not exist"
   )
 
-  write_quarto_yaml <- function(
-    object,
-    format = 'pptx',
-    outfile = tempfile(fileext = ".yml"),
-    author = getOption('targeter.author', 'welovedatascience targeter package'),
-    pptx_template = file.path(
-      find.package("targeter", lib.loc = .libPaths()),
-      "ressources",
-      "targeter-report.pptx"
-    ),
-    ...
-  ) {
-    assertthat::assert_that(
-      inherits(object, "targeter"),
-      msg = "Needs a targeter object"
-    )
-
-    cat("---\n", file = outfile, append = FALSE)
-    cat(
-      paste0('title: "', object$analysis, '"\n'),
-      file = outfile,
-      append = TRUE
-    )
-    cat(paste0('author: "', author, '"\n'), file = outfile, append = TRUE)
-    cat(paste0('execute:\n  echo: false\n'), file = outfile, append = TRUE)
-    cat(paste0("params:\n"), file = outfile, append = TRUE)
-    cat(paste0("  object: ''\n"), file = outfile, append = TRUE)
-    cat(paste0("  fullplot_which_plot: '1:2'\n"), file = outfile, append = TRUE)
-    cat("format:\n", file = outfile, append = TRUE)
-    cat("  ", format, ":\n", file = outfile, append = TRUE)
-    if (format == "pptx") {
-      assertthat::assert_that(
-        file.exists(pptx_template),
-        msg = "pptx template file does not exists"
-      )
-      cat(
-        paste0('    reference-doc: "', pptx_template, '"\n'),
-        file = outfile,
-        append = TRUE
-      )
-      cat(paste0("    df-format: kable\n"), file = outfile, append = TRUE)
-    }
-    cat("---\n\n", file = outfile, append = TRUE)
-    invisible(outfile)
-  }
-
-  file_extension <- switch(format, pptx = "pptx")
-  # temp <- "targeter-quarto-tmp2a5644777c6933"
-
+  
   temp <- basename(tempfile(pattern = "targeter-quarto-tmp"))
-
+  dir.create(file.path(tmpdir, temp))
+  tmpdir <- file.path(tmpdir, temp)
+  file_extension <- switch(format, pptx = "pptx", revealjs = "html")
   tmp_file_outfile <- paste(temp, file_extension, sep = ".")
+
+  # save tmp  object in tmpdir
   tmp_file_object <- paste(temp, "tar.qs", sep = ".")
+  qs::qsave(object, file.path(tmpdir, tmp_file_object))
 
-  qs::qsave(object, tmp_file_object)
-
+  # prepare tmp_quarto
   tmp_file_quarto <- paste(temp, "qmd", sep = ".")
 
-  if (generate_yaml) {
-    cat('\nOK\n')
-    tmp_file_yaml <- write_quarto_yaml(
-      object,
-      pptx_template = pptx_template,
-      outfile = paste(temp, "yml", sep = ".")
-    )
-    system(
-      command = paste("cat", tmp_file_yaml, template, ">", tmp_file_quarto)
-    )
-  } else {
-    file.copy(from = template, to = tmp_file_quarto)
-  }
+  if (format == "pptx"){
+    # if default template we will also use powerpoint wlds template (or override
+    # with user provided one)
+    if (default_template | !default_pptx_template) {
+      #pptx_template <- "targeter-report.pptx"
+      tmp_pptx_reference_doc <- paste(paste0(temp, "-template"), "pptx", sep = ".")
+      file.copy(
+        from = pptx_reference_doc,
+        to = file.path(tmpdir, tmp_pptx_reference_doc),
+        overwrite = TRUE
+      )
 
-  launch_quarto <- system(
-    intern = TRUE,
-    command = paste0(
-      "quarto render ",
-      tmp_file_quarto,
-      " --output ",
-      tmp_file_outfile,
-      " -P object:",
-      basename(tmp_file_object)
-    )
+      quarto_template <- paste(readLines(template), collapse = "\n")
+      quarto_template <- gsub(
+        "$TARGETER_PARAM_template-pptx$",
+        tmp_pptx_reference_doc,
+        quarto_template,
+        fixed = TRUE
+      )
+      cat(
+        quarto_template,
+        file = file.path(tmpdir, tmp_file_quarto),
+        append = FALSE
+      )
+    } else {
+      file.copy(template, file.path(tmpdir, tmp_file_quarto))
+    }
+  }  else if (format == "revealjs") {
+    
+    if (revealjs_template != ""){
+      file.copy(
+        from = revealjs_template,
+        to = file.path(tmpdir, basename(revealjs_template)),
+        overwrite = TRUE
+      )
+    }
+      quarto_template <- paste(readLines(template), collapse = "\n")
+      quarto_template <- gsub(
+        "$TARGETER_PARAM_template_revealjs$",
+        basename(revealjs_template),
+        quarto_template,
+        fixed = TRUE
+      )
+      cat(
+        quarto_template,
+        file = file.path(tmpdir, tmp_file_quarto),
+        append = FALSE
+      )
+    }
+
+      
+  } else {
+    file.copy(template, file.path(tmpdir, tmp_file_quarto))
+  }
+  
+  meta_yml_params <- list(
+    object = tmp_file_object,
+    fullplot_which_plot = fullplot_which_plot,
+    title = title,
+    author = author,
+    tables = as.character(tables)
+  )
+
+  
+  quarto::quarto_render(
+    input = file.path(tmpdir, tmp_file_quarto),
+    output_file = tmp_file_outfile,
+    execute_dir = tmpdir,
+    execute_params = meta_yml_params,
+    debug = TRUE,
+    output_format = format
   )
 
   if (is.null(output_file)) {
-    output_file <- basename(
-      tempfile(
-        pattern = "targeter-report-",
-        fileext = paste0(".", file_extension)
-      )
-    )
+
+    output_file <- paste0("targeter-report-", 
+    format(Sys.time(), format = "%Y-%m-%d_%H%M%S"),
+    ".", file_extension)
+    
   }
   if (file.exists(tmp_file_outfile)) {
     file.copy(
@@ -180,17 +219,17 @@ slidify <- function(
       to = file.path(output_dir, output_file),
       overwrite = TRUE
     )
+    file.remove(tmp_file_outfile)
   }
 
-  if (delete_temporary_files){
-      tempfiles <- list.files(pattern = temp, full.names = TRUE)
-      file.remove(tempfiles)
-      
+  if (delete_temporary_files) {
+    # https://stackoverflow.com/questions/9296377/automatically-delete-files-folders
+      unlink(tmpdir, recursive = TRUE, force = TRUE)
+
   }
-  cat("\nPresentation generated.\n")
+  cat("\nPresentation generated in file:.", file.path(output_dir, output_file),"\n")
   invisible(file.path(output_dir, output_file))
 }
-
 
 # temp <- basename(tempfile(pattern = "targeter-quarto-tmp"))
 # file_objec
@@ -203,7 +242,11 @@ slidify <- function(
 # system(command = paste("cat", file_yaml,quarto_template, ">", file_quarto))
 # system(command = paste0("quarto render ", basename(file_quarto)," --output ",outfile," -P object:",basename(file_object)
 
-
 # }
 
-# slidify(tar)
+# library(data.table)
+# data(adult)
+# object <- targeter(adult, target = "ABOVE50K")
+# qs::qsave(object, "tmp/object.qs")
+# slidify(object, delete_temporary_files = TRUE)
+

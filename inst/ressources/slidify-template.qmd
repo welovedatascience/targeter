@@ -1,5 +1,27 @@
-
-
+---
+execute:
+  echo: false
+params:
+  object: "" # will have to be passed as mandatory parameter  title: "targeter analysis"
+  fullplot_which_plot: "1:2"
+  author: "welovedatascience - targeter"
+  title: "targeter analyis"
+  tables: "TRUE"
+format:
+  revealjs:
+    smaller: true
+    scrollable: true
+    embed-resources: true
+    logo: wlds-logo.png
+    df-print: paged 
+    template: $TARGETER_PARAM_template_revealjs$   # apparently can't be managed by params :(
+  pptx: 
+    df-print: "kable" 
+    doc-reference: $TARGETER_PARAM_template-pptx$  # apparently can't be managed by params :(
+date: "`r format(Sys.Date())`"
+title: "`r params$title`"
+author: "`r params$author`"
+---
 
 ```{r}
 #| label: setup
@@ -8,9 +30,9 @@ library(data.table)
 library(targeter)
 library(gt)
 
-# print(params$object)
+# print(params)
 object <- qs::qread(params$object)
-#print(object) 
+
 ```
 
 
@@ -34,17 +56,17 @@ if (object$target_type == "binary"){
 - Target: `r paste(object$target, ifelse(!is.null(object$description_target), object$description_target, ""))` [`r object$target_type`]
 - Number of variables: `r length(object$profiles)`
 - Analysed population contains: `r Ntot` records.
-- Analysis performed on: `r paste(object$session$R_version, "with targeter", object$session$targeter_package_version)` 
-
+- Analysis performed on: `r paste(object$session$R_version, "with targeter", object$session$targeter_package_version)
 :::
 
 ::: {.column}
 ```{r}
-gt(stats)
+#| output: asis
+print(stats)
 ```
-
 :::
 ::::
+
 
 
 ```{r}
@@ -61,15 +83,16 @@ for (i in seq_along(object$profiles)){
     #   text = params$fullplot_which_plot
     # ))))
 
+  if (as.logical(params$tables)){
 
-  cat('\n\n::: {.notes}\n\n')
+      cat("\n\n## ",names(object$profiles)[i]," [table]\n\n")
+      tab <- table_crossvar(iprofile)
 
-  kableExtra::kable(table_crossvar(iprofile))
-  cat("\n:::\n")
+      print(tab)
+
+    cat("\n\n")
+
+  }
+  
 }
-
-
-
-
 ```
-
