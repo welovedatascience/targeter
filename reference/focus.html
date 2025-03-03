@@ -13,7 +13,7 @@ It also allows filtering on minimum number of values within
 
     <a class="navbar-brand me-2" href="../index.html">targeter</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -143,15 +143,11 @@ retained/forced per group? Default: 1</p></dd>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">adult</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">t</span> <span class="op">&lt;-</span> <span class="fu"><a href="targeter.html">targeter</a></span><span class="op">(</span><span class="va">adult</span>, target <span class="op">=</span> <span class="st">"ABOVE50K"</span>, analysis_name <span class="op">=</span> <span class="st">"Analyse"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in data.table(variable = sort(unique(c(select_vars, exclude_vars,     names(data))))):</span> could not find function "data.table"</span>
-<span class="r-in"><span><span class="fu">focus</span><span class="op">(</span><span class="va">t</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> Error: x must be an object of class 'targeter'.</span>
-<span class="r-in"><span><span class="fu">focus</span><span class="op">(</span><span class="va">t</span>, n <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> Error: x must be an object of class 'targeter'.</span>
-<span class="r-in"><span><span class="fu">focus</span><span class="op">(</span><span class="va">t</span>, nmin <span class="op">=</span> <span class="fl">500</span>, criteria <span class="op">=</span> <span class="st">"index.max.index"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> Error: x must be an object of class 'targeter'.</span>
-<span class="r-in"><span><span class="fu">focus</span><span class="op">(</span><span class="va">t</span>, criteria <span class="op">=</span> <span class="st">"chisquare"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> Error: x must be an object of class 'targeter'.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO:target ABOVE50K detected as type: binary</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO:binary target contains number, automatic chosen level: 1; override using `target_reference_level`</span>
+<span class="r-in"><span><span class="va">tf</span> <span class="op">&lt;-</span> <span class="fu">focus</span><span class="op">(</span><span class="va">t</span>, n <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">tf</span> <span class="op">&lt;-</span> <span class="fu">focus</span><span class="op">(</span><span class="va">t</span>, nmin <span class="op">=</span> <span class="fl">500</span>, criteria <span class="op">=</span> <span class="st">"index.max.index"</span>, min_criteria <span class="op">=</span> <span class="fl">1.2</span><span class="op">)</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

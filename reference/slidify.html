@@ -9,7 +9,7 @@ powerpoint (other formats to come)."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">targeter</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -44,14 +44,19 @@ powerpoint (other formats to come).</p>
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">slidify</span><span class="op">(</span></span>
 <span>  <span class="va">object</span>,</span>
+<span>  metadata <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  format <span class="op">=</span> <span class="st">"pptx"</span>,</span>
 <span>  template <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  pptx_template <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  generate_yaml <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  pptx_reference_doc <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  revealjs_template <span class="op">=</span> <span class="st">""</span>,</span>
 <span>  output_dir <span class="op">=</span> <span class="st">"."</span>,</span>
 <span>  output_file <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  metadata <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  delete_temporary_files <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  title <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">analysis</span>,</span>
+<span>  author <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"targeter.author"</span>, <span class="st">"welovedatascience targeter"</span><span class="op">)</span>,</span>
+<span>  fullplot_which_plot <span class="op">=</span> <span class="st">"1:2"</span>,</span>
+<span>  tables <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  logo <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -64,8 +69,12 @@ powerpoint (other formats to come).</p>
 <dd><p>- an object of class targeter</p></dd>
 
 
+<dt id="arg-metadata">metadata<a class="anchor" aria-label="anchor" href="#arg-metadata"></a></dt>
+<dd><p>- not used currently</p></dd>
+
+
 <dt id="arg-format">format<a class="anchor" aria-label="anchor" href="#arg-format"></a></dt>
-<dd><p>- character, default: pptx (currently the only format provided)</p></dd>
+<dd><p>- character, one of "pptx", "revealjs"</p></dd>
 
 
 <dt id="arg-template">template<a class="anchor" aria-label="anchor" href="#arg-template"></a></dt>
@@ -74,16 +83,17 @@ to generate presentation. If NULL (default), we will use targeter package
 default template.</p></dd>
 
 
-<dt id="arg-pptx-template">pptx_template<a class="anchor" aria-label="anchor" href="#arg-pptx-template"></a></dt>
-<dd><p>- charcater. Path to a default PPTX that will be used
-as Quarto-&gt;&gt;PPTX generation. If NULL (default), we will use targeter
-package default PPTX template.</p></dd>
+<dt id="arg-pptx-reference-doc">pptx_reference_doc<a class="anchor" aria-label="anchor" href="#arg-pptx-reference-doc"></a></dt>
+<dd><p>- character. Path to a default PPTX template
+that will be used as Q"uarto reference-doc
+If NULL (default), we will use targeter
+package default templates for PPTX.
+If empty string "", we won't use any template.</p></dd>
 
 
-<dt id="arg-generate-yaml">generate_yaml<a class="anchor" aria-label="anchor" href="#arg-generate-yaml"></a></dt>
-<dd><p>- boolean, defauly TRUE. For targeter defaults template
-we separated YAML header as we generate programmatically it (some values
-in YAML depend on parameters)</p></dd>
+<dt id="arg-revealjs-template">revealjs_template<a class="anchor" aria-label="anchor" href="#arg-revealjs-template"></a></dt>
+<dd><p>- character. Path to a default revealjs
+template If empty string (default), no revealjs template will be used.</p></dd>
 
 
 <dt id="arg-output-dir">output_dir<a class="anchor" aria-label="anchor" href="#arg-output-dir"></a></dt>
@@ -96,14 +106,41 @@ directory</p></dd>
 (default), slidify will generate a temporary name.</p></dd>
 
 
-<dt id="arg-metadata">metadata<a class="anchor" aria-label="anchor" href="#arg-metadata"></a></dt>
-<dd><p>- not used currently</p></dd>
-
-
 <dt id="arg-delete-temporary-files">delete_temporary_files<a class="anchor" aria-label="anchor" href="#arg-delete-temporary-files"></a></dt>
 <dd><p>- logical. Whether we delete temporary files or
 not once presentation  is generated. Default: TRUE. On might want to use
 FALSE for debugging purpose.</p></dd>
+
+
+<dt id="arg-title">title<a class="anchor" aria-label="anchor" href="#arg-title"></a></dt>
+<dd><p>- character, title for the presentation. Overide default title
+that consists in taking title for targeter object 'analysis' slot.</p></dd>
+
+
+<dt id="arg-author">author<a class="anchor" aria-label="anchor" href="#arg-author"></a></dt>
+<dd><p>- character: presentatiopn author.</p></dd>
+
+
+<dt id="arg-fullplot-which-plot">fullplot_which_plot<a class="anchor" aria-label="anchor" href="#arg-fullplot-which-plot"></a></dt>
+<dd><p>- character, selection of plots (cf `fullplot`
+documentation)</p></dd>
+
+
+<dt id="arg-tables">tables<a class="anchor" aria-label="anchor" href="#arg-tables"></a></dt>
+<dd><p>- logical whetheer to print tables in seprate slides in
+addition of graphics. Might ot produce nice outputs as tables are usually
+large.</p></dd>
+
+
+<dt id="arg-logo">logo<a class="anchor" aria-label="anchor" href="#arg-logo"></a></dt>
+<dd><p>- character: path to a logo file. If NULL (default), we will take
+package welovedatascience logo. If empty, no logo will be used. Only used
+by revealjs format.</p></dd>
+
+
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dd><p>additional parameters to be passed to quarto, for instance
+allowing to pass/overwite any YAML set-up</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -116,7 +153,7 @@ FALSE for debugging purpose.</p></dd>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
 <span class="r-in"><span><span class="va">tar</span> <span class="op">&lt;-</span> <span class="fu"><a href="targeter.html">targeter</a></span><span class="op">(</span><span class="va">adult</span>, target <span class="op">=</span><span class="st">"ABOVE50K"</span>, analysis_name<span class="op">=</span><span class="st">"Analyse"</span>,</span></span>
 <span class="r-in"><span>naming_conventions<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">slidfy</span><span class="op">(</span><span class="va">tar</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">slidify</span><span class="op">(</span><span class="va">tar</span>, format <span class="op">=</span> <span class="st">"pptx"</span>, author <span class="op">=</span> <span class="st">"this is me"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 </code></pre></div>
     </div>

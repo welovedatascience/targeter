@@ -9,7 +9,7 @@ This function allows to generate a quadrant graphic on an object of class "cross
 
     <a class="navbar-brand me-2" href="../index.html">targeter</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -86,11 +86,13 @@ The label will be used for the title and the x-axis of the graph.</p></dd>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">t</span> <span class="op">&lt;-</span> <span class="fu"><a href="crossvar.html">crossvar</a></span><span class="op">(</span><span class="va">adult</span>,<span class="st">"ABOVE50K"</span>,<span class="st">"WORKCLASS"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in data.table(variable = sort(unique(c(select_vars, exclude_vars,     names(data))))):</span> could not find function "data.table"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO:target ABOVE50K detected as type: binary</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO:binary target contains number, automatic chosen level: 1; override using `target_reference_level`</span>
 <span class="r-in"><span><span class="fu">quadrant_plot</span><span class="op">(</span><span class="va">t</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> the parameter x must to be an object of class crossvar</span>
+<span class="r-plt img"><img src="quadrant_plot-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="fu">quadrant_plot</span><span class="op">(</span><span class="va">t</span>, max_ncat<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> the parameter x must to be an object of class crossvar</span>
+<span class="r-plt img"><img src="quadrant_plot-2.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
