@@ -81,10 +81,17 @@ for (i in seq_along(object$profiles)){
 
   cat("\n\n## ",names(object$profiles)[i],"\n\n")
 
-  print(fullplot(iprofile, which_plot=1:2))
-    # which_plot = eval(parse(
-    #   text = params$fullplot_which_plot
-    # ))))
+
+  print(
+    fullplot(
+      iprofile, 
+      which_plot= eval(
+        parse(
+          text = params$fullplot_which_plot 
+          )
+        )
+      )
+    )
 
   if (as.logical(params$tables)){
 

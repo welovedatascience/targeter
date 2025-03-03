@@ -1,8 +1,16 @@
+
+# targeter 1.3.2
+
+* released on 20250303 
+* slidify function and its default template allow generating presentations in
+  PowerPoint, HTML (revealJS) or PDF (LaTeX beamer) formats.
+
+
 # targeter 1.3.1
 
 * released on 20250302 
 * beta version of presentations generation (currently powerpoint, only unix,
-  few tests).
+  few tests). Quarto is a requirement for that.
 
 # targeter 1.3
 

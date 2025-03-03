@@ -34,7 +34,8 @@
 #' @param logo - character: path to a logo file. If NULL (default), we will take
 #' package welovedatascience logo. If empty, no logo will be used. Only used
 #' by revealjs format.
-#' @param ... - not yet used.
+#' @param ...  additional parameters to be passed to quarto, for instance
+#' allowing to pass/overwite any YAML set-up
 #' @return inviisibly returns path to the generated presentation
 #' @export slidify
 #' @importFrom assertthat assert_that
@@ -44,7 +45,7 @@
 #' \dontrun{
 #' tar <- targeter(adult, target ="ABOVE50K", analysis_name="Analyse",
 #' naming_conventions=FALSE)
-#' slidfy(tar)
+#' slidify(tar, format = "pptx", author = "this is me")
 #' }
 
 slidify <- function(
@@ -65,6 +66,37 @@ slidify <- function(
   ...
 ) {
   
+  # <TOCO> more test assert that on all parameters 
+  assertthat::assert_that(is.character(format), msg = "format must be a character")
+  format <- match.arg(format, c("pptx","revealjs","beamer"), several.ok = FALSE)
+  
+
+  assertthat::assert_that(
+    inherits(object, "targeter"),
+    msg = "The class of object must to be 'targeter'."
+  )
+  assertthat::assert_that(
+    inherits(metadata, "data.frame") | is.null(metadata),
+    msg = "The parameter metadata must be either NULL (no metadata) or a data.frame"
+  )
+  if (format == "pptx" & !is.null(pptx_reference_doc)) {
+    assertthat::assert_that(
+      is.character(pptx_reference_doc),
+      msg = "pptx template must be a character string giving the path of a powerpoint template"
+    )
+    assertthat::assert_that(
+      file.exists(pptx_reference_doc),
+      msg = "powerpoint template provided file does not exist"
+    )
+  }
+  
+  assertthat::assert_that(
+    file.exists(template),
+    msg = "template file does not exist"
+  )
+
+  
+
   ## handled default values 
   default_pptx_template <- is.null(pptx_reference_doc)
   if (is.null(pptx_reference_doc)) {
@@ -91,31 +123,7 @@ slidify <- function(
       "slidify-template.qmd"
     )
   }
-  assertthat::assert_that(
-    inherits(object, "targeter"),
-    msg = "The class of object must to be 'targeter'."
-  )
-  assertthat::assert_that(
-    inherits(metadata, "data.frame") | is.null(metadata),
-    msg = "The parameter metadata must be either NULL (no metadata) or a data.frame"
-  )
-  if (format == "pptx") {
-    assertthat::assert_that(
-      is.character(pptx_reference_doc),
-      msg = "pptx template must be a character string giving the path of a powerpoint template"
-    )
-    assertthat::assert_that(
-      file.exists(pptx_reference_doc),
-      msg = "powerpoint template provided file does not exist"
-    )
-  }
-  
-  assertthat::assert_that(
-    file.exists(template),
-    msg = "template file does not exist"
-  )
 
-  
   temp <- basename(tempfile(pattern = "_targeter-quarto-tmp"))
   file_extension <- switch(format, pptx = "pptx", revealjs = "html", "beamer"="pdf")
   tmp_file_outfile <- paste(temp, file_extension, sep = ".")
@@ -268,26 +276,10 @@ slidify <- function(
   invisible(file.path(output_dir, output_file))
 }
 
-# temp <- basename(tempfile(pattern = "targeter-quarto-tmp"))
-# file_objec
-# t <-paste(temp, ".tar.qs", sep=".")
-# qs::qsave(object, file_object)
-
-# file_yaml <- write_quarto_yaml(tarfocus, outfile = paste(temp, "yml", sep="."))
-# file_quarto <- paste(temp, "qmd", sep=".")
-
-# system(command = paste("cat", file_yaml,quarto_template, ">", file_quarto))
-# system(command = paste0("quarto render ", basename(file_quarto)," --output ",outfile," -P object:",basename(file_object)
-
-# }
-
 # library(data.table)
 # data(adult)
 # object <- targeter(adult, target = "ABOVE50K")
 # qs::qsave(object, "tmp/object.qs")
 # slidify(object, delete_temporary_files = TRUE)
-# slidify(object, delete_temporary_files = TRUE, tables=TRUE)
-#  slidify(object, delete_temporary_files = TRUE, format="revealjs", tables=TRUE)
-
-
+# slidify(object, delete_temporary_files = TRUE, format="revealjs", tables=TRUE, fullplot_which_plot = "1:4")
 # slidify(object, delete_temporary_files = FALSE, tables=TRUE, format = "beamer")
