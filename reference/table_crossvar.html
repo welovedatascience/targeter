@@ -73,27 +73,9 @@ add row percentages and column percentage for target (both always by default)</p
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">tar</span> <span class="op">&lt;-</span> <span class="fu"><a href="targeter.html">targeter</a></span><span class="op">(</span><span class="va">adult</span>, target <span class="op">=</span> <span class="st">'ABOVE50K'</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO:target ABOVE50K detected as type: binary</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO:binary target contains number, automatic chosen level: 1; override using `target_reference_level`</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in if (binning_method == "clustering") {    deps &lt;- c("Ckmeans.1d.dp")    if (getOption("targeter.auto_install_deps", FALSE)) {        pacman::p_load(deps, install = FALSE)    }    assertthat::assert_that(pacman::p_load(deps), msg = paste("some of targeter following optional packages are not available:",         paste(deps, collapse = ",")))}:</span> the condition has length &gt; 1</span>
 <span class="r-in"><span><span class="fu">table_crossvar</span><span class="op">(</span><span class="va">tar</span><span class="op">$</span><span class="va">profiles</span><span class="op">[[</span><span class="st">'EDUCATION'</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                 N0   N1  Ntot   perc0   perc1 target%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  10th          871   62   933 93.355%  6.645%  0.791%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  11th         1115   60  1175 94.894%  5.106%  0.765%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  12th          400   33   433 92.379%  7.621%  0.421%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  1st-4th       162    6   168 96.429%  3.571%  0.077%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  5th-6th       317   16   333 95.195%  4.805%  0.204%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  7th-8th       606   40   646 93.808%  6.192%   0.51%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  9th           487   27   514 94.747%  5.253%  0.344%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Assoc-acdm    802  265  1067 75.164% 24.836%   3.38%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Assoc-voc    1021  361  1382 73.878% 26.122%  4.604%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Bachelors    3134 2221  5355 58.525% 41.475% 28.325%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Doctorate     107  306   413 25.908% 74.092%  3.903%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  HS-grad      8826 1675 10501 84.049% 15.951% 21.362%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Masters       764  959  1723 44.341% 55.659% 12.231%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Preschool      51    0    51    100%      0%      0%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Prof-school   153  423   576 26.562% 73.438%  5.395%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Some-college 5904 1387  7291 80.977% 19.023% 17.689%</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in tar$profiles:</span> object of type 'closure' is not subsettable</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
