@@ -188,7 +188,6 @@ plot.crossvar_numeric <- function(
       p1 <- p1 + ggplot2::theme_bw()
     } else {
       # median or avg
-      #<TODO>
       if (show == "median") {
         p1 <- ggplot2::ggplot(dfm, ggplot2::aes(x = level, y = median))
       } else if (show == "avg") {

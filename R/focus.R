@@ -123,7 +123,7 @@ focus <- function(
 
   ## Apply the summary function
   if (!is.null(summary_object)) {
-    ## <TODO> add checks for consistency between summary_object and x
+    ## todo add checks for consistency between summary_object and x
     tmp <- summary_object
     if (
       criteria %in%
