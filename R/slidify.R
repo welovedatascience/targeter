@@ -20,8 +20,6 @@
 #' directory
 #' @param output_file - character, name of output file (with extension). if NULL
 #' (default), slidify will generate a temporary name.
-#' @param tmpdir - path to a temporarry folder tp handle quarto rendering, 
-#' By default, a call to `tempdir()` is performed.
 #' @param delete_temporary_files - logical. Whether we delete temporary files or
 #' not once presentation  is generated. Default: TRUE. On might want to use
 #' FALSE for debugging purpose.
@@ -58,7 +56,6 @@ slidify <- function(
   revealjs_template = "", # <TODO> prepare a revealjs template
   output_dir = ".",
   output_file = NULL,
-  tmpdir = tempdir(), # tmpdir = "/hackdata/share/_tmp"
   delete_temporary_files = TRUE,
   title = object$analysis,
   author = getOption("targeter.author", "welovedatascience targeter"),
@@ -77,8 +74,14 @@ slidify <- function(
       "slidify-pptx-targeter-template.pptx"
     )
   }
-
-
+  # cat(pptx_reference_doc)
+  if (is.null(logo)){
+    logo <- file.path(
+      find.package("targeter", lib.loc = .libPaths()),
+      "ressources",
+      "wlds-logo.png"
+    )
+  }
 
   default_template <- is.null(template)
   if (is.null(template)) {
@@ -86,14 +89,6 @@ slidify <- function(
       find.package("targeter", lib.loc = .libPaths()),
       "ressources",
       "slidify-template.qmd"
-    )
-  }
-  if (is.null(logo)){
-    if (default_template)
-    logo <- file.path(
-      find.package("targeter", lib.loc = .libPaths()),
-      "ressources",
-      "wlds-logo.png"
     )
   }
   assertthat::assert_that(
@@ -106,29 +101,28 @@ slidify <- function(
   )
   if (format == "pptx") {
     assertthat::assert_that(
-      is.character(pptx_template),
+      is.character(pptx_reference_doc),
       msg = "pptx template must be a character string giving the path of a powerpoint template"
     )
     assertthat::assert_that(
-      file.exists(pptx_template),
+      file.exists(pptx_reference_doc),
       msg = "powerpoint template provided file does not exist"
     )
   }
+  
   assertthat::assert_that(
     file.exists(template),
     msg = "template file does not exist"
   )
 
   
-  temp <- basename(tempfile(pattern = "targeter-quarto-tmp"))
-  dir.create(file.path(tmpdir, temp))
-  tmpdir <- file.path(tmpdir, temp)
-  file_extension <- switch(format, pptx = "pptx", revealjs = "html")
+  temp <- basename(tempfile(pattern = "_targeter-quarto-tmp"))
+  file_extension <- switch(format, pptx = "pptx", revealjs = "html", "beamer"="pdf")
   tmp_file_outfile <- paste(temp, file_extension, sep = ".")
 
   # save tmp  object in tmpdir
   tmp_file_object <- paste(temp, "tar.qs", sep = ".")
-  qs::qsave(object, file.path(tmpdir, tmp_file_object))
+  qs::qsave(object,  tmp_file_object)
 
   # prepare tmp_quarto
   tmp_file_quarto <- paste(temp, "qmd", sep = ".")
@@ -141,53 +135,98 @@ slidify <- function(
       tmp_pptx_reference_doc <- paste(paste0(temp, "-template"), "pptx", sep = ".")
       file.copy(
         from = pptx_reference_doc,
-        to = file.path(tmpdir, tmp_pptx_reference_doc),
+        to = tmp_pptx_reference_doc,
         overwrite = TRUE
       )
+      pptx_reference_doc <- tmp_pptx_reference_doc
+    }
 
       quarto_template <- paste(readLines(template), collapse = "\n")
       quarto_template <- gsub(
         "$TARGETER_PARAM_template-pptx$",
-        tmp_pptx_reference_doc,
+        pptx_reference_doc,
         quarto_template,
         fixed = TRUE
       )
       cat(
         quarto_template,
-        file = file.path(tmpdir, tmp_file_quarto),
+        file = tmp_file_quarto,
         append = FALSE
       )
-    } else {
-      file.copy(template, file.path(tmpdir, tmp_file_quarto))
-    }
-  }  else if (format == "revealjs") {
-    
+  } else if (format == "revealjs") {
+    tmp_file_revealjs_template <- paste(paste0(temp,"-revealjs-template"),"html", sep=".")
     if (revealjs_template != ""){
       file.copy(
         from = revealjs_template,
-        to = file.path(tmpdir, basename(revealjs_template)),
+        to =  tmp_file_revealjs_template,
         overwrite = TRUE
       )
+      revealjs_template <- tmp_file_revealjs_template
     }
-      quarto_template <- paste(readLines(template), collapse = "\n")
-      quarto_template <- gsub(
-        "$TARGETER_PARAM_template_revealjs$",
-        basename(revealjs_template),
-        quarto_template,
-        fixed = TRUE
-      )
-      cat(
-        quarto_template,
-        file = file.path(tmpdir, tmp_file_quarto),
-        append = FALSE
-      )
-    }
+    if (logo != ""){
+      tmp_logo <- paste0(temp,"-revealjs-logo-", basename(logo))
 
       
-  } else {
-    file.copy(template, file.path(tmpdir, tmp_file_quarto))
+      file.copy(
+        from = logo,
+        to = tmp_logo,
+        overwrite = TRUE
+      )
+      logo <- tmp_logo
+    } 
+      
+    quarto_template <- paste(readLines(template), collapse = "\n")
+    quarto_template <- gsub(
+      "$TARGETER_PARAM_template_revealjs$",
+      ifelse(revealjs_template!='',basename(revealjs_template), "''"),
+      quarto_template,
+      fixed = TRUE
+      )
+
+    quarto_template <- gsub(
+      "$TARGETER_PARAM_template_logo$",
+      logo,
+      quarto_template,
+      fixed = TRUE
+    )
+
+    
+    cat(
+      quarto_template,
+      file =  tmp_file_quarto,
+      append = FALSE
+    )
+      
+  } else if (format == "beamer"){
+
+    if (logo != ""){
+      tmp_logo <- paste0(temp,"-beamer-logo-", basename(logo))
+
+      
+      file.copy(
+        from = logo,
+        to = tmp_logo,
+        overwrite = TRUE
+      )
+      logo <- tmp_logo
+    } 
+    quarto_template <- paste(readLines(template), collapse = "\n")
+
+    quarto_template <- gsub(
+      "$TARGETER_PARAM_template_logo$",
+      logo,
+      quarto_template,
+      fixed = TRUE
+    )
+    
+    cat(
+      quarto_template,
+      file =  tmp_file_quarto,
+      append = FALSE
+    )
+    
   }
-  
+
   meta_yml_params <- list(
     object = tmp_file_object,
     fullplot_which_plot = fullplot_which_plot,
@@ -196,11 +235,9 @@ slidify <- function(
     tables = as.character(tables)
   )
 
-  
   quarto::quarto_render(
-    input = file.path(tmpdir, tmp_file_quarto),
+    input = tmp_file_quarto,
     output_file = tmp_file_outfile,
-    execute_dir = tmpdir,
     execute_params = meta_yml_params,
     debug = TRUE,
     output_format = format
@@ -223,8 +260,8 @@ slidify <- function(
   }
 
   if (delete_temporary_files) {
-    # https://stackoverflow.com/questions/9296377/automatically-delete-files-folders
-      unlink(tmpdir, recursive = TRUE, force = TRUE)
+    lfiles <- list.files(pattern=temp, include.dirs = TRUE)
+    unlink(lfiles, recursive = TRUE)
 
   }
   cat("\nPresentation generated in file:.", file.path(output_dir, output_file),"\n")
@@ -249,4 +286,8 @@ slidify <- function(
 # object <- targeter(adult, target = "ABOVE50K")
 # qs::qsave(object, "tmp/object.qs")
 # slidify(object, delete_temporary_files = TRUE)
+# slidify(object, delete_temporary_files = TRUE, tables=TRUE)
+#  slidify(object, delete_temporary_files = TRUE, format="revealjs", tables=TRUE)
 
+
+# slidify(object, delete_temporary_files = FALSE, tables=TRUE, format = "beamer")

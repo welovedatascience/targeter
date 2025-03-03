@@ -9,10 +9,10 @@ slidify(
   metadata = NULL,
   format = "pptx",
   template = NULL,
-  pptx_template = NULL,
+  pptx_reference_doc = NULL,
+  revealjs_template = "",
   output_dir = ".",
   output_file = NULL,
-  tmpdir = tempdir(),
   delete_temporary_files = TRUE,
   title = object$analysis,
   author = getOption("targeter.author", "welovedatascience targeter"),
@@ -33,14 +33,20 @@ slidify(
 to generate presentation. If NULL (default), we will use targeter package
 default template.}
 
+\item{pptx_reference_doc}{- character. Path to a default PPTX template 
+that will be used as Q"uarto reference-doc
+If NULL (default), we will use targeter
+package default templates for PPTX. 
+If empty string "", we won't use any template.}
+
+\item{revealjs_template}{- character. Path to a default revealjs
+template If empty string (default), no revealjs template will be used.}
+
 \item{output_dir}{- character. Output directory - default to working
 directory}
 
 \item{output_file}{- character, name of output file (with extension). if NULL
 (default), slidify will generate a temporary name.}
-
-\item{tmpdir}{- path to a temporarry folder tp handle quarto rendering, 
-By default, a call to `tempdir()` is performed.}
 
 \item{delete_temporary_files}{- logical. Whether we delete temporary files or
 not once presentation  is generated. Default: TRUE. On might want to use
@@ -63,12 +69,6 @@ package welovedatascience logo. If empty, no logo will be used. Only used
 by revealjs format.}
 
 \item{...}{- not yet used.}
-
-\item{reference_doc}{- character. Path to a default PPTX/reveal HTML template 
-that will be used as Quarto reference-doc
-(mostly for PPTX) If NULL (default), we will use targeter
-package default templates for PPTX and no template for revealjs
-If empty, default template will be used.}
 }
 \value{
 inviisibly returns path to the generated presentation

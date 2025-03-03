@@ -2,22 +2,25 @@
 execute:
   echo: false
 params:
-  object: "" # will have to be passed as mandatory parameter  title: "targeter analysis"
+  object: "" # will have to be passed - will be a mandatory parameter  -> path to a qs export of a targeter object
   fullplot_which_plot: "1:2"
   author: "welovedatascience - targeter"
   title: "targeter analyis"
-  tables: "TRUE"
+  tables: "FALSE"
 format:
   revealjs:
     smaller: true
     scrollable: true
     embed-resources: true
-    logo: wlds-logo.png
-    df-print: paged 
+    logo: $TARGETER_PARAM_template_logo$
+    df-print: kable 
     template: $TARGETER_PARAM_template_revealjs$   # apparently can't be managed by params :(
   pptx: 
-    df-print: "kable" 
-    doc-reference: $TARGETER_PARAM_template-pptx$  # apparently can't be managed by params :(
+    df-print: kable 
+    reference-doc: $TARGETER_PARAM_template-pptx$  # apparently can't be managed by params :(
+  beamer:
+    toc: true
+    logo: $TARGETER_PARAM_template_logo$
 date: "`r format(Sys.Date())`"
 title: "`r params$title`"
 author: "`r params$author`"
@@ -28,7 +31,7 @@ author: "`r params$author`"
 #| warning: false
 library(data.table)
 library(targeter)
-library(gt)
+
 
 # print(params)
 object <- qs::qread(params$object)
@@ -56,13 +59,13 @@ if (object$target_type == "binary"){
 - Target: `r paste(object$target, ifelse(!is.null(object$description_target), object$description_target, ""))` [`r object$target_type`]
 - Number of variables: `r length(object$profiles)`
 - Analysed population contains: `r Ntot` records.
-- Analysis performed on: `r paste(object$session$R_version, "with targeter", object$session$targeter_package_version)
+- Analysis performed on: `r paste(object$session$R_version, "with targeter", object$session$targeter_package_version)`
 :::
 
 ::: {.column}
 ```{r}
 #| output: asis
-print(stats)
+print(kableExtra::kable(stats, format = "simple"))
 ```
 :::
 ::::
@@ -88,8 +91,8 @@ for (i in seq_along(object$profiles)){
       cat("\n\n## ",names(object$profiles)[i]," [table]\n\n")
       tab <- table_crossvar(iprofile)
 
-      print(tab)
-
+      print(kableExtra::kable(tab, format = "simple"))
+      
     cat("\n\n")
 
   }

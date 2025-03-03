@@ -36,5 +36,5 @@ targeter.code-workspace
 _work.r
 inst/ressources/pptx-quarto.pptx
 tmp/
-targeter-quarto-tmp*
+_targeter-quarto-tmp*
 targeter-report-*
