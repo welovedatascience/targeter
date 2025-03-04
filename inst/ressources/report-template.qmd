@@ -13,7 +13,7 @@ params:
   fullplot_numvar_as: "bin" # 'bin', 'value'
   decision_tree: TRUE
   decision_tree_format: "static" # static, interactive
-  logo: "www/wlds-logo.png"
+  logo: "wlds-logo.png"
 format:
   revealjs:
     smaller: true
