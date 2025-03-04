@@ -1,0 +1,285 @@
+---
+execute:
+  echo: false
+params:
+  object: "adult_tar.rds" # will have to be passed - will be a mandatory parameter  -> path to a rds export of a targeter object
+  summary_object: ""  # if not empty, where summary objeect is stored. If emptuy we will recompute
+  author: "welovedatascience - targeter"
+  title: "targeter analyis"
+  include_introduction: TRUE
+  show_toc: TRUE
+  show_tables: TRUE
+  fullplot_which_plot: "1:2"
+  fullplot_numvar_as: "bin" # 'bin', 'value'
+  decision_tree: TRUE
+  decision_tree_format: "static" # static, interactive
+  logo: "www/wlds-logo.png"
+format:
+  revealjs:
+    smaller: true
+    scrollable: true
+    embed-resources: true
+    slide-level: 3
+  pptx:
+    slide-level: 3
+  html:
+    toc: true
+    embed-resources: true
+  docx:
+    toc: true
+  pdf:
+    toc: true
+date: "`r format(Sys.Date())`"
+title: "`r params$title`"
+author: "`r params$author`"
+logo: "`r params$logo`"
+---
+
+
+```{r}
+#| label: setup
+#| warning: false
+library(targeter)
+
+library(ggplot2)
+library(DT)
+format <- knitr::pandoc_to()
+
+object <- readRDS(params$object)
+metadata <- attr(object, "metadata")
+if (params$summary_object == ""){ 
+  summary_object <- summary(object)
+} else {
+  summary_object <- readRDS(params$summary_object)
+}
+```
+
+
+
+
+```{r}
+#| label: target-stats-prepare
+stats <- setDT(object$profiles[[1]]$target_stats)
+Ntot <- stats[, sum(count)]
+if (object$target_type == "binary"){
+  stats[, reference_level := ifelse(as.character(value) == as.character(object$target_reference_level), "*", "")]
+}
+```
+
+```{r}
+slideTitle <- function(title){
+  levels <- ifelse(
+    format %in% c("revealjs","beamer","pptx"),
+    "###",
+    "##"
+    )
+  paste0("\n\n", levels, " ", title,"\n\n")
+}
+```
+
+
+
+```{r}
+#| label: slide-Analysisparameters
+#| output: asis
+cat(slideTitle("Analysis parameters"))
+```
+
+
+- Data used: `r object$dataname`
+- Descrition of data: `r ifelse(!is.null(object$description_data), object$description_data, "no description provided.")`
+- Analysis performed the: `r object$date`
+- Target: `r paste(object$target, ifelse(!is.null(object$description_target), object$description_target, ""))` [`r object$target_type`]
+- Number of variables: `r length(object$profiles)`
+- Analysed population contains: `r Ntot` records.
+- Analysis performed on: `r paste(object$session$R_version, "with targeter", object$session$targeter_package_version)`
+
+
+
+::: {.content-hidden unless-meta="params.include_introduction"}
+
+<!-- TODO: adapt text to traget type -->
+
+
+## Introduction
+
+This report contains a snapshot of the specific subpopulation **«`r label(object$target,metadata)` » == `r object$target_reference_level``**. 
+
+This subpopulation is characterized by  performing bivariate analyses, crossing the variable of interest (target) with  potential explanatory variables. Only most relevant (highest discriminative power) may be retained.
+
+Report contains:
+
+*   A summary overview table with selected retained criteria with some available information such as one statistic called information value (IV) that provides an idea of the explanatory power of the criteria.
+*   Detailed analyses per criteria with graphics that highlight the reation between one of the candidate criteria and the _target_.
+
+It can happen that one criteria contains some missing values. If such, we will introduce value *"[Missing]"* in the report, eventually with a cross **[x]**. Also, if two few data are available, we would use a minus **[-]** instead of reporting value. 
+
+### Summary table interpretation
+
+Criteria are sorted by decreasing importance order, which one is determined by the IV. 
+One modality (value) index is also computed as the proportion of target «`r label(object$target,metadata)`» within the modality, that is the target penetration in the subpopulation selected by the specific modality of a criteria. A value near 1 would indicate a non-discriminative modality: selecting the corresponding subpopulation would result in the overall average target penetration. On the other way, the hightest the index (>1), the more target is over-representated in the subpopulation. Low index (<1) would be interpreted as under-representation. So high index modalities are of interest as they characterize subpopulation with high target penetration.
+
+Note that index will always be computed for segments (modalities): continuous variables are cut into buckets. If a criteria/variable has no segment with any high index, it will not be of interest at all. Also, having one segment with an index  greater than 1 implies that there are counterparts segments with index lower 1.
+
+There is no special rule to say that an index is a __good__ one as its interpretation has to take into account the natural (average) target pourcentage (penetration). Indeed, when the penetration is low, it is easier to observe eventually high index. Think that for a global penetration of 50% of target, maximal index is 2 (and more generally, index is bounded by `1/(target penetration)`)
+
+For every criteria, summary table presents its possible value (modality) having the highest index along with the corresponding number of records. Pay attention that you might observe high index dealing with very restrictive sub-populations.
+
+
+\newpage
+
+
+
+:::
+
+
+
+
+```{r}
+#| label: slide-pop-target
+#| output: asis
+cat(slideTitle("Populations"))
+```
+
+
+
+- **Population**
+
+  
+```{r, ,results='asis'}
+if (!is.null(object$description_data)) {
+  cat(object$description_data[[1]])
+} else {
+  cat("No description of the global population (data) have been provided during the analysis.")
+}
+
+stats <- setDT(object$profiles[[1]]$target_stats)
+Ntot <- stats[, sum(count)]
+cat("\n Analyzed population contains ", Ntot, " records.")
+```
+
+
+- **Target**
+  
+
+```{r,results='asis'}
+if (!is.null(object$description_target)) {
+  cat(object$description_target[[1]])
+} else {
+  cat("No description of the target has been provided during the analysis.")
+}
+```
+
+
+
+```{r}
+#| label: target-stats
+#| output: asis
+print(kableExtra::kable(stats, format = "simple"))
+```
+
+
+```{r}
+#| label: slide-summary
+#| output: asis
+cat(slideTitle("Summary"))
+```
+
+
+```{r}
+#| label: summary table
+
+## filter df columns; remove varname (we have rownames) keep only: index.max.index, index.max.level, index.max.count,
+df2 <- as.data.frame(summary_object[
+  ,
+  c(
+    "varname", "vartype", "IV", "index.max.level", "index.max.count",
+    "index.max.props", "index.max.index"
+  )
+])
+df2$index.max.index <- round(df2$index.max.index, 2)
+df2$index.max.props <- round(df2$index.max.props * 100, 2)
+colnames(df2) <- c("variable", "type", "IV", "Level", "#Records", "%Records", "Index")
+df2$IV <- round(df2$IV, 3)
+# [the relevant section](#test)
+
+if (!is.null(metadata)) {
+  df2 <- cbind(data.frame(Label = sapply(df2$variable, label, metadata = metadata), stringsAsFactors = FALSE), df2)
+  rownames(df2) <- NULL
+}
+if (format == "pdf") {
+  knitr::kable(df2, format = "latex", booktabs = TRUE)
+} else if (format %in% c("html","revealjs")) {
+  df2$variable <- paste0("<a href='#",ifelse(format=="revealjs","/",""), tolower(df2$variable), "'>", df2$variable, "</a>")
+  # kableExtra::kable_styling(knitr::kable(df2, format=format_tables))
+  DT::datatable(df2,
+    rownames = FALSE, filter = "top",
+    selection = "none", autoHideNavigation = TRUE,
+    escape = -ifelse(is.null(metadata), 1, 2),
+    options = list(pageLength = ifelse(format=="html",20,10)) # adapt to revealjs only 10
+  )
+} else if (format == "docx") {
+  # word
+  flextable::qflextable(df2)
+}  else if (format == "pptx") {
+  # word
+  flextable::qflextable(head(df2,10))
+}
+```
+
+## Variables
+
+
+
+```{r}
+#| label: variables
+#| output: asis
+
+## sort by descending IV
+vars <- sort(sapply(object$profiles, function(x)x$IV), decreasing=TRUE)
+
+for (ivar in names(vars)){
+
+  cat("\n\n\\newpage\n\n") # for LaTeX
+ 
+  # ivar <- names(object$profiles)[i]
+  iprofile <- object$profiles[[ivar]]
+  ivar_label <- label(ivar, metadata = metadata)
+  cat("\n\n### ",tolower(ivar),"\n\n")
+  if (tolower(ivar_label)!=tolower(ivar)){
+    cat("\n", ivar_label, "\n")
+  }
+    
+  # if (format %in% c("html")){
+  #   cat(paste0("<div id='var-", tolower(ivar), "'>\n\n### ", label(ivar, metadata = metadata), ifelse(ivar_label != ivar, paste0(" (", ivar, ")"), ""), "\n</div>"))
+  # }  else {
+  #   } 
+  
+
+  cat("\n__IV:", round(iprofile$IV, 3), "__\n\n")
+
+  print(
+    fullplot(
+      iprofile, 
+      which_plot= eval(
+        parse(
+          text = params$fullplot_which_plot 
+          )
+        )
+      )
+    )
+
+  if (as.logical(params$show_tables)){
+    cat("\n\n\\newpage\n\n") # for LaTeX
+      cat("\n\n### ",tolower(ivar)," [table]\n\n")
+      tab <- table_crossvar(iprofile)
+
+      print(kableExtra::kable(tab, format = "simple"))
+      
+    cat("\n\n")
+
+  }
+  
+}
+```
+

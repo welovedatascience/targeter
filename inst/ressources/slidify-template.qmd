@@ -6,7 +6,7 @@ params:
   fullplot_which_plot: "1:2"
   author: "welovedatascience - targeter"
   title: "targeter analyis"
-  tables: "FALSE"
+  show_tables: FALSE
 format:
   revealjs:
     smaller: true
@@ -94,7 +94,7 @@ for (ivar in names(vars)){
       )
     )
 
-  if (as.logical(params$tables)){
+  if (as.logical(params$show_tables)){
 
       cat("\n\n## ",names(object$profiles)[i]," [table]\n\n")
       tab <- table_crossvar(iprofile)
