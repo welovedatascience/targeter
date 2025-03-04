@@ -73,8 +73,11 @@ print(kableExtra::kable(stats, format = "simple"))
 ```{r}
 #| output: asis
 
-for (i in seq_along(object$profiles)){
-  ivar <- names(object$profiles)[i]
+## sort by descending IV
+vars <- sort(sapply(object$profiles, function(x)x$IV), decreasing=TRUE)
+
+for (ivar in names(vars)){
+  # ivar <- names(object$profiles)[i]
   iprofile <- object$profiles[[ivar]]
 
   cat("\n\n## ",names(object$profiles)[i],"\n\n")

@@ -92,10 +92,7 @@ slidify <- function(
     )
   }
   
-  assertthat::assert_that(
-    file.exists(template),
-    msg = "template file does not exist"
-  )
+
 
   
 
@@ -125,6 +122,11 @@ slidify <- function(
       "slidify-template.qmd"
     )
   }
+
+  assertthat::assert_that(
+    file.exists(template),
+    msg = "template file does not exist"
+  )
 
   temp <- basename(tempfile(pattern = "_targeter-quarto-tmp"))
   file_extension <- switch(format, pptx = "pptx", revealjs = "html", "beamer"="pdf")
