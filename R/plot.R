@@ -465,7 +465,7 @@ plot.crossvar_categorical <- function(
       vlabels <- vbreaks
       names(vcolors) <- c(target_ref, '[Missing]')
     } else {
-      vcolors <- c('cornflowerblue', 'firebrick1', 'black')
+      vcolors <- c('#6495ED', 'firebrick1', 'black')
       nontarget <- vbreaks[!vbreaks %in% c(target_ref, '[Missing]')]
       names(vcolors) <- c(nontarget, target_ref, '[Missing]')
     }

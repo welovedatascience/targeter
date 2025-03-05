@@ -39,7 +39,7 @@ if (getRversion() >= "3.1.0")
     )
   )
 
-#' @title report
+#' @title report_old
 #' @description This function creates an automatic report according to a
 #'  predefined template in the package or a user-generated template.
 #'
@@ -79,7 +79,7 @@ if (getRversion() >= "3.1.0")
 #' @param ... other parameter from the function render.
 #' @return path to the generated report. Side effect would be to open a
 #' document, if \code{browse} is TRUE.
-#' @export report
+#' @export report_old
 #'
 #' @seealso
 #' \itemize{
@@ -98,7 +98,7 @@ if (getRversion() >= "3.1.0")
 
 # report(tar, template="/hackdata/share/code/R/packages/targeter/inst/ressources/report_template_target_numeric.Rmd", browse=FALSE, output_dir = "/hackdata/share/_tmp", template_params=list("show_tables"=FALSE))
 
-report <- function(
+report_old <- function(
   object,
   template = NULL,
   template_params = NULL,

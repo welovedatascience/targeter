@@ -2,7 +2,7 @@
 execute:
   echo: false
 params:
-  object: "adult_tar.rds" # will have to be passed - will be a mandatory parameter  -> path to a rds export of a targeter object
+  object: "tar.rds" # will have to be passed - will be a mandatory parameter  -> path to a rds export of a targeter object
   summary_object: ""  # if not empty, where summary objeect is stored. If emptuy we will recompute
   author: "welovedatascience - targeter"
   title: "targeter analyis"
@@ -13,6 +13,8 @@ params:
   fullplot_numvar_as: "bin" # 'bin', 'value'
   decision_tree: TRUE
   decision_tree_format: "static" # static, interactive
+  metadata_var_field: "variable"
+  metadata_var_label: "label"
   logo: "wlds-logo.png"
 format:
   revealjs:
@@ -23,7 +25,15 @@ format:
   pptx:
     slide-level: 3
   html:
+    theme: cosmo
     toc: true
+    toc-location: left
+    fontsize: 1.1em
+    linestretch: 1.5
+    title-block-banner: true
+    smooth-scroll: true
+    anchor-sections: true
+    search: true
     embed-resources: true
   docx:
     toc: true
@@ -33,6 +43,7 @@ date: "`r format(Sys.Date())`"
 title: "`r params$title`"
 author: "`r params$author`"
 logo: "`r params$logo`"
+reporty-type: targeter
 ---
 
 
@@ -103,7 +114,7 @@ cat(slideTitle("Analysis parameters"))
 
 ## Introduction
 
-This report contains a snapshot of the specific subpopulation **«`r label(object$target,metadata)` » == `r object$target_reference_level``**. 
+This report contains a snapshot of the specific subpopulation **«`r label(object$target,metadata, var_field = params$metadata_var_field, label_field= params$metadata_var_label )` » == `r object$target_reference_level``**. 
 
 This subpopulation is characterized by  performing bivariate analyses, crossing the variable of interest (target) with  potential explanatory variables. Only most relevant (highest discriminative power) may be retained.
 
@@ -117,7 +128,7 @@ It can happen that one criteria contains some missing values. If such, we will i
 ### Summary table interpretation
 
 Criteria are sorted by decreasing importance order, which one is determined by the IV. 
-One modality (value) index is also computed as the proportion of target «`r label(object$target,metadata)`» within the modality, that is the target penetration in the subpopulation selected by the specific modality of a criteria. A value near 1 would indicate a non-discriminative modality: selecting the corresponding subpopulation would result in the overall average target penetration. On the other way, the hightest the index (>1), the more target is over-representated in the subpopulation. Low index (<1) would be interpreted as under-representation. So high index modalities are of interest as they characterize subpopulation with high target penetration.
+One modality (value) index is also computed as the proportion of target «`r label(object$target,metadata, var_field = params$metadata_var_field, label_field= params$metadata_var_label )`» within the modality, that is the target penetration in the subpopulation selected by the specific modality of a criteria. A value near 1 would indicate a non-discriminative modality: selecting the corresponding subpopulation would result in the overall average target penetration. On the other way, the hightest the index (>1), the more target is over-representated in the subpopulation. Low index (<1) would be interpreted as under-representation. So high index modalities are of interest as they characterize subpopulation with high target penetration.
 
 Note that index will always be computed for segments (modalities): continuous variables are cut into buckets. If a criteria/variable has no segment with any high index, it will not be of interest at all. Also, having one segment with an index  greater than 1 implies that there are counterparts segments with index lower 1.
 
@@ -166,8 +177,9 @@ cat("\n Analyzed population contains ", Ntot, " records.")
 if (!is.null(object$description_target)) {
   cat(object$description_target[[1]])
 } else {
-  cat("No description of the target has been provided during the analysis.")
-}
+  cat("\nNo description of the target has been provided during the analysis.")
+  cat("\n\nTarget used:",label(object$target,metadata, var_field = params$metadata_var_field, label_field= params$metadata_var_label, include_varname = TRUE),"\n\n")
+} 
 ```
 
 
@@ -203,19 +215,21 @@ colnames(df2) <- c("variable", "type", "IV", "Level", "#Records", "%Records", "I
 df2$IV <- round(df2$IV, 3)
 # [the relevant section](#test)
 
-if (!is.null(metadata)) {
-  df2 <- cbind(data.frame(Label = sapply(df2$variable, label, metadata = metadata), stringsAsFactors = FALSE), df2)
+if (!is.null(metadata) & format=="html") {
+  df2 <- cbind(data.frame(Label = sapply(
+    df2$variable, label, metadata = metadata, var_field = params$metadata_var_field, label_field= params$metadata_var_label ),
+    stringsAsFactors = FALSE), df2)
   rownames(df2) <- NULL
 }
 if (format == "pdf") {
   knitr::kable(df2, format = "latex", booktabs = TRUE)
-} else if (format %in% c("html","revealjs")) {
+} else if (format %in% c("html")) {
   df2$variable <- paste0("<a href='#",ifelse(format=="revealjs","/",""), tolower(df2$variable), "'>", df2$variable, "</a>")
   # kableExtra::kable_styling(knitr::kable(df2, format=format_tables))
   DT::datatable(df2,
     rownames = FALSE, filter = "top",
     selection = "none", autoHideNavigation = TRUE,
-    escape = -ifelse(is.null(metadata), 1, 2),
+    escape = -ifelse(!is.null(metadata) & format=="html", 2, 1), # we use labels in HTML format
     options = list(pageLength = ifelse(format=="html",20,10)) # adapt to revealjs only 10
   )
 } else if (format == "docx") {
@@ -244,7 +258,9 @@ for (ivar in names(vars)){
  
   # ivar <- names(object$profiles)[i]
   iprofile <- object$profiles[[ivar]]
-  ivar_label <- label(ivar, metadata = metadata)
+  ivar_label <- label(ivar, metadata = metadata,
+     var_field = params$metadata_var_field, label_field= params$metadata_var_label,
+      include_varname = FALSE)
   cat("\n\n### ",tolower(ivar),"\n\n")
   if (tolower(ivar_label)!=tolower(ivar)){
     cat("\n", ivar_label, "\n")

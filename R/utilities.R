@@ -22,9 +22,9 @@ if (getRversion() >= "3.1.0") {
 #' variable name (default: 'var')
 #' @param label_field - character: name of the column in metadata that contains
 #' variable label (default: 'LABEL')
-#' @param lang  character - the code for the language. It's useful if you have
-#' a metadata with different labels for different languages.
-#' By default, the value is NULL.
+#' @param include_varname: logical. If returned string will also include 
+#' variables names within brackets aftre label for variables that has label.
+#' (default: FALSE).
 #' @return a label
 #' @export label
 #'
@@ -37,7 +37,7 @@ label <- function(
   metadata,
   var_field = "var",
   label_field = "LABEL",
-  lang = NULL
+  include_varname = FALSE
 ) {
   ##test
 
@@ -47,7 +47,8 @@ label <- function(
     msg = "The parameter metadata must be a data.frame or data.table"
   )
 
-  metadata <- as.data.frame(metadata)
+  metadata <- as.data.frame(metadata) # in case of data tabke so gthat we can use rownames
+  
   rownames(metadata) <- metadata[[var_field]]
   assertthat::assert_that(
     inherits(var, "character"),
@@ -60,8 +61,6 @@ label <- function(
     msg = paste("var_field ", var_field, "not present in metadata")
   )
 
-  ##add language code
-  if (!is.null(lang)) label_field <- paste(label_field, lang, sep = '_')
   #
   assertthat::assert_that(
     label_field %in% names(metadata),
@@ -74,6 +73,10 @@ label <- function(
   labels <- metadata[var, ][[label_field]]
 
   labels[!var_hasLabel] <- var[!var_hasLabel]
+  if (include_varname){
+    labels[var_hasLabel] <- paste0(labels[var_hasLabel], " [",var[var_hasLabel], "]")
+  }
+  
   labels <- unlist(labels)
   return(labels)
 }
