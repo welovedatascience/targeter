@@ -197,8 +197,8 @@ report <- function(
       input = output_dir,
       execute_params = meta_yml_params,
       debug = debug,
-      output_format = format, as_job = FALSE 
-    )1
+      output_format = format, as_job = FALSE
+    )
     cat("\nPresentation generated in folder:.", output_dir ,"\n")
     invisible(file.path(output_dir, output_file))
 
