@@ -25,8 +25,8 @@ variable name (default: 'var')}
 \item{label_field}{- character: name of the column in metadata that contains
 variable label (default: 'LABEL')}
 
-\item{include_varname:}{logical. If returned string will also include 
-variables names within brackets aftre label for variables that has label.
+\item{include_varname}{- logical. If returned string will also include 
+variables names within brackets after label for variables that has label.
 (default: FALSE).}
 }
 \value{

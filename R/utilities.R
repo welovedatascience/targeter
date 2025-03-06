@@ -22,9 +22,10 @@ if (getRversion() >= "3.1.0") {
 #' variable name (default: 'var')
 #' @param label_field - character: name of the column in metadata that contains
 #' variable label (default: 'LABEL')
-#' @param include_varname: logical. If returned string will also include 
-#' variables names within brackets aftre label for variables that has label.
+#' @param include_varname - logical. If returned string will also include 
+#' variables names within brackets after label for variables that has label.
 #' (default: FALSE).
+#' 
 #' @return a label
 #' @export label
 #'
@@ -32,6 +33,7 @@ if (getRversion() >= "3.1.0") {
 #' \dontrun{
 #' label(adult$EDUCATIONNUM, metadata=mymetadata) # assumes mymetadata dataframe exists
 #' }
+
 label <- function(
   var,
   metadata,

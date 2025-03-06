@@ -61,6 +61,11 @@ default template.}
 calling targeter first time in an analyses project will initiate everything
 for user.}
 
+\item{quarto_targeters_project_dir}{(default "targeter-reports", within
+quarto_root_dir) Path to a folder where all targeter reports will be stored.
+Using a pre-existing projetc allows benfiting from its settings.
+(you might  want to put brand_file to empty or use your own brand file)}
+
 \item{quarto_project_template}{- character. Path to a default Quarto template
 that will be used as Quarto reference-doc for all formats. If NULL (default),
 we will use targeter package default templates.}
@@ -68,6 +73,9 @@ we will use targeter package default templates.}
 \item{quarto_project_brandfile}{- character. Path to a default Quarto brandfile
 that will be used as Quarto reference-doc for all formats. If NULL (default),
 we will use targeter package default brandfile.}
+
+\item{targeter_sub_folder}{- character. Output directory - default to create a
+new dedicated directory in working folder.}
 
 \item{pptx_reference_doc}{- character. Path to a default PPTX template
 that will be used as Quarto reference-doc for pppx formzt
@@ -85,6 +93,10 @@ that consists in taking title for targeter object 'analysis' slot.}
 
 \item{fullplot_which_plot}{- character, selection of plots (cf `fullplot`
 documentation)}
+
+\item{show_tables}{- logical whetheer to print tables in seprate slides in
+addition of graphics. Might ot produce nice outputs as tables are usually
+large.}
 
 \item{debug}{- logical. If TRUE, the function will print debug information 
 (passed to Quarto call).}
@@ -105,18 +117,6 @@ Frozen reports renders can always be bypassed by explicit call to quarto.}
 
 \item{...}{additional parameters to be passed to quarto, for instance
 allowing to pass/overwite any YAML set-up}
-
-\item{quarto_targeter_project_dir}{(default "targeter-reports", within
-quarto_root_dir) Path to a folder where all targeter reports will be stored.
-Using a pre-existing projetc allows benfiting from its settings.
-(you might  want to put brand_file to empty or use your own brand file)}
-
-\item{target_sub_folder}{- character. Output directory - default to create a
-new dedicated directory in working folder.}
-
-\item{tables}{- logical whetheer to print tables in seprate slides in
-addition of graphics. Might ot produce nice outputs as tables are usually
-large.}
 }
 \value{
 invisibly returns path to the generated specific file (unique format)
@@ -131,7 +131,8 @@ Create a report from a targeter report object
 \dontrun{
 tar <- targeter(adult, target ="ABOVE50K", analysis_name="Analyse",
 naming_conventions=FALSE)
-slidify(tar, format = "pptx", author = "this is me")
+report(tar,  author = "this is me")
+report(tar,  format= c("pptx","pdf","docx"),author = "this is me")
 }
 }
 \seealso{

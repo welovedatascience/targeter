@@ -21,7 +21,7 @@
 #'  where  quarto project folder will be avaible. Default to "." so that
 #' calling targeter first time in an analyses project will initiate everything
 #' for user.
-#' @param quarto_targeter_project_dir (default "targeter-reports", within
+#' @param quarto_targeters_project_dir (default "targeter-reports", within
 #' quarto_root_dir) Path to a folder where all targeter reports will be stored.
 #' Using a pre-existing projetc allows benfiting from its settings.
 #' (you might  want to put brand_file to empty or use your own brand file)
@@ -31,7 +31,7 @@
 #' @param quarto_project_brandfile - character. Path to a default Quarto brandfile
 #' that will be used as Quarto reference-doc for all formats. If NULL (default),
 #' we will use targeter package default brandfile.
-#' @param target_sub_folder - character. Output directory - default to create a
+#' @param targeter_sub_folder - character. Output directory - default to create a
 #' new dedicated directory in working folder.
 #' @param output_file - character, name of output file (without file extension).
 #' default value: index
@@ -40,7 +40,7 @@
 #' @param author - character: presentatiopn author.
 #' @param fullplot_which_plot - character, selection of plots (cf `fullplot`
 #' documentation)
-#' @param tables - logical whetheer to print tables in seprate slides in
+#' @param show_tables - logical whetheer to print tables in seprate slides in
 #' addition of graphics. Might ot produce nice outputs as tables are usually
 #' large.
 #' @param logo - character: path to a logo file. If NULL (default), we will take
@@ -81,7 +81,8 @@
 #' \dontrun{
 #' tar <- targeter(adult, target ="ABOVE50K", analysis_name="Analyse",
 #' naming_conventions=FALSE)
-#' slidify(tar, format = "pptx", author = "this is me")
+#' report(tar,  author = "this is me")
+#' report(tar,  format= c("pptx","pdf","docx"),author = "this is me")
 #' }
 
 report <- function(
