@@ -3,10 +3,9 @@ execute:
   echo: false
 params:
   object: "tar.rds" # will have to be passed - will be a mandatory parameter  -> path to a rds export of a targeter object
-  summary_object: ""  # if not empty, where summary objeect is stored. If emptuy we will recompute
   author: "welovedatascience - targeter"
   title: "targeter analyis"
-  include_introduction: TRUE
+  show_details: TRUE
   show_toc: TRUE
   show_tables: TRUE
   fullplot_which_plot: "1:2"
@@ -15,7 +14,6 @@ params:
   decision_tree_format: "static" # static, interactive
   metadata_var_field: "variable"
   metadata_var_label: "label"
-  logo: "wlds-logo.png"
 format:
   revealjs:
     smaller: true
@@ -43,7 +41,7 @@ date: "`r format(Sys.Date())`"
 title: "`r params$title`"
 author: "`r params$author`"
 logo: "`r params$logo`"
-reporty-type: targeter
+report-type: targeter
 ## will be replaced by eventual parameters passsed
 ## to targter via `custom_fields` paramater.
 ##{{custom-fields}}## 
@@ -110,7 +108,7 @@ cat(slideTitle("Analysis parameters"))
 
 
 
-::: {.content-hidden unless-meta="params.include_introduction"}
+::: {.content-hidden unless-meta="params.show_details"}
 
 <!-- TODO: adapt text to traget type -->
 
@@ -280,6 +278,7 @@ for (ivar in names(vars)){
   print(
     fullplot(
       iprofile, 
+      numvar_as = params$fullplot_numvar_as,
       which_plot= eval(
         parse(
           text = params$fullplot_which_plot 

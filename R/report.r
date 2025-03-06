@@ -89,6 +89,7 @@ report <- function(
   object,
   summary_object = NULL,
   metadata = NULL,
+  metadata_vars= list(varname="variable",label="label"),
   format = "html",
   nmax = 100, #todo implement
   template = NULL, # default QMD template for slides
@@ -120,11 +121,15 @@ report <- function(
   title = object$analysis,
   author = getOption("targeter.author", "welovedatascience targeter"),
   fullplot_which_plot = "1:2",
+  fullplot_numvar_as = "bin",
   show_tables = FALSE,
+  show_toc = TRUE,
+  show_details = TRUE,
   debug = FALSE,
   render = TRUE,
   logo = NULL,
   freeze = TRUE,
+  verbose = FALSE,
   custom_fields = list("report_type" = "targeter", "freeze" = freeze),
    # todo implement
   ... # additional parameters to be passed to quarto
@@ -149,7 +154,7 @@ report <- function(
     inherits(metadata, "data.frame") | is.null(metadata),
     msg = "The parameter metadata must be either NULL (no metadata) or a data.frame"
   )
-  if (format == "pptx" && !is.null(pptx_reference_doc)) {
+  if (("pptx" %in% format) && !is.null(pptx_reference_doc)) {
     assertthat::assert_that(
       is.character(pptx_reference_doc),
       msg = "pptx template must be a character string giving the path of a powerpoint template"
@@ -158,6 +163,7 @@ report <- function(
       file.exists(pptx_reference_doc),
       msg = "powerpoint template provided file does not exist"
     )
+    if (verbose)cat("\n- For pptx format, we will use template:",pptx_reference_doc,"\n")
   }
 
   assertthat::assert_that(
@@ -168,7 +174,7 @@ report <- function(
       file.exists(quarto_project_brandfile),
       msg = "brandfile must be a valid file"
     )
-
+    if (verbose)cat("\n- Using brandfile:",quarto_project_brandfile,"\n")
    }
   
   assertthat::assert_that(
@@ -208,6 +214,7 @@ report <- function(
     file.exists(template),
     msg = "template file does not exist"
   )
+  if (verbose)cat("\n- Using template:",template,"\n")
 
   # quarto_root_dir = ".",
   # quarto_targeters_project_dir = "targeter-reports",
@@ -236,7 +243,9 @@ report <- function(
     msg = "quarto_project_brandfile must be a charcter string giving path to a file or being empty (no brand file used)"
   )
 
-  if (!dir.exists(quarto_targeters_project_dir)) {
+
+  if (!dir.exists(file.path(quarto_root_dir,quarto_targeters_project_dir))) {
+    if (verbose)cat("\n- Creating quarto project folder:",file.path(quarto_root_dir,quarto_targeters_project_dir),"\n")
     # we must create a quarto project to store targeters reports
     quarto::quarto_create_project(
       name = quarto_targeters_project_dir,
@@ -280,7 +289,6 @@ report <- function(
         overwrite = TRUE
       )
     }
-    cat("\nInitializing Quarto project storing targeter analyses...")
     quarto::quarto_render(
       input = file.path(quarto_root_dir, quarto_targeters_project_dir),
       debug = debug,
@@ -288,6 +296,12 @@ report <- function(
     )
     cat(" - Done.\n")
   } else {
+    
+    if (verbose)cat("\n- Using existing quarto project folder:",file.path(
+        quarto_root_dir,
+        quarto_targeters_project_dir
+      )
+      ,"\n")
     assertthat::assert_that(
       quarto::is_using_quarto(file.path(
         quarto_root_dir,
@@ -302,12 +316,15 @@ report <- function(
     quarto_targeters_project_dir,
     targeter_sub_folder
   )
-  dir_created <- dir.create(target_path, showWarnings = FALSE)
-  assertthat::assert_that(
-    dir_created,
-    msg = "Could not create targeter report folder"
-  )
-
+  if (verbose)cat("\n- using  targeter report folder:",target_path,"\n")
+  if (!dir.exists(target_path)) {
+    dir_created <- dir.create(target_path, showWarnings = FALSE)
+    assertthat::assert_that(
+      dir_created,
+      msg = "Could not create targeter report folder"
+    )
+  }
+  
   attr(object, "metadata") <- metadata
   attr(object, "summary_oject") <- summary_object
 
@@ -319,18 +336,17 @@ report <- function(
   )
   assertthat::assert_that(template_copied, msg = "Could not copy template file")
 
-
   # pptx template
-  if (format %in% c("pptx", "all")) {
+  if (("pptx" %in% format) |("all" %in% format)) {
     # if default template we will also use powerpoint wlds template (or override
     # with user provided one)
     has_pptx_template <- FALSE
     if (default_template | !default_pptx_template) {
       #pptx_template <- "targeter-report.pptx"
-      tmp_pptx_reference_doc <- "pptx-template-reference.pptx"
+      tmp_pptx_reference_doc <- "report-template.pptx"
       file.copy(
         from = pptx_reference_doc,
-        to = file.path(target_sub_folder, tmp_pptx_reference_doc),
+        to = file.path(target_path, tmp_pptx_reference_doc),
         overwrite = TRUE
       )
       has_pptx_template <- TRUE
@@ -341,28 +357,55 @@ report <- function(
   if (!is.null(custom_fields)){
     # search in template and replace by yaml equivalent
     temp <- readLines(file.path(target_path, paste(output_file, "qmd", sep = ".")))
-    if (any(grep("##{{custom-fields}}##", temp))){
-      gsub("##{{custom-fields}}##",temp, yaml::as.yaml(custom_fields))
-      data.table::fwrite(temp, file.path(target_path, paste(output_file, "qmd", sep = ".")))
+    if (any(grepl("##{{custom-fields}}##", temp, fixed=TRUE))){
+      cat("Yes.")
+      class(custom_fields) <- c("verbatim", class(custom_fields))
+      # see yaml::as.yaml documentation
+        # custom handler with verbatim output to change how logical vectors are
+  # emitted
+      out_yaml <- yaml::as.yaml(custom_fields,
+        handlers = list(logical = yaml::verbatim_logical))
+
+
+      temp <- gsub("##{{custom-fields}}##", out_yaml, temp, fixed=TRUE)
+      print(temp[49])
+
+      cat(temp,
+      sep = "\n", 
+      file = file.path(target_path, paste(output_file, "qmd", sep = ".")), 
+      append= FALSE)
     }
   }
 
   meta_yml_params <- list(
-    # todo: add other from default template
     object = "tar.qs",
     fullplot_which_plot = fullplot_which_plot,
+    fullplot_numvar_as = fullplot_numvar_as,
+    metadata_var_field = metadata_vars$varname,
+    metadata_var_label = metadata_vars$label,
     title = title,
     author = author,
-    show_tables = as.character(show_tables)
-  )
+    show_tables = as.character(show_tables),
+    show_toc = as.character(show_toc),
+    show_details = as.character(show_details)
 
+
+    # todo decision trees
+  )
+  pandoc_args <- c()
+  if (has_pptx_template) {
+    pandoc_args <- c(
+      "--reference-doc" = file.path(pptx_reference_doc)
+    )
+  }
   if (render) {
     quarto::quarto_render(
       input = target_path,
       execute_params = meta_yml_params,
       debug = debug,
       output_format = format,
-      as_job = FALSE
+      as_job = FALSE,
+      pandoc_args = pandoc_args
     )
     cat("\nPresentation generated in folder:.", target_path, "\n")
     invisible(file.path(target_path))
