@@ -94,7 +94,7 @@ report <- function(
 
   # todo cover all parameters  assert tests 
   assertthat::assert_that(is.character(format), msg = "format must be a character")
-  format <- match.arg(format, c("pptx","revealjs","beamer"), several.ok = FALSE)
+  # format <- match.arg(format, c(""pptx","revealjs","beamer"), several.ok = FALSE)
   
 
   assertthat::assert_that(
@@ -161,7 +161,7 @@ report <- function(
   attr(object, "metadata") <- metadata
   attr(object, "summary_oject") <- summary_object
   
-  saveRDS(object,  file.path(outdir,"tar.qs"))
+  saveRDS(object,  file.path(output_dir,"tar.qs"))
   file.copy(from= template, to = file.path(output_dir, paste(output_file,"qmd", sep=".")), overwrite = TRUE)
 
   # pptx template
@@ -197,8 +197,8 @@ report <- function(
       input = output_dir,
       execute_params = meta_yml_params,
       debug = debug,
-      output_format = format
-    )
+      output_format = format, as_job = FALSE 
+    )1
     cat("\nPresentation generated in folder:.", output_dir ,"\n")
     invisible(file.path(output_dir, output_file))
 
