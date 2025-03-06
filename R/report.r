@@ -103,11 +103,12 @@ report <- function(
   title = object$analysis,
   author = getOption("targeter.author", "welovedatascience targeter"),
   fullplot_which_plot = "1:2",
-  tables = FALSE,
+  show_tables = FALSE,
   debug = FALSE,
   render = TRUE,
+  logo = ""
   freeze = TRUE,
-  custom_fields = c("report_type" = "targeter", "freeze" = freeze), # todo implement
+  custom_fields = list("report_type" = "targeter", "freeze" = freeze), # todo implement
   ... # additional parameters to be passed to quarto
 ) {
   assertthat::assert_that(
@@ -319,12 +320,22 @@ report <- function(
     }
   }
 
+  if (!is.null(custom_fields)){
+    # search in template and replace by yaml equivalent
+    temp <- readLines(file.path(target_path, paste(output_file, "qmd", sep = ".")))
+    if (any(grep("##{{custom-fields}}##", temp))){
+      gsub("##{{custom-fields}}##",temp, yaml::as.yaml(custom_fields))
+      fwrite(temp, file.path(target_path, paste(output_file, "qmd", sep = ".")))
+    }
+  }
+
   meta_yml_params <- list(
+    # todo: add other from default template
     object = "tar.qs",
     fullplot_which_plot = fullplot_which_plot,
     title = title,
     author = author,
-    show_tables = as.character(tables)
+    show_tables = as.character(show_tables)
   )
 
   if (render) {

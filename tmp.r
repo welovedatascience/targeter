@@ -22,3 +22,9 @@ file.copy(
   to = file.path(find.package("targeter", lib.loc = .libPaths()),"ressources"), overwrite = TRUE)
 
 # cp -r /hackdata/share/code/R/packages/targeter/inst/ressources/* /hackdata/Rlibrary-4.2.2/targeter/ressources
+
+
+
+
+ custom_fields = list("report_type" = "targeter", "freeze" = TRUE)
+yaml::as.yaml(custom_fields)
