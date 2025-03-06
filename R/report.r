@@ -339,10 +339,11 @@ report <- function(
   assertthat::assert_that(template_copied, msg = "Could not copy template file")
 
   # pptx template
+  has_pptx_template <- FALSE
+  
   if (("pptx" %in% format) | ("all" %in% format)) {
     # if default template we will also use powerpoint wlds template (or override
     # with user provided one)
-    has_pptx_template <- FALSE
     if (default_template | !default_pptx_template) {
 
       #pptx_template <- "targeter-report.pptx"

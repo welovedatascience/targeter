@@ -16,11 +16,6 @@ params:
   metadata_var_field: "variable"
   metadata_var_label: "label"
 format:
-  revealjs:
-    smaller: true
-    scrollable: true
-    embed-resources: true
-    slide-level: 3
   pptx:
     slide-level: 3
   html:
