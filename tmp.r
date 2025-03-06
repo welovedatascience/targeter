@@ -1,9 +1,9 @@
 
 
 #library(targter)
-# data(adult)
-# tar <- targeter(adult, target = "ABOVE50K")
-# report(tar)
+data(adult)
+object <- tar <- targeter(adult, target = "ABOVE50K")
+report(tar)
 
 
 # quarto::is_using_quarto()
