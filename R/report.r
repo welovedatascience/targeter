@@ -326,9 +326,11 @@ report <- function(
   }
   
   attr(object, "metadata") <- metadata
-  attr(object, "summary_oject") <- summary_object
-
-  saveRDS(object, file.path(target_path, "tar.qs"))
+  if (is.null(summary_object)) summary_object <- summary(object)
+  saveRDS(summary_object, file.path(target_path, "tar_summary.rds"))
+  
+  
+  saveRDS(object, file.path(target_path, "tar.rds"))
   template_copied <- file.copy(
     from = template,
     to = file.path(target_path, paste(output_file, "qmd", sep = ".")),
@@ -378,7 +380,8 @@ report <- function(
   }
 
   meta_yml_params <- list(
-    object = "tar.qs",
+    object = "tar.rds",
+    summary_object = "tarsum.rds",
     fullplot_which_plot = fullplot_which_plot,
     fullplot_numvar_as = fullplot_numvar_as,
     metadata_var_field = metadata_vars$varname,

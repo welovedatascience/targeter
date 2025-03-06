@@ -3,6 +3,7 @@ execute:
   echo: false
 params:
   object: "tar.rds" # will have to be passed - will be a mandatory parameter  -> path to a rds export of a targeter object
+  summary_object : "tar_summary.rds"  
   author: "welovedatascience - targeter"
   title: "targeter analyis"
   show_details: TRUE
@@ -59,7 +60,7 @@ format <- knitr::pandoc_to()
 
 object <- readRDS(params$object)
 metadata <- attr(object, "metadata")
-summary_object <- attr("object", "summary_object")
+summary_object <- readRDS(params$summary_object))
 ```
 
 
