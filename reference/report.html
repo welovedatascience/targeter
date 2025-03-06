@@ -11,7 +11,7 @@ Create a report from a targeter report object"></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">targeter</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.4.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -49,6 +49,7 @@ Create a report from a targeter report object</p>
 <span>  <span class="va">object</span>,</span>
 <span>  summary_object <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  metadata <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  metadata_vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>varname <span class="op">=</span> <span class="st">"variable"</span>, label <span class="op">=</span> <span class="st">"label"</span><span class="op">)</span>,</span>
 <span>  format <span class="op">=</span> <span class="st">"html"</span>,</span>
 <span>  nmax <span class="op">=</span> <span class="fl">100</span>,</span>
 <span>  template <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -67,11 +68,15 @@ Create a report from a targeter report object</p>
 <span>  title <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">analysis</span>,</span>
 <span>  author <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"targeter.author"</span>, <span class="st">"welovedatascience targeter"</span><span class="op">)</span>,</span>
 <span>  fullplot_which_plot <span class="op">=</span> <span class="st">"1:2"</span>,</span>
+<span>  fullplot_numvar_as <span class="op">=</span> <span class="st">"bin"</span>,</span>
 <span>  show_tables <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  show_toc <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  show_details <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  debug <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  render <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  logo <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  freeze <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  custom_fields <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>report_type <span class="op">=</span> <span class="st">"targeter"</span>, freeze <span class="op">=</span> <span class="va">freeze</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -95,6 +100,12 @@ summary of object.</p></dd>
 label of the variables can be used. Default value (NULL) corresponds to
 no metadata available.
 The label will be used for the title and the x-axis of the graph.</p></dd>
+
+
+<dt id="arg-metadata-vars">metadata_vars<a class="anchor" aria-label="anchor" href="#arg-metadata-vars"></a></dt>
+<dd><p>- list of two character strings: varname and label.
+Default to varname="variable", label="label". Used to specify the columns in
+metadata that contains variable names and labels.</p></dd>
 
 
 <dt id="arg-format">format<a class="anchor" aria-label="anchor" href="#arg-format"></a></dt>
@@ -171,10 +182,25 @@ that consists in taking title for targeter object 'analysis' slot.</p></dd>
 documentation)</p></dd>
 
 
+<dt id="arg-fullplot-numvar-as">fullplot_numvar_as<a class="anchor" aria-label="anchor" href="#arg-fullplot-numvar-as"></a></dt>
+<dd><p>- character, one of "bin" or "value"
+(cf `fullplot` documentation)</p></dd>
+
+
 <dt id="arg-show-tables">show_tables<a class="anchor" aria-label="anchor" href="#arg-show-tables"></a></dt>
 <dd><p>- logical whetheer to print tables in seprate slides in
 addition of graphics. Might ot produce nice outputs as tables are usually
 large.</p></dd>
+
+
+<dt id="arg-show-toc">show_toc<a class="anchor" aria-label="anchor" href="#arg-show-toc"></a></dt>
+<dd><p>- logical. If TRUE (default), a table of content will be
+generated. If FALSE, no table of content will be generated.</p></dd>
+
+
+<dt id="arg-show-details">show_details<a class="anchor" aria-label="anchor" href="#arg-show-details"></a></dt>
+<dd><p>- logical. If TRUE (default), some more information will be
+displayed in the report.</p></dd>
 
 
 <dt id="arg-debug">debug<a class="anchor" aria-label="anchor" href="#arg-debug"></a></dt>
@@ -198,6 +224,11 @@ by revealjs format.</p></dd>
 <dd><p>- logical: default TRUE. If TRUE, the report will be frozen
 (no more changes can be made). If FALSE, the report will be editable.
 Frozen reports renders can always be bypassed by explicit call to quarto.</p></dd>
+
+
+<dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
+<dd><p>- logical. If TRUE, the function will print some information
+along the process</p></dd>
 
 
 <dt id="arg-custom-fields">custom_fields<a class="anchor" aria-label="anchor" href="#arg-custom-fields"></a></dt>
