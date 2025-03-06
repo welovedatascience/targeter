@@ -8,6 +8,7 @@ report(
   object,
   summary_object = NULL,
   metadata = NULL,
+  metadata_vars = list(varname = "variable", label = "label"),
   format = "html",
   nmax = 100,
   template = NULL,
@@ -26,11 +27,15 @@ report(
   title = object$analysis,
   author = getOption("targeter.author", "welovedatascience targeter"),
   fullplot_which_plot = "1:2",
+  fullplot_numvar_as = "bin",
   show_tables = FALSE,
+  show_toc = TRUE,
+  show_details = TRUE,
   debug = FALSE,
   render = TRUE,
   logo = NULL,
   freeze = TRUE,
+  verbose = FALSE,
   custom_fields = list(report_type = "targeter", freeze = freeze),
   ...
 )
@@ -45,6 +50,10 @@ summary of object.}
 label of the variables can be used. Default value (NULL) corresponds to
 no metadata available.
 The label will be used for the title and the x-axis of the graph.}
+
+\item{metadata_vars}{- list of two character strings: varname and label.
+Default to varname="variable", label="label". Used to specify the columns in
+metadata that contains variable names and labels.}
 
 \item{format}{- Target output format (defaults to "html").
 The option "all" will render all formats.}
@@ -94,9 +103,18 @@ that consists in taking title for targeter object 'analysis' slot.}
 \item{fullplot_which_plot}{- character, selection of plots (cf `fullplot`
 documentation)}
 
+\item{fullplot_numvar_as}{- character, one of "bin" or "value" 
+(cf `fullplot` documentation)}
+
 \item{show_tables}{- logical whetheer to print tables in seprate slides in
 addition of graphics. Might ot produce nice outputs as tables are usually
 large.}
+
+\item{show_toc}{- logical. If TRUE (default), a table of content will be
+generated. If FALSE, no table of content will be generated.}
+
+\item{show_details}{- logical. If TRUE (default), some more information will be
+displayed in the report.}
 
 \item{debug}{- logical. If TRUE, the function will print debug information 
 (passed to Quarto call).}
@@ -112,6 +130,9 @@ by revealjs format.}
 \item{freeze}{- logical: default TRUE. If TRUE, the report will be frozen
 (no more changes can be made). If FALSE, the report will be editable. 
 Frozen reports renders can always be bypassed by explicit call to quarto.}
+
+\item{verbose}{- logical. If TRUE, the function will print some information 
+along the process}
 
 \item{custom_fields}{- list of custom fields to be added to the report.}
 

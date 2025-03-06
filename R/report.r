@@ -43,6 +43,17 @@
 #' @param show_tables - logical whetheer to print tables in seprate slides in
 #' addition of graphics. Might ot produce nice outputs as tables are usually
 #' large.
+#' @param show_toc - logical. If TRUE (default), a table of content will be
+#' generated. If FALSE, no table of content will be generated.
+#' @param show_details - logical. If TRUE (default), some more information will be
+#' displayed in the report. 
+#' @param verbose - logical. If TRUE, the function will print some information 
+#' along the process 
+#' @param fullplot_numvar_as - character, one of "bin" or "value" 
+#' (cf `fullplot` documentation)
+#' @param metadata_vars - list of two character strings: varname and label.
+#' Default to varname="variable", label="label". Used to specify the columns in
+#' metadata that contains variable names and labels.
 #' @param logo - character: path to a logo file. If NULL (default), we will take
 #' package welovedatascience logo. If empty, no logo will be used. Only used
 #' by revealjs format.
