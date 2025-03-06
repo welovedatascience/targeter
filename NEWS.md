@@ -1,3 +1,9 @@
+# targeter 1.4
+
+* 20250306
+* Brand new reporting mechanism fullly based on quarto engine, very flexible and
+  customizable (brands, logos, colors, etc.).
+  slidify function is removed, replaced by updated render function.
 
 # targeter 1.3.2
 

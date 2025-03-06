@@ -1,7 +1,7 @@
 Package: targeter
 Type: Package
 Title: Efficient Visual Targets Exploration 
-Version: 1.3.2
+Version: 1.4
 Authors@R: c(
     person("Eric","Lecoutre", email = "eric.lecoutre@welovedatascience.com", 
     role = c("aut", "cre")),
@@ -37,7 +37,8 @@ Imports:
     utils,
     kableExtra,
     quarto,
-    pacman
+    pacman,
+    yaml
 Suggest:
     DT,
     miniUI,

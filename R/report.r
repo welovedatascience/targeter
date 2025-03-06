@@ -17,11 +17,21 @@
 #' @param template - character. path to a Quarto qmd document that will be used
 #' to generate presentation. If NULL (default), we will use targeter package
 #' default template.
-#' @param quarto_project_dir (default "./targeter-reports") Path to a Quarto
-#' project patyh either pre-existing or that will be initiated with package
-#' default. Using a pre-existing projetc allows benfiting from its settings.
-#' (you might then want to put brand_file to empty )
-#' @param project_sub_folder - character. Output directory - default to create a
+#' @param quarto_root_dir (default "./targeter-reports") Path to a  root folder
+#'  where  quarto project folder will be avaible. Default to "." so that
+#' calling targeter first time in an analyses project will initiate everything
+#' for user.
+#' @param quarto_targeter_project_dir (default "targeter-reports", within
+#' quarto_root_dir) Path to a folder where all targeter reports will be stored.
+#' Using a pre-existing projetc allows benfiting from its settings.
+#' (you might  want to put brand_file to empty or use your own brand file)
+#' @param quarto_project_template - character. Path to a default Quarto template
+#' that will be used as Quarto reference-doc for all formats. If NULL (default),
+#' we will use targeter package default templates.
+#' @param quarto_project_brandfile - character. Path to a default Quarto brandfile
+#' that will be used as Quarto reference-doc for all formats. If NULL (default),
+#' we will use targeter package default brandfile.
+#' @param target_sub_folder - character. Output directory - default to create a
 #' new dedicated directory in working folder.
 #' @param output_file - character, name of output file (without file extension).
 #' default value: index
@@ -42,9 +52,14 @@
 #' package default templates for PPTX.
 #' If empty string "", we won't use any template.
 #' @param render - logical. If TRUE (default), the report will be rendered
-#'  and saved in the project_sub_folder. If FALSE, the report will be generated but not
+#'  and saved in the target_sub_folder. If FALSE, the report will be generated but not
 #'  rendered. Useful for debugging.
-#' @param debug - logical. If TRUE, the function will print debug information (passed to Quarto call).
+#' @param debug - logical. If TRUE, the function will print debug information 
+#' (passed to Quarto call).
+#' @param freeze - logical: default TRUE. If TRUE, the report will be frozen
+#' (no more changes can be made). If FALSE, the report will be editable. 
+#' Frozen reports renders can always be bypassed by explicit call to quarto. 
+#' @param custom_fields - list of custom fields to be added to the report. 
 #' @param ...  additional parameters to be passed to quarto, for instance
 #' allowing to pass/overwite any YAML set-up
 #' @return invisibly returns path to the generated specific file (unique format)
@@ -58,9 +73,10 @@
 #' \item \code{\link{focus}}
 #' }
 #' @importFrom assertthat assert_that
-## ' @importFrom quarto quarto_render
-## ' @importFrom qs qsave
+## @importFrom quarto quarto_render
 #' @importFrom pacman p_load
+#' @importFrom data.table fwrite
+#' @importFrom yaml as.yaml
 #' @examples
 #' \dontrun{
 #' tar <- targeter(adult, target ="ABOVE50K", analysis_name="Analyse",
@@ -106,9 +122,10 @@ report <- function(
   show_tables = FALSE,
   debug = FALSE,
   render = TRUE,
-  logo = ""
+  logo = NULL,
   freeze = TRUE,
-  custom_fields = list("report_type" = "targeter", "freeze" = freeze), # todo implement
+  custom_fields = list("report_type" = "targeter", "freeze" = freeze),
+   # todo implement
   ... # additional parameters to be passed to quarto
 ) {
   assertthat::assert_that(
@@ -155,7 +172,7 @@ report <- function(
   
   assertthat::assert_that(
     is.character(targeter_sub_folder),
-    msg = "project_sub_folder must be a character string giving the path of the output directory"
+    msg = "target_sub_folder must be a character string giving the path of the output directory"
   )
   # todo: test if valid string foe a folder name
 
@@ -312,7 +329,7 @@ report <- function(
       tmp_pptx_reference_doc <- "pptx-template-reference.pptx"
       file.copy(
         from = pptx_reference_doc,
-        to = file.path(project_sub_folder, tmp_pptx_reference_doc),
+        to = file.path(target_sub_folder, tmp_pptx_reference_doc),
         overwrite = TRUE
       )
       has_pptx_template <- TRUE
@@ -325,7 +342,7 @@ report <- function(
     temp <- readLines(file.path(target_path, paste(output_file, "qmd", sep = ".")))
     if (any(grep("##{{custom-fields}}##", temp))){
       gsub("##{{custom-fields}}##",temp, yaml::as.yaml(custom_fields))
-      fwrite(temp, file.path(target_path, paste(output_file, "qmd", sep = ".")))
+      data.table::fwrite(temp, file.path(target_path, paste(output_file, "qmd", sep = ".")))
     }
   }
 

@@ -11,19 +11,27 @@ report(
   format = "html",
   nmax = 100,
   template = NULL,
-  pptx_reference_doc = NULL,
-  output_dir = paste0("targeter-report", format(Sys.time(), format =
+  quarto_root_dir = ".",
+  quarto_targeters_project_dir = "targeter-reports",
+  quarto_project_template = getOption("targeter.template",
+    file.path(find.package("targeter", lib.loc = .libPaths()), "ressources",
+    "_targeter_project_default.yml")),
+  quarto_project_brandfile = getOption("targeter.brandfile",
+    file.path(find.package("targeter", lib.loc = .libPaths()), "ressources",
+    "_targeter_brand_default.yml")),
+  targeter_sub_folder = paste0("targeter-report-", format(Sys.time(), format =
     "\%Y-\%m-\%d_\%H\%M\%S")),
+  pptx_reference_doc = NULL,
   output_file = "index",
   title = object$analysis,
   author = getOption("targeter.author", "welovedatascience targeter"),
   fullplot_which_plot = "1:2",
-  tables = FALSE,
-  brandfile = getOption("targeter.brandfile", file.path(find.package("targeter", lib.loc
-    = .libPaths()), "ressources", "_brand.yml")),
-  logo = NULL,
+  show_tables = FALSE,
   debug = FALSE,
   render = TRUE,
+  logo = NULL,
+  freeze = TRUE,
+  custom_fields = list(report_type = "targeter", freeze = freeze),
   ...
 )
 }
@@ -41,21 +49,31 @@ The label will be used for the title and the x-axis of the graph.}
 \item{format}{- Target output format (defaults to "html").
 The option "all" will render all formats.}
 
-\item{nmax}{- integer: maximum number of variables to be used. Default 100. 
+\item{nmax}{- integer: maximum number of variables to be used. Default 100.
 use NULL to force all variables to be present in report.See notes.}
 
 \item{template}{- character. path to a Quarto qmd document that will be used
 to generate presentation. If NULL (default), we will use targeter package
 default template.}
 
-\item{pptx_reference_doc}{- character. Path to a default PPTX template 
+\item{quarto_root_dir}{(default "./targeter-reports") Path to a  root folder
+ where  quarto project folder will be avaible. Default to "." so that
+calling targeter first time in an analyses project will initiate everything
+for user.}
+
+\item{quarto_project_template}{- character. Path to a default Quarto template
+that will be used as Quarto reference-doc for all formats. If NULL (default),
+we will use targeter package default templates.}
+
+\item{quarto_project_brandfile}{- character. Path to a default Quarto brandfile
+that will be used as Quarto reference-doc for all formats. If NULL (default),
+we will use targeter package default brandfile.}
+
+\item{pptx_reference_doc}{- character. Path to a default PPTX template
 that will be used as Quarto reference-doc for pppx formzt
 If NULL (default), we will use targeter
-package default templates for PPTX. 
+package default templates for PPTX.
 If empty string "", we won't use any template.}
-
-\item{output_dir}{- character. Output directory - default to create a 
-new dedicated directory in working folder.}
 
 \item{output_file}{- character, name of output file (without file extension).
 default value: index}
@@ -68,22 +86,37 @@ that consists in taking title for targeter object 'analysis' slot.}
 \item{fullplot_which_plot}{- character, selection of plots (cf `fullplot`
 documentation)}
 
-\item{tables}{- logical whetheer to print tables in seprate slides in 
-addition of graphics. Might ot produce nice outputs as tables are usually
-large.}
+\item{debug}{- logical. If TRUE, the function will print debug information 
+(passed to Quarto call).}
+
+\item{render}{- logical. If TRUE (default), the report will be rendered
+and saved in the target_sub_folder. If FALSE, the report will be generated but not
+rendered. Useful for debugging.}
 
 \item{logo}{- character: path to a logo file. If NULL (default), we will take
 package welovedatascience logo. If empty, no logo will be used. Only used
 by revealjs format.}
 
-\item{debug}{- logical. If TRUE, the function will print debug information (passed to Quarto call).}
+\item{freeze}{- logical: default TRUE. If TRUE, the report will be frozen
+(no more changes can be made). If FALSE, the report will be editable. 
+Frozen reports renders can always be bypassed by explicit call to quarto.}
 
-\item{render}{- logical. If TRUE (default), the report will be rendered
-and saved in the output_dir. If FALSE, the report will be generated but not
-rendered. Useful for debugging.}
+\item{custom_fields}{- list of custom fields to be added to the report.}
 
 \item{...}{additional parameters to be passed to quarto, for instance
 allowing to pass/overwite any YAML set-up}
+
+\item{quarto_targeter_project_dir}{(default "targeter-reports", within
+quarto_root_dir) Path to a folder where all targeter reports will be stored.
+Using a pre-existing projetc allows benfiting from its settings.
+(you might  want to put brand_file to empty or use your own brand file)}
+
+\item{target_sub_folder}{- character. Output directory - default to create a
+new dedicated directory in working folder.}
+
+\item{tables}{- logical whetheer to print tables in seprate slides in
+addition of graphics. Might ot produce nice outputs as tables are usually
+large.}
 }
 \value{
 invisibly returns path to the generated specific file (unique format)
