@@ -189,7 +189,7 @@ report <- function(
     pptx_reference_doc <- file.path(
       find.package("targeter", lib.loc = .libPaths()),
       "ressources",
-      "slidify-pptx-targeter-template.pptx"
+      "report-template.pptx"
     )
   }
   # cat(pptx_reference_doc)
@@ -339,18 +339,20 @@ report <- function(
   assertthat::assert_that(template_copied, msg = "Could not copy template file")
 
   # pptx template
-  if (("pptx" %in% format) |("all" %in% format)) {
+  if (("pptx" %in% format) | ("all" %in% format)) {
     # if default template we will also use powerpoint wlds template (or override
     # with user provided one)
     has_pptx_template <- FALSE
     if (default_template | !default_pptx_template) {
+
       #pptx_template <- "targeter-report.pptx"
       tmp_pptx_reference_doc <- "report-template.pptx"
-      file.copy(
+      pptx_copied <- file.copy(
         from = pptx_reference_doc,
         to = file.path(target_path, tmp_pptx_reference_doc),
         overwrite = TRUE
       )
+      assertthat::assert_that(pptx_copied, msg = "Could not copy pptx template file")
       has_pptx_template <- TRUE
       pptx_reference_doc <- tmp_pptx_reference_doc
     }
@@ -365,12 +367,17 @@ report <- function(
       # see yaml::as.yaml documentation
         # custom handler with verbatim output to change how logical vectors are
   # emitted
+
+
+    if (has_pptx_template) {
+      custom_fields[["reference-doc"]] <- pptx_reference_doc
+
+    }
       out_yaml <- yaml::as.yaml(custom_fields,
         handlers = list(logical = yaml::verbatim_logical))
 
 
       temp <- gsub("##{{custom-fields}}##", out_yaml, temp, fixed=TRUE)
-      print(temp[49])
 
       cat(temp,
       sep = "\n", 
@@ -381,7 +388,7 @@ report <- function(
 
   meta_yml_params <- list(
     object = "tar.rds",
-    summary_object = "tarsum.rds",
+    summary_object = "tar_summary.rds",
     fullplot_which_plot = fullplot_which_plot,
     fullplot_numvar_as = fullplot_numvar_as,
     metadata_var_field = metadata_vars$varname,
@@ -395,20 +402,15 @@ report <- function(
 
     # todo decision trees
   )
-  pandoc_args <- c()
-  if (has_pptx_template) {
-    pandoc_args <- c(
-      "--reference-doc" = file.path(pptx_reference_doc)
-    )
-  }
+  # pandoc_args <- c()
+
   if (render) {
     quarto::quarto_render(
       input = target_path,
       execute_params = meta_yml_params,
       debug = debug,
       output_format = format,
-      as_job = FALSE,
-      pandoc_args = pandoc_args
+      as_job = FALSE#,pandoc_args = pandoc_args
     )
     cat("\nPresentation generated in folder:.", target_path, "\n")
     invisible(file.path(target_path))

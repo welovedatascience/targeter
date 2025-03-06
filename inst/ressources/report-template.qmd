@@ -60,7 +60,7 @@ format <- knitr::pandoc_to()
 
 object <- readRDS(params$object)
 metadata <- attr(object, "metadata")
-summary_object <- readRDS(params$summary_object))
+summary_object <- readRDS(params$summary_object)
 ```
 
 
