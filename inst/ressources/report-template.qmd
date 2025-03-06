@@ -44,6 +44,9 @@ title: "`r params$title`"
 author: "`r params$author`"
 logo: "`r params$logo`"
 reporty-type: targeter
+## will be replaced by eventual parameters passsed
+## to targter via `custom_fields` paramater.
+##{{custom-fields}}## 
 ---
 
 
