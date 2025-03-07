@@ -130,9 +130,7 @@ and continuous targets.</p></li>
 <span>  woe_post_cluster <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  woe_post_cluster_n <span class="op">=</span> <span class="fl">6</span>,</span>
 <span>  smart_quantile_by <span class="op">=</span> <span class="fl">0.01</span>,</span>
-<span>  decision_tree <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  decision_tree_maxdepth <span class="op">=</span> <span class="fl">3</span>,</span>
-<span>  decision_tree_cp <span class="op">=</span> <span class="fl">0</span></span>
+<span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -286,19 +284,9 @@ number of clusters to be used.</p></dd>
 quantile step - default y step of 0.01.</p></dd>
 
 
-<dt id="arg-decision-tree">decision_tree<a class="anchor" aria-label="anchor" href="#arg-decision-tree"></a></dt>
-<dd><p>boolean (default FALSE). Should a decision tree be fit
-on source variables.</p></dd>
-
-
-<dt id="arg-decision-tree-maxdepth">decision_tree_maxdepth<a class="anchor" aria-label="anchor" href="#arg-decision-tree-maxdepth"></a></dt>
-<dd><p>integer (default 3). Maximum depth for the
-decision tree if one is fit.</p></dd>
-
-
-<dt id="arg-decision-tree-cp">decision_tree_cp<a class="anchor" aria-label="anchor" href="#arg-decision-tree-cp"></a></dt>
-<dd><p>numeric (default 0). Value for `cp` parameter in
-rpart.control.</p></dd>
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dd><p>additional parameters (might be used by other targeter functions,
+no special side effect for user).</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -357,7 +345,7 @@ See crossvar class documentation.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Analysis of  ABOVE50K on data: adult"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $date</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "2025-03-06"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "2025-03-07"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $profiles</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $profiles$AGE</span>
@@ -681,12 +669,6 @@ See crossvar class documentation.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $target_reference_level</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $decision_tree</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $decision_tree_model</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"class")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "targeter" "list"    </span>
