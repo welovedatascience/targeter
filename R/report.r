@@ -101,7 +101,7 @@ tar_report <- function(object, ...) {
   UseMethod("tar_report")
 }
 
-#' @method tar_report targeter
+#' @exportS3Method  tar_report targeter
 tar_report.targeter <- function(
   object,
   summary_object = NULL,
@@ -510,7 +510,8 @@ tar_report.targeter <- function(
 #' @return invisibly returns path to the generated specific file (unique format)
 #' or folder (several formats)
 
-#' @method  tar_report tartree
+#' @exportS3Method tar_report tartree
+
 tar_report.tartree <- function(
   object,
   metadata = NULL,
