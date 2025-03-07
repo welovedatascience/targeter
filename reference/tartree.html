@@ -44,8 +44,12 @@
 <span>  tar_object <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  tarsum_object <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  target <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  decision_tree_maxdepth <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  decision_tree_maxdepth <span class="op">=</span> <span class="fl">3L</span>,</span>
 <span>  decision_tree_cp <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  decision_tree_sample <span class="op">=</span> <span class="fl">0.8</span>,</span>
+<span>  predict_prob_cutpoint <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>  predict_prob_cutpoint_quantile <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>  seed <span class="op">=</span> <span class="fl">42</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -78,13 +82,25 @@
 <dd><p>numeric, complexity parameter - default: 0</p></dd>
 
 
+<dt id="arg-decision-tree-sample">decision_tree_sample<a class="anchor" aria-label="anchor" href="#arg-decision-tree-sample"></a></dt>
+<dd><p>numeric, proportion of data to be used for training -  to be betwwen 0 (not included) and 1 (not recommended) default: 0.8</p></dd>
+
+
+<dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
+<dd><p>integer, seed for random number generation - default: 42</p></dd>
+
+
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>other parameters</p></dd>
+<dd><p>other parameters to be passed to targeter</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>a targeter decision tree model on top of which a report can be generated with report function</p>
+    </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>tartree is a function that builds a decision tree model based on a targeter analysis. It is recommended to have pre-computed targeter object and targeter summary object. If not, the function will compute them. The targeter object is used to define the target column and the target type. The targeter summary object is used to define the variables to be used in the decision tree model. The function will split the data into training and validation sets, build the decision tree model, and return it. The decision tree model is a rpart object with additional attributes: tar_object, tarsum_object, and target.</p>
     </div>
 
     <div class="section level2">
