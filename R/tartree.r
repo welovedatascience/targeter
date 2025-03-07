@@ -248,9 +248,9 @@ tartree <- function(
   tar_object_model$profile <- tar_object_model$profile[dt_vars]
   attr(mod, "tar_object") <- tar_object_model
   
-  tarsum_object_model <- tarsum_object[varname %in% dt_vars]
+  tarsum_model <- tarsum_object[varname %in% dt_vars]
   
-  attr(mod, "tar_object_model") <- tar_object_model
+  attr(mod, "tar_summary_model") <- tarsum_model
 
   
   attr(mod, "target") <- target

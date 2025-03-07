@@ -6,6 +6,8 @@ params:
     title: "targeter tree(small)  model"
     author: "welovedatascience - targeter"
     decision_tree_format: "static"
+    metadata_var_field: "variable"
+    metadata_var_label: "label"
 format:
   html:
     theme: cosmo
@@ -90,3 +92,4 @@ hist(attr(mod, "model_predictions")$N_TARGET_PROB)
 kableExtra::kable(t(t(quantile(attr(mod, "model_predictions")$N_TARGET_PROB, probs= seq(0,1, by = 0.1)))))
 
 ```
+
