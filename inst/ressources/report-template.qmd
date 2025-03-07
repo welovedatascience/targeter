@@ -55,6 +55,7 @@ format <- knitr::pandoc_to()
 
 object <- readRDS(params$object)
 metadata <- attr(object, "metadata")
+metadata <- metadata[!duplicated(metadata[[params$metadata_var_field]])] 
 summary_object <- readRDS(params$summary_object)
 ```
 

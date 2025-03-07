@@ -78,7 +78,8 @@ label <- function(
   if (include_varname){
     labels[var_hasLabel] <- paste0(labels[var_hasLabel], " [",var[var_hasLabel], "]")
   }
-  
+  labels[which(is.na(labels))] <- var[which(is.na(labels))]
+
   labels <- unlist(labels)
   return(labels)
 }

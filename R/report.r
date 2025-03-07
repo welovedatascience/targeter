@@ -51,8 +51,8 @@
 #' along the process 
 #' @param fullplot_numvar_as - character, one of "bin" or "value" 
 #' (cf `fullplot` documentation)
-#' @param metadata_vars - list of two character strings: varname and label.
-#' Default to varname="variable", label="label". Used to specify the columns in
+#' @param metadata_vars - list of two character strings: varname and varlabel.
+#' Default to varname="variable", varlabel="label". Used to specify the columns in
 #' metadata that contains variable names and labels.
 #' @param logo - character: path to a logo file. If NULL (default), we will take
 #' package welovedatascience logo. If empty, no logo will be used. Only used
@@ -100,7 +100,7 @@ report <- function(
   object,
   summary_object = NULL,
   metadata = NULL,
-  metadata_vars= list(varname="variable",label="label"),
+  metadata_vars= list(varname="variable",varlabel="label"),
   format = "html",
   nmax = 100, #todo implement
   template = NULL, # default QMD template for slides
@@ -404,7 +404,7 @@ report <- function(
     fullplot_which_plot = fullplot_which_plot,
     fullplot_numvar_as = fullplot_numvar_as,
     metadata_var_field = metadata_vars$varname,
-    metadata_var_label = metadata_vars$label,
+    metadata_var_label = metadata_vars$varlabel,
     title = title,
     author = author,
     show_tables = as.character(show_tables),

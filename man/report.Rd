@@ -8,7 +8,7 @@ report(
   object,
   summary_object = NULL,
   metadata = NULL,
-  metadata_vars = list(varname = "variable", label = "label"),
+  metadata_vars = list(varname = "variable", varlabel = "label"),
   format = "html",
   nmax = 100,
   template = NULL,
@@ -51,8 +51,8 @@ label of the variables can be used. Default value (NULL) corresponds to
 no metadata available.
 The label will be used for the title and the x-axis of the graph.}
 
-\item{metadata_vars}{- list of two character strings: varname and label.
-Default to varname="variable", label="label". Used to specify the columns in
+\item{metadata_vars}{- list of two character strings: varname and varlabel.
+Default to varname="variable", varlabel="label". Used to specify the columns in
 metadata that contains variable names and labels.}
 
 \item{format}{- Target output format (defaults to "html").

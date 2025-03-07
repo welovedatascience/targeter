@@ -48,14 +48,8 @@ if (getRversion() >= "3.1.0")
       # optional methods
       "Ckmeans.1d.dp",
       "clustering.sc.dp", 
-      # decision trees
-      "visTree",
-      "rpart",
-      "clustering",
-      "rpart.control",
-      "rpart.plot",
-      "weight_target"
-    )
+      "clustering"
+        )
   )
 
 #' @title targeter
@@ -160,12 +154,8 @@ if (getRversion() >= "3.1.0")
 #' number of clusters to be used.
 #' @param smart_quantile_by numeric, for binning method 'smart',
 #' quantile step - default y step of 0.01.
-#' @param decision_tree boolean (default FALSE). Should a decision tree be fit
-#' on source variables.
-#' @param decision_tree_maxdepth integer (default 3). Maximum depth for the
-#' decision tree if one is fit.
-#' @param decision_tree_cp numeric (default 0). Value for `cp` parameter in
-#' rpart.control.
+#' @param ... additional parameters (might be used by other targeter functions, 
+#' no special side effect for user).
 #'
 #'
 #' @return The function returns a list of class "targeter".
@@ -179,7 +169,6 @@ if (getRversion() >= "3.1.0")
 #' \item description_target text about the description of target
 #' \item analysis - name of the analysis.
 #' \item date - date of the analysis.
-#' \item decision_tree_model - the fitted decision tree by `rpart` (if asked so)
 #' \item profiles : list of elements containing the result the
 #' individual crossing per variable.
 #' See crossvar class documentation.
@@ -234,9 +223,7 @@ targeter <- function(
   woe_post_cluster = FALSE,
   woe_post_cluster_n = 6,
   smart_quantile_by = 0.01,
-  decision_tree = FALSE,
-  decision_tree_maxdepth = 3,
-  decision_tree_cp = 0
+  ...
 ) {
   ##test
   assertthat::assert_that(
@@ -373,15 +360,6 @@ if (woe_post_cluster){
     msg=paste('some of targeter following optional packages are not available:',
     paste(deps, collapse=",")))
 
-}
-if (decision_tree){
-  deps <- c("explore","rpart")
-  if (getOption("targeter.auto_install_deps", FALSE)){
-    pacman::p_load(deps)
-  }
-  assertthat::assert_that(pacman::p_load(deps, install = FALSE), 
-  msg=paste('some of targeter following optional packages required for decision trees are not available:',
-  paste(deps, collapse=",")))
 }
 
 ## analysis start -----------
@@ -1216,84 +1194,7 @@ if (decision_tree){
   if (target_type %in% c('binary', 'categorical')) {
     out$target_reference_level <- target_reference_level
   }
-  ## compute > decision tree ------
   
-  out$decision_tree <- decision_tree
-  if (decision_tree) {
-    
-    if (length(dt_vars_exp) < 2)
-      msg <- c(
-        msg,
-        list(WARNING = "too few columns to grow decition tree.")
-      ) else {
-      formula_txt <- as.formula("L_TARGET~.")
-
-      # from explore::explain_tree function
-
-      if (target_type %in% c('binary')) {
-        # look in function for categorical targets
-
-        # we will use weight
-        data[, L_TARGET := ifelse(get(target) == target_reference_level, 1, 0)]
-
-        weights <- weight_target(
-          data[, unique(c("L_TARGET", dt_vars_exp)), with = FALSE],
-          L_TARGET
-        )
-        minsplit <- sum(weights) / 10
-
-        n <- table(data[["L_TARGET"]])
-        prior <- n / sum(n)
-        #  decision_tree_cp <- 0 # to be put as parametre
-        if (all(weights == 1)) {
-          mod <- rpart(
-            formula_txt,
-            data = data[, unique(c("L_TARGET", dt_vars_exp)), with = FALSE],
-            method = "class",
-            model = TRUE,
-            parms = list(prior = prior),
-            control = rpart.control(
-              maxdepth = decision_tree_maxdepth,
-              minsplit = minsplit,
-              cp = decision_tree_cp
-            )
-          )
-        } else {
-          mod <- rpart(
-            formula_txt,
-            data = data[, unique(c("L_TARGET", dt_vars_exp)), with = FALSE],
-            method = "class",
-            weights = weights,
-            model = TRUE,
-            control = rpart.control(
-              maxdepth = decision_tree_maxdepth,
-              minsplit = minsplit,
-              cp = decision_tree_cp
-            )
-          )
-        }
-      } else {
-        #numeric target
-        minsplit <- 30
-        data[, L_TARGET := get(target)]
-        mod <- rpart(
-          formula_txt,
-          model = TRUE,
-          data = data[, unique(c("L_TARGET", dt_vars_exp)), with = FALSE],
-          method = "anova",
-          control = rpart.control(
-            maxdepth = decision_tree_maxdepth,
-            minsplit = minsplit,
-            cp = decision_tree_cp
-          )
-        )
-      }
-      out$decision_tree_model <- mod
-    }
-  } else {
-    out$decision_tree_model <- NA
-  }
-
   ## assign class
   ## output > final return ----------
   class(out) <- c("targeter", class(out))

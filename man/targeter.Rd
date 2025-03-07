@@ -30,9 +30,7 @@ targeter(
   woe_post_cluster = FALSE,
   woe_post_cluster_n = 6,
   smart_quantile_by = 0.01,
-  decision_tree = FALSE,
-  decision_tree_maxdepth = 3,
-  decision_tree_cp = 0
+  ...
 )
 }
 \arguments{
@@ -136,14 +134,8 @@ number of clusters to be used.}
 \item{smart_quantile_by}{numeric, for binning method 'smart',
 quantile step - default y step of 0.01.}
 
-\item{decision_tree}{boolean (default FALSE). Should a decision tree be fit
-on source variables.}
-
-\item{decision_tree_maxdepth}{integer (default 3). Maximum depth for the
-decision tree if one is fit.}
-
-\item{decision_tree_cp}{numeric (default 0). Value for `cp` parameter in
-rpart.control.}
+\item{...}{additional parameters (might be used by other targeter functions, 
+no special side effect for user).}
 }
 \value{
 The function returns a list of class "targeter".
