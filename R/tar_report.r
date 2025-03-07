@@ -90,9 +90,9 @@
 #' \dontrun{
 #' tar <- targeter(adult, target ="ABOVE50K", analysis_name="Analyse",
 #' naming_conventions=FALSE)
-#' report(tar,  author = "this is me")
-#' report(tar,  format= c("pptx","pdf","docx"),author = "this is me")
-#' }
+#' tar_report(tar,  author = "this is me")
+#' tar_report(tar,  format= c("pptx","pdf","docx"),author = "this is me")
+#' }1
 
 #' @export tar_report
 
