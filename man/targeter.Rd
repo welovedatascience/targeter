@@ -189,6 +189,6 @@ targeter(adult,target ="ABOVE50K")
 \item \code{\link{summary.targeter}}
 \item \code{\link{plot.crossvar}}
 \item \code{\link{summary.crossvar}}
-\item \code{\link{report}}
+\item \code{\link{tar_report}}
 }
 }
