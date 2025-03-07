@@ -91,6 +91,7 @@ tartree <- function(
   }
   dt_vars_exp <- tarsum_object$varname
   vars_targeter <- c(dt_vars_exp, target)
+  vars_model <- c(dt_vars_exp, target)
   assertthat::assert_that(
     all(c(vars_targeter %in% names(data))),
     msg = "some of required  variables are not in data"
@@ -211,7 +212,7 @@ tartree <- function(
   predictions[, .N, by= list(L_TARGET,  L_TARGET_PREDICTION_CP_QUANTILE)]
 
 
-  pROC <- pROC::roc(predictions$L_TARGET, predictions$N_TARGET_PROB)
+  pROC <- roc(predictions$L_TARGET, predictions$N_TARGET_PROB)
 
   ## subset targeter object and targeter summary object
 
@@ -234,16 +235,24 @@ tartree <- function(
   attr(mod, "model_predictions") <- predictions
   
   attr(mod, "pROC") <- pROC
-  attr(mod, "model_varimp") <- vars_imp_df
+  attr(mod, "model_varimp") <- setDT(vars_imp_df)
   attr(mod, "decision_tree_params") <- list(
     decision_tree_maxdepth = decision_tree_maxdepth,
     decision_tree_cp = decision_tree_cp,
     decision_tree_sample = decision_tree_sample,
     seed  = seed
   )
-    
-  attr(mod, "tar_object") <- tar_object
-  attr(mod, "tarsum_object") <- tarsum_object
+
+  ## subset targeter object and targeter summary object
+  tar_object_model <- tar_object
+  tar_object_model$profile <- tar_object_model$profile[dt_vars]
+  attr(mod, "tar_object") <- tar_object_model
+  
+  tarsum_object_model <- tarsum_object[varname %in% dt_vars]
+  
+  attr(mod, "tar_object_model") <- tar_object_model
+
+  
   attr(mod, "target") <- target
   class(mod) <- c("tartree", class(mod))
   return(mod)

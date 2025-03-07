@@ -9,8 +9,12 @@ tartree(
   tar_object = NULL,
   tarsum_object = NULL,
   target = NULL,
-  decision_tree_maxdepth = 3,
+  decision_tree_maxdepth = 3L,
   decision_tree_cp = 0,
+  decision_tree_sample = 0.8,
+  predict_prob_cutpoint = 0.5,
+  predict_prob_cutpoint_quantile = 0.5,
+  seed = 42,
   ...
 )
 }
@@ -27,13 +31,20 @@ tartree(
 
 \item{decision_tree_cp}{numeric, complexity parameter - default: 0}
 
-\item{...}{other parameters}
+\item{decision_tree_sample}{numeric, proportion of data to be used for training -  to be betwwen 0 (not included) and 1 (not recommended) default: 0.8}
+
+\item{seed}{integer, seed for random number generation - default: 42}
+
+\item{...}{other parameters to be passed to targeter}
 }
 \value{
 a targeter decision tree model on top of which a report can be generated with report function
 }
 \description{
 Build a decision tree model following/based on a targeter analysis
+}
+\details{
+tartree is a function that builds a decision tree model based on a targeter analysis. It is recommended to have pre-computed targeter object and targeter summary object. If not, the function will compute them. The targeter object is used to define the target column and the target type. The targeter summary object is used to define the variables to be used in the decision tree model. The function will split the data into training and validation sets, build the decision tree model, and return it. The decision tree model is a rpart object with additional attributes: tar_object, tarsum_object, and target.
 }
 \examples{
 \dontrun{

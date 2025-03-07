@@ -3,9 +3,11 @@
 # ' @importFrom rpart.plot rpart.plot
 
 #' @importFrom pacman p_load
+#' @export treeplot
+
 
 treeplot <- function(
-  x,
+  decision_tree,
   format = "static",
   prefix = "target = ",
   type = 2,
@@ -21,33 +23,26 @@ treeplot <- function(
 
   deps <- c("visNetwork","visTree","rpart.plot")
   if (getOption("targeter.auto_install_deps", FALSE)){
-    pacman::p_load(deps, install = FALSE)
+    pacman::p_load(char=deps, install = FALSE)
   }
-  assertthat::assert_that(pacman::p_load(deps), 
+  assertthat::assert_that(all(pacman::p_load(deps)), 
   msg=paste('some of targeter following optional packages are not available:',
   paste(deps, collapse=",")))
   
 
+
   assertthat::assert_that(
-    inherits(x, 'targeter'),
-    msg = 'x is not a targeter object.'
-  )
-  assertthat::assert_that(
-    x$decision_tree,
-    msg = "targeter has not been fitted with a decision tree"
-  )
-  assertthat::assert_that(
-    inherits(x$decision_tree_model, 'rpart'),
+    inherits(decision_tree, 'rpart'),
     msg = "there is a problem with the fitted decision tree"
   )
 
-  dt <- x$decision_tree_model
+  
   format <- match.arg(format, c("static", "interactive"), several.ok = FALSE)
   if (format == "static") {
     # rpart.plot::rpart.plot(
     rpart.plot(
     
-      dt,
+      decision_tree,
       prefix = prefix,
       type = type,
       yesno = yesno,
@@ -61,6 +56,6 @@ treeplot <- function(
     )
   } else {
     # visNetwork::visTree(dt, ...)
-    visTree(dt, ...)
+    visTree(decision_tree, ...)
   }
 }

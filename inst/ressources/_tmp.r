@@ -6,3 +6,7 @@ tarsum_object <- summary(tar_object)
 mod <- tartree(data, tar_object = tar_object, tarsum_object = tarsum_object)
 
 mod <- tartree(data, tar_object = tar_object, tarsum_object = tarsum_object, decision_tree_sample = 1)
+
+getwd()
+saveRDS(mod, file = 'tar_mod.rds')
+saveRDS(mod, file = './inst/ressources/tar_mod.rds')

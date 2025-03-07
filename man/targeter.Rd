@@ -149,7 +149,6 @@ numeric / categorical (text is expended so "b" also works for binary)
 \item description_target text about the description of target
 \item analysis - name of the analysis.
 \item date - date of the analysis.
-\item decision_tree_model - the fitted decision tree by `rpart` (if asked so)
 \item profiles : list of elements containing the result the
 individual crossing per variable.
 See crossvar class documentation.

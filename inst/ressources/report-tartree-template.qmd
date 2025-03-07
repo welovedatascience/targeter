@@ -1,0 +1,89 @@
+---
+execute:
+  echo: false
+params:
+    model: "tar_mod.rds" # will have to be passed - will be a mandatory parameter  -> path 
+    title: "targeter tree(small)  model"
+    author: "welovedatascience - targeter"
+    decision_tree_format: "static"
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-location: left
+    fontsize: 1.1em
+    linestretch: 1.5
+    title-block-banner: true
+    smooth-scroll: true
+    anchor-sections: true
+    search: true
+    embed-resources: true
+  pptx:
+    slide-level: 3
+  docx:
+    toc: true
+  pdf:
+    toc: true
+title: "`r params$title`"
+---
+
+```{r}
+#| label: setup
+#| warning: false
+suppressMessages(suppressPackageStartupMessages(library(targeter)))
+```
+
+
+```{r}
+mod <- readRDS( file = 'tar_mod.rds')
+```
+
+### Tree basic information
+
+```{r}
+varimp <- attr(mod, "model_varimp")
+```
+
+Tree contains `r  nrow(varimp[which(in_tree=="*"),])` variables, with following importance (eventually showing some next variables,see the variable with `intree`=*):
+
+
+
+
+```{r}
+kableExtra::kable(varimp)
+```
+
+
+### Tree visual
+
+
+```{r}
+targeter::treeplot(mod, format = params$decision_tree_format)
+```
+
+### Performances
+
+
+```{r}
+pROC <- attr(mod, "pROC")
+cat("\n\nAUC:", round(pROC$auc, 3),"\n")
+plot(pROC, print.auc=TRUE)
+```
+
+
+### Probabilty distribution
+
+
+```{r}
+hist(attr(mod, "model_predictions")$N_TARGET_PROB)
+```
+
+
+### Probabilities quantiles
+
+
+
+```{r}
+kableExtra::kable(t(t(quantile(attr(mod, "model_predictions")$N_TARGET_PROB, probs= seq(0,1, by = 0.1)))))
+
+```

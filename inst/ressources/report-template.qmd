@@ -11,8 +11,6 @@ params:
   show_tables: TRUE
   fullplot_which_plot: "1:2"
   fullplot_numvar_as: "bin" # 'bin', 'value'
-  decision_tree: TRUE
-  decision_tree_format: "static" # static, interactive
   metadata_var_field: "variable"
   metadata_var_label: "label"
 format:
