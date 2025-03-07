@@ -340,7 +340,7 @@ explore <- function(
         summary_object <- summary_object[summary_object$varname %in% selvars, ]
         # S <<- summary_object
         show_modal_spinner() # show the modal window
-        targeter::report(
+        targeter::tar_report(
           object = object,
           template = NULL,
           summary_object = summary_object,
@@ -366,7 +366,7 @@ explore <- function(
       if (length(selvars) > 1) {
         summary_object <- summary_object[summary_object$varname %in% selvars, ]
         show_modal_spinner() # show the modal window
-        targeter::report(
+        targeter::tar_report(
           object = object,
           template = NULL,
           summary_object = summary_object,
@@ -392,7 +392,7 @@ explore <- function(
       if (length(selvars) > 1) {
         summary_object <- summary_object[summary_object$varname %in% selvars, ]
         show_modal_spinner() # show the modal window
-        targeter::report(
+        targeter::tar_report(
           object = object,
           template = NULL,
           summary_object = summary_object,

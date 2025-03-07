@@ -180,7 +180,7 @@ if (getRversion() >= "3.1.0")
 #' \item \code{\link{summary.targeter}}
 #' \item \code{\link{plot.crossvar}}
 #' \item \code{\link{summary.crossvar}}
-#' \item \code{\link{report}}
+#' \item \code{\link{tar_report}}
 #' }
 #' @examples
 #' targeter(adult,target ="ABOVE50K")
