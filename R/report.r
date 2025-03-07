@@ -327,6 +327,7 @@ report <- function(
     quarto_targeters_project_dir,
     targeter_sub_folder
   )
+  target_path <- tolower(target_path) # potential quarto bug for listings
   if (verbose)cat("\n- using  targeter report folder:",target_path,"\n")
   if (!dir.exists(target_path)) {
     dir_created <- dir.create(target_path, showWarnings = FALSE)
@@ -430,10 +431,327 @@ report <- function(
   invisible(TRUE)
 }
 
-# library(data.table)
-# data(adult)
-# object <- targeter(adult, target = "ABOVE50K")
-# qs::qsave(object, "tmp/object.qs")
-# slidify(object, delete_temporary_files = TRUE)
-# slidify(object, delete_temporary_files = TRUE, format="revealjs", tables=TRUE, fullplot_which_plot = "1:4")
-# slidify(object, delete_temporary_files = FALSE, tables=TRUE, format = "beamer")
+
+
+
+
+report.tartree <- function(
+  tar_mod,
+  metadata = NULL,
+  metadata_vars= list(varname="variable",varlabel="label"),
+  format = "html",
+  template = NULL, # default QMD template for slides
+  quarto_root_dir = ".",
+  quarto_targeters_project_dir = "targeter-reports",
+  quarto_project_template = getOption(
+    "targeter.template",
+    file.path(
+      find.package("targeter", lib.loc = .libPaths()),
+      "ressources",
+      "_targeter_project_default.yml"
+    )
+  ),
+  quarto_project_brandfile = getOption(
+    "targeter.brandfile",
+    file.path(
+      find.package("targeter", lib.loc = .libPaths()),
+      "ressources",
+      "_targeter_brand_default.yml"
+    )
+  ),
+  targeter_sub_folder = paste0(
+    "targeter-report-tree-",
+    format(Sys.time(), format = "%Y-%m-%d_%H%M%S")
+  ),
+  pptx_reference_doc = NULL, # for pptx format, default template,
+  # revealjs_template = "", # todo prepare a revealjs template
+  output_file = "index",
+  title = paste(object$analysis, "- decision tree"),
+  author = getOption("targeter.author", "welovedatascience targeter"),
+  render = TRUE,
+  freeze = TRUE,
+  verbose = FALSE,
+  custom_fields = list("report_type" = "targeter-tree", "freeze" = freeze),
+   # todo implement
+  ... # additional parameters to be passed to quarto
+) {
+  assertthat::assert_that(
+    pacman::p_load("quarto"),
+    msg = "quarto package and runtime are required."
+  )
+  deps <- c("explore", "rpart", "dplyr","pROC")
+  if (getOption("targeter.auto_install_deps", FALSE)) {
+    pacman::p_load(char = deps)
+  }
+  assertthat::assert_that(
+    all(pacman::p_load(char = deps, install = FALSE)),
+    msg = paste(
+      'some of targeter following optional packages required for decision trees are not available:',
+      paste(deps, collapse = ",")
+    )
+  )
+  #
+  
+  assertthat:::assert_that(
+    inherits(tar_mod, "tartree"),
+    msg = "tar_mod must to be a tartree object"
+  
+  )
+
+
+  #  todo cover all parameters  assert tests
+  assertthat::assert_that(
+    is.character(format),
+    msg = "format must be a character"
+  )
+  # format <- match.arg(format, c(""pptx","revealjs","beamer"), several.ok = FALSE)
+
+  assertthat::assert_that(
+    inherits(metadata, "data.frame") | is.null(metadata),
+    msg = "The parameter metadata must be either NULL (no metadata) or a data.frame"
+  )
+  
+  if (("pptx" %in% format) && !is.null(pptx_reference_doc)) {
+    assertthat::assert_that(
+      is.character(pptx_reference_doc),
+      msg = "pptx template must be a character string giving the path of a powerpoint template"
+    )
+    assertthat::assert_that(
+      file.exists(pptx_reference_doc),
+      msg = "powerpoint template provided file does not exist"
+    )
+    if (verbose)cat("\n- For pptx format, we will use template:",pptx_reference_doc,"\n")
+  }
+
+  assertthat::assert_that(
+    is.character(quarto_project_brandfile), msg = "brandfile must be a character string")
+
+   if (quarto_project_brandfile != "") {
+    assertthat::assert_that(
+      file.exists(quarto_project_brandfile),
+      msg = "brandfile must be a valid file"
+    )
+    if (verbose)cat("\n- Using brandfile:",quarto_project_brandfile,"\n")
+   }
+  
+  assertthat::assert_that(
+    is.character(targeter_sub_folder),
+    msg = "target_sub_folder must be a character string giving the path of the output directory"
+  )
+  # todo: test if valid string foe a folder name
+
+  ## handled default values
+  default_pptx_template <- is.null(pptx_reference_doc)
+  if (is.null(pptx_reference_doc)) {
+    pptx_reference_doc <- file.path(
+      find.package("targeter", lib.loc = .libPaths()),
+      "ressources",
+      "report-template.pptx"
+    )
+  }
+  # cat(pptx_reference_doc)
+  if (is.null(logo)) {
+    logo <- file.path(
+      find.package("targeter", lib.loc = .libPaths()),
+      "ressources",
+      "wlds-logo.png"
+    )
+  }
+
+  default_template <- is.null(template)
+  if (is.null(template)) {
+    template <- file.path(
+      find.package("targeter", lib.loc = .libPaths()),
+      "ressources",
+      "report-tartree-template.qmd"
+    )
+  }
+
+  assertthat::assert_that(
+    file.exists(template),
+    msg = "template file does not exist"
+  )
+  if (verbose)cat("\n- Using template:",template,"\n")
+
+  assertthat::assert_that(
+    is.character(quarto_root_dir),
+    msg = "quarto_root_dir must be a charcter string giving path to a folder"
+  )
+  assertthat::assert_that(
+    dir.exists(quarto_root_dir),
+    msg = "quarto_root_dir must be a valid directory"
+  )
+  assertthat::assert_that(
+    is.character(quarto_targeters_project_dir),
+    msg = "quarto_targeters_project_dir must be a charcter string giving path to a folder"
+  )
+
+  assertthat::assert_that(
+    is.character(quarto_project_brandfile),
+    msg = "quarto_project_brandfile must be a charcter string giving path to a file or being empty (no brand file used)"
+  )
+
+
+  if (!dir.exists(file.path(quarto_root_dir,quarto_targeters_project_dir))) {
+    if (verbose)cat("\n- Creating quarto project folder:",file.path(quarto_root_dir,quarto_targeters_project_dir),"\n")
+    # we must create a quarto project to store targeters reports
+    quarto::quarto_create_project(
+      name = quarto_targeters_project_dir,
+      dir = quarto_root_dir,
+      no_prompt = TRUE,
+      quiet = TRUE
+    )
+
+    # copy quarto project template there
+    assertthat::assert_that(
+      is.character(quarto_project_template),
+      msg = "quarto_project_template must be a charcter string giving path to a file"
+    )
+    assertthat::assert_that(
+      file.exists(quarto_project_template),
+      msg = "quarto_project_template must be a valid file"
+    )
+    file.copy(
+      from = quarto_project_template,
+      to = file.path(
+        quarto_root_dir,
+        quarto_targeters_project_dir,
+        paste(quarto_targeters_project_dir, "qmd", sep = ".")
+      ),
+      overwrite = TRUE
+    )
+    # cp _brand file
+
+    if (quarto_project_brandfile != "") {
+      assertthat::assert_that(
+        file.exists(quarto_project_brandfile),
+        msg = "quarto_project_brandfile must be a valid file"
+      )
+      file.copy(
+        from = quarto_project_brandfile,
+        to = file.path(
+          quarto_root_dir,
+          quarto_targeters_project_dir,
+          "_brand.yml"
+        ),
+        overwrite = TRUE
+      )
+    }
+    quarto::quarto_render(
+      input = file.path(quarto_root_dir, quarto_targeters_project_dir),
+      debug = debug,
+      as_job = FALSE
+    )
+    cat(" - Done.\n")
+  } else {
+    
+    if (verbose)cat("\n- Using existing quarto project folder:",file.path(
+        quarto_root_dir,
+        quarto_targeters_project_dir
+      )
+      ,"\n")
+    assertthat::assert_that(
+      quarto::is_using_quarto(file.path(
+        quarto_root_dir,
+        quarto_targeters_project_dir
+      )),
+      msg = "Provided quarto project folder is not a valid quarto project"
+    )
+  }
+
+  target_path <- file.path(
+    quarto_root_dir,
+    quarto_targeters_project_dir,
+    targeter_sub_folder
+  )
+  if (verbose)cat("\n- using  targeter report folder:",target_path,"\n")
+  if (!dir.exists(target_path)) {
+    dir_created <- dir.create(target_path, showWarnings = FALSE)
+    assertthat::assert_that(
+      dir_created,
+      msg = "Could not create targeter report folder"
+    )
+  }
+  
+  attr(tar_mod, "metadata") <- metadata
+  saveRDS(tar_mod, file.path(target_path, "tar_mod.rds"))
+  
+  template_copied <- file.copy(
+    from = template,
+    to = file.path(target_path, paste(output_file, "qmd", sep = ".")),
+    overwrite = TRUE
+  )
+  assertthat::assert_that(template_copied, msg = "Could not copy template file")
+
+  # pptx template
+  has_pptx_template <- FALSE
+  
+  if (("pptx" %in% format) | ("all" %in% format)) {
+    # if default template we will also use powerpoint wlds template (or override
+    # with user provided one)
+    if (default_template | !default_pptx_template) {
+
+      #pptx_template <- "targeter-report.pptx"
+      tmp_pptx_reference_doc <- "report-template.pptx"
+      pptx_copied <- file.copy(
+        from = pptx_reference_doc,
+        to = file.path(target_path, tmp_pptx_reference_doc),
+        overwrite = TRUE
+      )
+      assertthat::assert_that(pptx_copied, msg = "Could not copy pptx template file")
+      has_pptx_template <- TRUE
+      pptx_reference_doc <- tmp_pptx_reference_doc
+    }
+  }
+
+  if (!is.null(custom_fields)){
+    # search in template and replace by yaml equivalent
+    temp <- readLines(file.path(target_path, paste(output_file, "qmd", sep = ".")))
+    if (any(grepl("##{{custom-fields}}##", temp, fixed=TRUE))){
+      cat("Yes.")
+      class(custom_fields) <- c("verbatim", class(custom_fields))
+      # see yaml::as.yaml documentation
+        # custom handler with verbatim output to change how logical vectors are
+  # emitted
+
+
+    if (has_pptx_template) {
+      custom_fields[["reference-doc"]] <- pptx_reference_doc
+
+    }
+    out_yaml <- yaml::as.yaml(custom_fields,
+      handlers = list(logical = yaml::verbatim_logical))
+
+
+    temp <- gsub("##{{custom-fields}}##", out_yaml, temp, fixed=TRUE)
+
+    cat(temp,
+    sep = "\n", 
+    file = file.path(target_path, paste(output_file, "qmd", sep = ".")), 
+    append= FALSE)
+    }
+  }
+
+  meta_yml_params <- list(
+    object = "tar_mod.rds",
+    metadata_var_field = metadata_vars$varname,
+    metadata_var_label = metadata_vars$varlabel,
+    title = title,
+    author = author,
+  )
+  # pandoc_args <- c()
+
+  if (render) {
+    quarto::quarto_render(
+      input = target_path,
+      execute_params = meta_yml_params,
+      debug = debug,
+      output_format = format,
+      as_job = FALSE#,pandoc_args = pandoc_args
+    )
+    cat("\Targeter decision tree report generated in folder:.", target_path, "\n")
+    invisible(file.path(target_path))
+  }
+  invisible(TRUE)
+}
+

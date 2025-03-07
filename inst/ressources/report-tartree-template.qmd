@@ -25,6 +25,9 @@ format:
   pdf:
     toc: true
 title: "`r params$title`"
+## will be replaced by eventual parameters passsed
+## to targter via `custom_fields` paramater.
+##{{custom-fields}}## 
 ---
 
 ```{r}
