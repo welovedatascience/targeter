@@ -73,6 +73,10 @@
 #' (no more changes can be made). If FALSE, the report will be editable.
 #' Frozen reports renders can always be bypassed by explicit call to quarto.
 #' @param custom_fields - list of custom fields to be added to the report.
+#' @param report_categories - list of categories / tags to be used for report
+#' USeful if you want to classfiy reports as your Quarto project reports listing
+#' could make use of categories (which is the case of default targeter template)
+
 #' @param ...  additional parameters to be passed to quarto, for instance
 #' allowing to pass/overwite any YAML set-up
 #' @return invisibly returns path to the generated specific file (unique format)
@@ -151,6 +155,7 @@ tar_report.targeter <- function(
   freeze = TRUE,
   verbose = FALSE,
   custom_fields = list("freeze" = freeze),
+  report_categories = c("profile"), # character vector
   # todo implement
   ... # additional parameters to be passed to quarto
 ) {
@@ -321,11 +326,6 @@ tar_report.targeter <- function(
         overwrite = TRUE
       )
     }
-    quarto::quarto_render(
-      input = file.path(quarto_root_dir, quarto_targeters_project_dir),
-      debug = debug,
-      as_job = FALSE
-    )
     cat(" - Done.\n")
   } else {
     if (verbose)
@@ -410,6 +410,10 @@ tar_report.targeter <- function(
 
   yaml <- list(title = title, author = author, date = format(Sys.Date()))
 
+  if (is.null(custom_fields)){
+    custom_fields <- list()
+  }
+
   custom_fields[["reference-doc"]] <- pptx_reference_doc
 
   if (!is.null(custom_fields)) {
@@ -419,13 +423,18 @@ tar_report.targeter <- function(
     )
     yaml[names(custom_fields)] <- custom_fields
   }
+
+  if (!is.null(report_categories) && (report_categories!='')){
+    custom_fields[["categories"]] <- report_categories
+  }
+
+  
   # search in template and replace by yaml equivalent
   temp <- readLines(file.path(
     target_path,
     paste(output_file, "qmd", sep = ".")
   ))
   if (any(grepl("##{{targeter-yaml}}##", temp, fixed = TRUE))) {
-    class(custom_fields) <- c("verbatim", class(custom_fields))
     # see yaml::as.yaml documentation
     # custom handler with verbatim output to change how logical vectors are
     # emitted
@@ -464,9 +473,18 @@ tar_report.targeter <- function(
       execute_params = meta_yml_params,
       debug = debug,
       output_format = format,
+      use_freezer = TRUE,
       as_job = FALSE #,pandoc_args = pandoc_args
     )
-    cat("\nPresentation generated in folder:.", target_path, "\n")
+    quarto::quarto_render(
+      use_freezer = TRUE,
+      input = file.path(quarto_root_dir, quarto_targeters_project_dir),
+      debug = debug,
+      output_format = "html",
+      as_job = FALSE
+    )
+    cat("\nReport generated in folder:.", target_path, "\n")
+
     invisible(file.path(target_path))
   }
   invisible(TRUE)
@@ -522,6 +540,9 @@ tar_report.targeter <- function(
 #' @param verbose - logical. If TRUE, the function will print some information
 #' along the process
 #' @param custom_fields - list of custom fields to be added to the report.
+#' @param report_categories - list of categories / tags to be used for report
+#' USeful if you want to classfiy reports as your Quarto project reports listing
+#' could make use of categories (which is the case of default targeter template)
 #' @param ...  additional parameters to be passed to quarto, for instance
 #' allowing to pass/overwite any YAML set-up
 #' @return invisibly returns path to the generated specific file (unique format)
@@ -555,8 +576,8 @@ tar_report.tartree <- function(
     )
   ),
   targeter_sub_folder = paste0(
-    "targeter-report-tree-",
-    format(Sys.time(), format = "%Y-%m-%d_%H%M%S")
+    format(Sys.time(), format = "%Y-%m-%d_%H%M%S"),
+    "-targeter-report-tree",
   ),
   pptx_reference_doc = NULL, # for pptx format, default template,
   # revealjs_template = "", # todo prepare a revealjs template
@@ -574,7 +595,7 @@ tar_report.tartree <- function(
   debug = FALSE,
   verbose = FALSE,
   custom_fields = list("freeze" = freeze),
-  # todo implement
+  report_categories = c("tree"),
   ... # additional parameters to be passed to quarto
 ) {
   cat("\n Yes report tartree\n")
@@ -831,6 +852,10 @@ tar_report.tartree <- function(
   }
 
   yaml <- list(title = title, author = author, date = format(Sys.Date()))
+  
+  if (is.null(custom_fields)){
+    custom_fields <- list()
+  }
   custom_fields[["reference-doc"]] <- pptx_reference_doc
 
   if (!is.null(custom_fields)) {
@@ -840,10 +865,18 @@ tar_report.tartree <- function(
     )
     yaml[names(custom_fields)] <- custom_fields
   }
+
+  if (!is.null(report_categories) && (report_categories!='')){
+    custom_fields[["categories"]] <- report_categories
+  }
+
   # search in template and replace by yaml equivalent
+    temp <- readLines(file.path(
+    target_path,
+    paste(output_file, "qmd", sep = ".")
+  ))
 
   if (any(grepl("##{{targeter-yaml}}##", temp, fixed = TRUE))) {
-    class(custom_fields) <- c("verbatim", class(custom_fields))
     # see yaml::as.yaml documentation
     # custom handler with verbatim output to change how logical vectors are
     # emitted
@@ -868,18 +901,25 @@ tar_report.tartree <- function(
     metadata_var_field = metadata_vars$varname,
     metadata_var_label = metadata_vars$varlabel
   )
-  # pandoc_args <- c()
 
-  # infile <- file.path(target_path, paste(output_file, "qmd", sep = "."))
-  print(infile)
   if (render) {
     quarto::quarto_render(
       input = target_path,
       execute_params = meta_yml_params,
       debug = debug,
+      use_freezer = TRUE,
       output_format = format,
       as_job = FALSE #,pandoc_args = pandoc_args
     )
+
+      quarto::quarto_render(
+      use_freezer = TRUE,
+      input = file.path(quarto_root_dir, quarto_targeters_project_dir),
+      debug = debug,
+      output_format = "html",
+      as_job = FALSE
+    )
+
     cat(
       "\nTargeter decision tree report generated in folder:.",
       target_path,

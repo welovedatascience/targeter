@@ -41,6 +41,7 @@ tar_report(object, ...)
   freeze = TRUE,
   verbose = FALSE,
   custom_fields = list(freeze = freeze),
+  report_categories = c("profile"),
   ...
 )
 
@@ -58,8 +59,8 @@ tar_report(object, ...)
   quarto_project_brandfile = getOption("targeter.brandfile",
     file.path(find.package("targeter", lib.loc = .libPaths()), "ressources",
     "_targeter_brand_default.yml")),
-  targeter_sub_folder = paste0("targeter-report-tree-", format(Sys.time(), format =
-    "\%Y-\%m-\%d_\%H\%M\%S")),
+  targeter_sub_folder = paste0(format(Sys.time(), format = "\%Y-\%m-\%d_\%H\%M\%S"),
+    "-targeter-report-tree", ),
   pptx_reference_doc = NULL,
   output_file = "index",
   title = paste0("Decision tree for target '", attr(object, "target"), "' on data:",
@@ -70,6 +71,7 @@ tar_report(object, ...)
   debug = FALSE,
   verbose = FALSE,
   custom_fields = list(freeze = freeze),
+  report_categories = c("tree"),
   ...
 )
 }
@@ -170,6 +172,10 @@ Frozen reports renders can always be bypassed by explicit call to quarto.}
 along the process}
 
 \item{custom_fields}{- list of custom fields to be added to the report.}
+
+\item{report_categories}{- list of categories / tags to be used for report
+USeful if you want to classfiy reports as your Quarto project reports listing
+could make use of categories (which is the case of default targeter template)}
 }
 \value{
 invisibly returns path to the generated specific file (unique format)

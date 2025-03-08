@@ -1,6 +1,7 @@
 ---
 title: "targeter analyses repository"
 listing: 
+  categories: true
   id: "targeter-reports"
   contents:
     - "reports/**/*.qmd"
@@ -10,18 +11,7 @@ listing:
     title: "Report"
   date-format: iso
   include:
-    report_type: "targeter"
-listing: 
-  id: "targeter-tree-reports"
-  contents:
-    - "reports/**/*.qmd"
-  type: table
-  sort: "date desc"
-  field-display-names:
-    title: "Report"
-  date-format: iso
-  include:
-    report_type: "targeter-tree"
+    report_type: "{targeter,targeter-tree}"
 ---
 
 
@@ -44,11 +34,6 @@ then in any selection.
 ::: {#targeter-reports}
 :::
 
-## targeter treer reports listing
-
-todo
-
-todo decision trees reports
 
 
 
