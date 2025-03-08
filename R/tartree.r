@@ -250,7 +250,7 @@ tartree <- function(
   
   tarsum_model <- tarsum_object[varname %in% dt_vars]
   
-  attr(mod, "tar_summary_model") <- tarsum_model
+  attr(mod, "tarsum_object") <- tarsum_model
 
   
   attr(mod, "target") <- target

@@ -11,6 +11,11 @@ params:
     decision_tree_format: "static"
     metadata_var_field: "variable"
     metadata_var_label: "label"
+    profiles: true
+    show_toc: TRUE
+    show_tables: TRUE
+    fullplot_which_plot: "1:2"
+    fullplot_numvar_as: "bin" # 'bin', 'value'
 format:
   html:
     theme: cosmo
@@ -41,6 +46,10 @@ suppressMessages(suppressPackageStartupMessages(library(targeter)))
 
 ```{r}
 mod <- readRDS( file = 'tar_mod.rds')
+object <- attr(mod,"tar_object") # already filtered on tree variables
+metadata <- attr(object, "metadata")
+metadata <- metadata[!duplicated(metadata[[params$metadata_var_field]])] 
+
 ```
 
 ### Tree basic information
@@ -83,7 +92,6 @@ plot(pROC, print.auc=TRUE)
 hist(attr(mod, "model_predictions")$N_TARGET_PROB)
 ```
 
-
 ### Probabilities quantiles
 
 
@@ -93,3 +101,62 @@ kableExtra::kable(t(t(quantile(attr(mod, "model_predictions")$N_TARGET_PROB, pro
 
 ```
 
+
+
+
+
+
+```{r}
+#| output: asis
+
+if (params$profiles){
+
+  cat("\n\n Tree variables profiles\n\n")
+
+
+  ## sort by descending IV
+  vars <- sort(sapply(object$profiles, function(x)x$IV), decreasing=TRUE)
+
+  for (ivar in names(vars)){
+
+    cat("\n\n\\newpage\n\n") # for LaTeX
+  
+    # ivar <- names(object$profiles)[i]
+    iprofile <- object$profiles[[ivar]]
+    ivar_label <- label(ivar, metadata = metadata,
+      var_field = params$metadata_var_field, label_field= params$metadata_var_label,
+        include_varname = FALSE)
+    cat("\n\n### ",tolower(ivar),"\n\n")
+    if (tolower(ivar_label)!=tolower(ivar)){
+      cat("\n", ivar_label, "\n")
+    }
+    
+    cat("\n__IV:", round(iprofile$IV, 3), "__\n\n")
+
+    print(
+      fullplot(
+        iprofile, 
+        numvar_as = params$fullplot_numvar_as,
+        which_plot= eval(
+          parse(
+            text = params$fullplot_which_plot 
+            )
+          )
+        )
+      )
+
+    if (as.logical(params$show_tables)){
+      cat("\n\n\\newpage\n\n") # for LaTeX
+        cat("\n\n### ",tolower(ivar)," [table]\n\n")
+        tab <- table_crossvar(iprofile)
+
+        print(kableExtra::kable(tab, format = "simple"))
+        
+      cat("\n\n")
+
+    }
+    
+  }
+
+}
+```
