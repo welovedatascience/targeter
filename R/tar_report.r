@@ -102,6 +102,9 @@
 
 #' @keywords targeter report
 
+
+
+
 #' @export
 tar_report <- function(object, ...) {
   UseMethod("tar_report")
@@ -135,13 +138,10 @@ tar_report.targeter <- function(
       "_targeter_brand_default.yml"
     )
   ),
-  targeter_sub_folder = paste0(
-    format(Sys.time(), format = "%Y-%m-%d_%H%M%S"),
-    "-targeter-report"
-  ),
+  targeter_sub_folder = tar_foldername(object),
   pptx_reference_doc = NULL, # for pptx format, default template,
   # revealjs_template = "", # todo prepare a revealjs template
-  output_file = "index",
+  output_file = tar_foldername(object),
   title = object$analysis,
   author = getOption("targeter.author", "wlds targeter"),
   fullplot_which_plot = "1:2",
@@ -420,8 +420,7 @@ tar_report.targeter <- function(
 
   if (!is.null(report_categories) && (report_categories != '')) {
     custom_fields[["categories"]] <- c(
-      report_categories,
-      paste0("targettype:", object$target_type)
+      report_categories, object$target_type
     )
   }
 
@@ -579,13 +578,10 @@ tar_report.tartree <- function(
       "_targeter_brand_default.yml"
     )
   ),
-  targeter_sub_folder = paste0(
-    format(Sys.time(), format = "%Y-%m-%d_%H%M%S"),
-    "-targeter-report-tree"
-  ),
+  targeter_sub_folder = tar_foldername(object),
   pptx_reference_doc = NULL, # for pptx format, default template,
   # revealjs_template = "", # todo prepare a revealjs template
-  output_file = "index",
+  output_file = tar_foldername(object),
   title = paste0(
     "Decision tree for target '",
     attr(object, "target"),
@@ -869,8 +865,7 @@ if (is.null(custom_fields)) {
 
   if (!is.null(report_categories) && (report_categories != '')) {
     custom_fields[["categories"]] <- c(
-      report_categories,
-      paste0("targettype:", object$target_type)
+      report_categories,attr(object,"tar_object")$target_type
     )
   }
 

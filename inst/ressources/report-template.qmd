@@ -203,12 +203,13 @@ colnames(df2) <- c("variable", "type", "IV", "Level", "#Records", "%Records", "I
 df2$IV <- round(df2$IV, 3)
 # [the relevant section](#test)
 
-if (!is.null(metadata) & format=="html") {
-  df2 <- cbind(data.frame(Label = sapply(
-    df2$variable, label, metadata = metadata, var_field = params$metadata_var_field, label_field= params$metadata_var_label ),
-    stringsAsFactors = FALSE), df2)
-  rownames(df2) <- NULL
-}
+# remove metadata treatment --
+# if (!is.null(metadata) & format=="html") {
+#   df2 <- cbind(data.frame(Label = sapply(
+#     df2$variable, label, metadata = metadata, var_field = params$metadata_var_field, label_field= params$metadata_var_label ),
+#     stringsAsFactors = FALSE), df2)
+#   rownames(df2) <- NULL
+# }
 if (format == "pdf") {
   knitr::kable(df2, format = "latex", booktabs = TRUE)
 } else if (format %in% c("html")) {

@@ -170,3 +170,35 @@ targeter_session_info <- function() {
     targeter_package_version = packageVersion("targeter")
   )
 }
+
+
+
+
+
+
+tar_foldername <- function(object){
+
+  assertthat::assert_that(
+    inherits(object, "targeter") ||
+    inherits(object, "tartree") ,
+    msg = "Function designed for targeter package objects"
+    )
+  
+  current_date <-  format(Sys.Date())
+  
+
+  if (inherits(object, "targeter")){
+    analysis <- object$analysis
+    txt <- "-targeter-report"
+  } else  if (inherits(object, "tartree")){
+
+    analysis <- attr(object,"tar_object")$analysis
+    txt <- "-targeter-tree"
+  }
+
+  analysis <- tolower(make.names(analysis))
+  analysis <- gsub(".", "-", analysis, fixed=TRUE)
+
+  folder <- paste0(current_date, txt,"-", analysis)
+  return(folder)
+}
