@@ -410,11 +410,20 @@ tar_report.targeter <- function(
 
   yaml <- list(title = title, author = author, date = format(Sys.Date()))
 
-  if (is.null(custom_fields)){
+  if (is.null(custom_fields)) {
     custom_fields <- list()
   }
 
+  custom_fields[["target_name"]] <- object$tartet
+
   custom_fields[["reference-doc"]] <- pptx_reference_doc
+
+  if (!is.null(report_categories) && (report_categories != '')) {
+    custom_fields[["categories"]] <- c(
+      report_categories,
+      paste0("targettype:", object$target_type)
+    )
+  }
 
   if (!is.null(custom_fields)) {
     assertthat::assert_that(
@@ -424,11 +433,6 @@ tar_report.targeter <- function(
     yaml[names(custom_fields)] <- custom_fields
   }
 
-  if (!is.null(report_categories) && (report_categories!='')){
-    custom_fields[["categories"]] <- report_categories
-  }
-
-  
   # search in template and replace by yaml equivalent
   temp <- readLines(file.path(
     target_path,
@@ -577,7 +581,7 @@ tar_report.tartree <- function(
   ),
   targeter_sub_folder = paste0(
     format(Sys.time(), format = "%Y-%m-%d_%H%M%S"),
-    "-targeter-report-tree",
+    "-targeter-report-tree"
   ),
   pptx_reference_doc = NULL, # for pptx format, default template,
   # revealjs_template = "", # todo prepare a revealjs template
@@ -852,11 +856,23 @@ tar_report.tartree <- function(
   }
 
   yaml <- list(title = title, author = author, date = format(Sys.Date()))
-  
-  if (is.null(custom_fields)){
+
+
+
+if (is.null(custom_fields)) {
     custom_fields <- list()
   }
+
+  custom_fields[["target_name"]] <- object$tartet
+
   custom_fields[["reference-doc"]] <- pptx_reference_doc
+
+  if (!is.null(report_categories) && (report_categories != '')) {
+    custom_fields[["categories"]] <- c(
+      report_categories,
+      paste0("targettype:", object$target_type)
+    )
+  }
 
   if (!is.null(custom_fields)) {
     assertthat::assert_that(
@@ -866,12 +882,8 @@ tar_report.tartree <- function(
     yaml[names(custom_fields)] <- custom_fields
   }
 
-  if (!is.null(report_categories) && (report_categories!='')){
-    custom_fields[["categories"]] <- report_categories
-  }
-
   # search in template and replace by yaml equivalent
-    temp <- readLines(file.path(
+  temp <- readLines(file.path(
     target_path,
     paste(output_file, "qmd", sep = ".")
   ))
@@ -912,7 +924,7 @@ tar_report.tartree <- function(
       as_job = FALSE #,pandoc_args = pandoc_args
     )
 
-      quarto::quarto_render(
+    quarto::quarto_render(
       use_freezer = TRUE,
       input = file.path(quarto_root_dir, quarto_targeters_project_dir),
       debug = debug,
