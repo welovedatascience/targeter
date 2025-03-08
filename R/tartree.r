@@ -32,6 +32,10 @@ if (getRversion() >= "3.1.0")
 #' @param decision_tree_cp numeric, complexity parameter - default: 0
 #' @param decision_tree_sample numeric, proportion of data to be used for training -  to be betwwen 0 (not included) and 1 (not recommended) default: 0.8
 #' @param seed integer, seed for random number generation - default: 42
+#' @param predict_prob_cutpoint cutpoint to be used for binary decision - default 0.5
+#' @param predict_prob_cutpoint_quantile quantile of probabilities to be used for 
+#' further additional preduction. Default 0.5. Could be used to see what if we
+#' want to create a group of x\% records. 
 #' @param ... other parameters to be passed to targeter
 #' @details
 #' tartree is a function that builds a decision tree model based on a targeter analysis. It is recommended to have pre-computed targeter object and targeter summary object. If not, the function will compute them. The targeter object is used to define the target column and the target type. The targeter summary object is used to define the variables to be used in the decision tree model. The function will split the data into training and validation sets, build the decision tree model, and return it. The decision tree model is a rpart object with additional attributes: tar_object, tarsum_object, and target.
@@ -43,7 +47,8 @@ if (getRversion() >= "3.1.0")
 #' tar_object <- targeter(adult, target = "ABOVE50K")
 #' tarsum_object <- summary(tar_object)
 #' tar_tree <- tartree(adult, tar_object = tar_object, tarsum_object = tarsum_object)
-#' report(tar_tree)
+#' plot(tar_tree)
+#' tar_report(tar_tree)
 #' }
 #' @importFrom data.table setDT
 #' @importFrom assertthat assert_that

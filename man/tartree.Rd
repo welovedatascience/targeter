@@ -33,6 +33,12 @@ tartree(
 
 \item{decision_tree_sample}{numeric, proportion of data to be used for training -  to be betwwen 0 (not included) and 1 (not recommended) default: 0.8}
 
+\item{predict_prob_cutpoint}{cutpoint to be used for binary decision - default 0.5}
+
+\item{predict_prob_cutpoint_quantile}{quantile of probabilities to be used for 
+further additional preduction. Default 0.5. Could be used to see what if we
+want to create a group of x\% records.}
+
 \item{seed}{integer, seed for random number generation - default: 42}
 
 \item{...}{other parameters to be passed to targeter}
@@ -52,6 +58,7 @@ data(adult)
 tar_object <- targeter(adult, target = "ABOVE50K")
 tarsum_object <- summary(tar_object)
 tar_tree <- tartree(adult, tar_object = tar_object, tarsum_object = tarsum_object)
-report(tar_tree)
+plot(tar_tree)
+tar_report(tar_tree)
 }
 }

@@ -5,7 +5,7 @@
 \title{Plot a targeter tartree object}
 \usage{
 \method{plot}{tartree}(
-  decision_tree,
+  x,
   format = "static",
   prefix = "target = ",
   type = 2,
@@ -20,11 +20,14 @@
 )
 }
 \arguments{
-\item{decision_tree}{- a decision tree as fitted by `tartree` function}
+\item{x}{- a decision tree as fitted by `tartree` function}
 
 \item{format}{see `rpart.plot` help}
 
 \item{prefix}{-see `rpart.plot` help}
+
+\item{type}{One of 'static' (use rpart.plot) or interactive (use visTree)
+Parameter expansion is used so that one can use "i". Default: static.}
 
 \item{yesno}{-see `rpart.plot` help}
 
@@ -39,8 +42,12 @@
 \item{cex}{-see `rpart.plot` help}
 
 \item{left}{-see `rpart.plot` help}
+
+\item{...}{-  eventuial additional parameters to be passed to `rpart.plot`
+or visTree}
 }
 \description{
 This function creates a plot for a targeter decision tree 
-model build with `tartree` function
+model build with `tartree` function If format is static, one will use
+rpart.plot package. If interactive, one will use visTree.
 }

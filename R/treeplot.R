@@ -16,8 +16,12 @@ if (getRversion() >= "3.1.0")
 #' @title Plot a targeter tartree object
 #'
 #' @description This function creates a plot for a targeter decision tree 
-#' model build with `tartree` function
-#' @param decision_tree - a decision tree as fitted by `tartree` function
+#' model build with `tartree` function If format is static, one will use
+#' rpart.plot package. If interactive, one will use visTree.
+#' 
+#' @param x - a decision tree as fitted by `tartree` function
+#' @param type One of 'static' (use rpart.plot) or interactive (use visTree)
+#' Parameter expansion is used so that one can use "i". Default: static. 
 #' @param format see `rpart.plot` help
 #' @param prefix -see `rpart.plot` help
 #' @param yesno -see `rpart.plot` help
@@ -27,11 +31,13 @@ if (getRversion() >= "3.1.0")
 #' @param shadow.col -see `rpart.plot` help
 #' @param cex -see `rpart.plot` help
 #' @param left -see `rpart.plot` help
+#' @param ... -  eventuial additional parameters to be passed to `rpart.plot`
+#' or visTree
 
 #' @importFrom pacman p_load
 #' @export
 plot.tartree <- function(
-  decision_tree,
+  x,
   format = "static",
   prefix = "target = ",
   type = 2,
@@ -56,7 +62,7 @@ plot.tartree <- function(
 
 
   assertthat::assert_that(
-    inherits(decision_tree, 'rpart'),
+    inherits(x, 'rpart'),
     msg = "there is a problem with the fitted decision tree"
   )
 
@@ -66,7 +72,7 @@ plot.tartree <- function(
     # rpart.plot::rpart.plot(
     rpart.plot(
     
-      decision_tree,
+      x,
       prefix = prefix,
       type = type,
       yesno = yesno,
@@ -80,6 +86,6 @@ plot.tartree <- function(
     )
   } else {
     # visNetwork::visTree(dt, ...)
-    visTree(decision_tree, ...)
+    visTree(x, ...)
   }
 }
