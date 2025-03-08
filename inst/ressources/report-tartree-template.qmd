@@ -72,7 +72,7 @@ kableExtra::kable(varimp)
 
 
 ```{r}
-targeter::treeplot(mod, format = params$decision_tree_format)
+plot(mod, format = params$decision_tree_format)
 ```
 
 ### Performances

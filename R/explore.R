@@ -55,7 +55,7 @@ if (getRversion() >= "3.1.0")
 #' }
 #' }
 #' @seealso
-#'  \code{\link[targeter]{report}}
+#'  \code{\link[targeter]{tar_report}}
 #' @rdname explore
 #' @export
 

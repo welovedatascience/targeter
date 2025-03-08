@@ -5,7 +5,7 @@ if (getRversion() >= "3.1.0")
   utils::globalVariables(
     c(
       "rpart.plot",
-      "viTree")
+      "visTree")
   )
 
 
@@ -13,11 +13,24 @@ if (getRversion() >= "3.1.0")
 # ' @importFrom visNetwork visTree
 # ' @importFrom rpart.plot rpart.plot
 
+#' @title Plot a targeter tartree object
+#'
+#' @description This function creates a plot for a targeter decision tree 
+#' model build with `tartree` function
+#' @param decision_tree - a decision tree as fitted by `tartree` function
+#' @param format see `rpart.plot` help
+#' @param prefix -see `rpart.plot` help
+#' @param yesno -see `rpart.plot` help
+#' @param branch -see `rpart.plot` help
+#' @param branch.type -see `rpart.plot` help
+#' @param box.palette -see `rpart.plot` help
+#' @param shadow.col -see `rpart.plot` help
+#' @param cex -see `rpart.plot` help
+#' @param left -see `rpart.plot` help
+
 #' @importFrom pacman p_load
-#' @export treeplot
-
-
-treeplot <- function(
+#' @export
+plot.tartree <- function(
   decision_tree,
   format = "static",
   prefix = "target = ",
@@ -59,10 +72,10 @@ treeplot <- function(
       yesno = yesno,
       branch = branch,
       branch.type = branch.type,
-      box.palette = "Blues",
-      shadow.col = 0,
-      cex = 0.7,
-      left = FALSE,
+      box.palette = box.palette,
+      shadow.col = shadow.col,
+      cex = cex,
+      left = left,
       ...
     )
   } else {

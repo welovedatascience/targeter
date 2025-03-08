@@ -46,6 +46,7 @@ tar_report(object, ...)
 
 \method{tar_report}{tartree}(
   object,
+  profiles = TRUE,
   metadata = NULL,
   metadata_vars = list(varname = "variable", varlabel = "label"),
   format = "html",
@@ -174,6 +175,9 @@ along the process}
 \item{report_categories}{- list of categories / tags to be used for report
 USeful if you want to classfiy reports as your Quarto project reports listing
 could make use of categories (which is the case of default targeter template)}
+
+\item{profiles}{- logical: do we display targeter profiles's graph for
+variables associated to tree.}
 }
 \value{
 invisibly returns path to the generated specific file (unique format)
