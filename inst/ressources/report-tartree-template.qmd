@@ -1,10 +1,13 @@
 ---
+## targter target analysis default template
+# title and author will be added rihght below byytar_report function,
+## including eventual parameters passsed
+## for custom_fields` list.
+##{{targeter-yaml}}## 
 execute:
   echo: false
 params:
     model: "tar_mod.rds" # will have to be passed - will be a mandatory parameter  -> path 
-    title: "targeter tree(small)  model"
-    author: "welovedatascience - targeter"
     decision_tree_format: "static"
     metadata_var_field: "variable"
     metadata_var_label: "label"
@@ -26,10 +29,7 @@ format:
     toc: true
   pdf:
     toc: true
-title: "`r params$title`"
-## will be replaced by eventual parameters passsed
-## to targter via `custom_fields` paramater.
-##{{custom-fields}}## 
+report_type: targeter-tree
 ---
 
 ```{r}

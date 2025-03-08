@@ -3,6 +3,12 @@ library(targeter)
 
 data(adult)
 
-tar <- targeter(adult, target="ABOVE50K")
+object <- tar <- targeter(adult, target="ABOVE50K")
 report.targeter(tar)
-class(tar)
+
+(tarsum <- summary(tar))
+
+
+(mod <- tartree(adult, tar, tarsum ))
+
+attributes(mod$tar_summary_model)

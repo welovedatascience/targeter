@@ -34,7 +34,7 @@ format:
     toc: true
   pdf:
     toc: true
-report-type: targeter
+report_type: targeter
 ---
 
 

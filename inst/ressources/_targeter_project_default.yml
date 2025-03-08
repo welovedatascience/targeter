@@ -11,6 +11,17 @@ listing:
   date-format: iso
   include:
     report_type: "targeter"
+listing: 
+  id: "targeter-tree-reports"
+  contents:
+    - "reports/**/*.qmd"
+  type: table
+  sort: "date desc"
+  field-display-names:
+    title: "Report"
+  date-format: iso
+  include:
+    report_type: "targeter-tree"
 ---
 
 

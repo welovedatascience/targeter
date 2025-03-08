@@ -1,7 +1,6 @@
-
 #' @rdname report
 #' @title Generate reports for targeter's analyses
-#' 
+#'
 #' @description This function creates an automatic report according to a
 #'  predefined template in the package or a user-generated template.
 #' Create a report from a targeter report object
@@ -99,7 +98,7 @@
 
 #' @keywords targeter report
 
-#' @export 
+#' @export
 report <- function(object, ...) {
   UseMethod("report")
 }
@@ -134,13 +133,13 @@ report.targeter <- function(
   ),
   targeter_sub_folder = paste0(
     format(Sys.time(), format = "%Y-%m-%d_%H%M%S"),
-    "-targeter-report"   
+    "-targeter-report"
   ),
   pptx_reference_doc = NULL, # for pptx format, default template,
   # revealjs_template = "", # todo prepare a revealjs template
   output_file = "index",
   title = object$analysis,
-  author = getOption("targeter.author", "welovedatascience targeter"),
+  author = getOption("targeter.author", "wlds targeter"),
   fullplot_which_plot = "1:2",
   fullplot_numvar_as = "bin",
   show_tables = FALSE,
@@ -151,7 +150,7 @@ report.targeter <- function(
   logo = NULL,
   freeze = TRUE,
   verbose = FALSE,
-  custom_fields = list("report_type" = "targeter", "freeze" = freeze),
+  custom_fields = list("freeze" = freeze),
   # todo implement
   ... # additional parameters to be passed to quarto
 ) {
@@ -352,8 +351,11 @@ report.targeter <- function(
     file.path(
       quarto_root_dir,
       quarto_targeters_project_dir,
-      "reports"), showWarnings = FALSE)
-  
+      "reports"
+    ),
+    showWarnings = FALSE
+  )
+
   target_path <- file.path(
     quarto_root_dir,
     quarto_targeters_project_dir,
@@ -385,10 +387,7 @@ report.targeter <- function(
   # pptx template
   has_pptx_template <- FALSE
 
-  if (("pptx" %in% format) || ("all" %in% format)) {
-    # if default template we will also use powerpoint wlds template (or override
-    # with user provided one)
-    if (default_template || !default_pptx_template) {
+  if (default_template || !default_pptx_template) {
       #pptx_template <- "targeter-report.pptx"
       tmp_pptx_reference_doc <- "report-template.pptx"
       pptx_copied <- file.copy(
@@ -400,24 +399,26 @@ report.targeter <- function(
         pptx_copied,
         msg = "Could not copy pptx template file"
       )
+  }
+
+  if (("pptx" %in% format) || ("all" %in% format)) {
+    # if default template we will also use powerpoint wlds template (or override
+    # with user provided one)
       has_pptx_template <- TRUE
       pptx_reference_doc <- tmp_pptx_reference_doc
     }
   }
 
-
-  yaml <- list(title = title,
-  author = author, date= format(Sys.Date())
-  )
-  if (has_pptx_template) {
-        custom_fields[["reference-doc"]] <- pptx_reference_doc
-      }
+  yaml <- list(title = title, author = author, date = format(Sys.Date()))
+  
+  custom_fields[["reference-doc"]] <- pptx_reference_doc
   
   if (!is.null(custom_fields)) {
-    assertthat::assert_that(!is.null(names(custom_fields)),
-    msg = "custom fields parameter must be a named list.")
+    assertthat::assert_that(
+      !is.null(names(custom_fields)),
+      msg = "custom fields parameter must be a named list."
+    )
     yaml[names(custom_fields)] <- custom_fields
-      
   }
   # search in template and replace by yaml equivalent
   temp <- readLines(file.path(
@@ -425,27 +426,25 @@ report.targeter <- function(
     paste(output_file, "qmd", sep = ".")
   ))
   if (any(grepl("##{{targeter-yaml}}##", temp, fixed = TRUE))) {
-      class(custom_fields) <- c("verbatim", class(custom_fields))
-      # see yaml::as.yaml documentation
-      # custom handler with verbatim output to change how logical vectors are
-      # emitted
+    class(custom_fields) <- c("verbatim", class(custom_fields))
+    # see yaml::as.yaml documentation
+    # custom handler with verbatim output to change how logical vectors are
+    # emitted
 
-      out_yaml <- yaml::as.yaml(
-        yaml,
-        handlers = list(logical = yaml::verbatim_logical)
-      )
+    out_yaml <- yaml::as.yaml(
+      yaml,
+      handlers = list(logical = yaml::verbatim_logical)
+    )
 
-      temp <- gsub("##{{targeter-yaml}}##", out_yaml, temp, fixed = TRUE)
+    temp <- gsub("##{{targeter-yaml}}##", out_yaml, temp, fixed = TRUE)
 
-      cat(
-        temp,
-        sep = "\n",
-        file = file.path(target_path, paste(output_file, "qmd", sep = ".")),
-        append = FALSE
-      )
-    
+    cat(
+      temp,
+      sep = "\n",
+      file = file.path(target_path, paste(output_file, "qmd", sep = ".")),
+      append = FALSE
+    )
   }
-
 
   meta_yml_params <- list(
     object = "tar.rds",
@@ -458,7 +457,7 @@ report.targeter <- function(
     show_toc = as.character(show_toc),
     show_details = as.character(show_details)
 
-    # todo decision trees
+    -
   )
   # pandoc_args <- c()
 
@@ -475,7 +474,6 @@ report.targeter <- function(
   }
   invisible(TRUE)
 }
-
 
 
 #' @title report.tartree
@@ -532,8 +530,6 @@ report.targeter <- function(
 #' @return invisibly returns path to the generated specific file (unique format)
 #' or folder (several formats)
 
-
-
 #' @rdname report
 #' @export
 
@@ -568,14 +564,19 @@ report.tartree <- function(
   pptx_reference_doc = NULL, # for pptx format, default template,
   # revealjs_template = "", # todo prepare a revealjs template
   output_file = "index",
-  title = paste(attr(object, "tar_object")$analysis, "- decision tree"),
-  author = getOption("targeter.author", "welovedatascience targeter"),
+  title = paste0(
+    "Decision tree for target '",
+    attr(object, "target"),
+    "' on data:",
+    attr(object, "tar_object")$description_data
+  ),
+  author = getOption("targeter.author", "wlds targeter"),
   render = TRUE,
   freeze = TRUE,
 
   debug = FALSE,
   verbose = FALSE,
-  custom_fields = list("report_type" = "targeter-tree", "freeze" = freeze),
+  custom_fields = list("freeze" = freeze),
   # todo implement
   ... # additional parameters to be passed to quarto
 ) {
@@ -705,6 +706,7 @@ report.tartree <- function(
     quarto::quarto_create_project(
       name = quarto_targeters_project_dir,
       dir = quarto_root_dir,
+      type = "website",
       no_prompt = TRUE,
       quiet = TRUE
     )
@@ -723,7 +725,7 @@ report.tartree <- function(
       to = file.path(
         quarto_root_dir,
         quarto_targeters_project_dir,
-        paste(quarto_targeters_project_dir, "qmd", sep = ".")
+        paste("index", "qmd", sep = ".")
       ),
       overwrite = TRUE
     )
@@ -769,11 +771,25 @@ report.tartree <- function(
     )
   }
 
+
+  # subdir reports
+  reports_path <- dir.create(
+    file.path(
+      quarto_root_dir,
+      quarto_targeters_project_dir,
+      "reports"
+    ),
+    showWarnings = FALSE
+  )
+
   target_path <- file.path(
     quarto_root_dir,
     quarto_targeters_project_dir,
+    "reports",
     targeter_sub_folder
   )
+  target_path <- tolower(target_path) # potential quarto bug for listings
+  
   if (verbose) cat("\n- using  targeter report folder:", target_path, "\n")
   if (!dir.exists(target_path)) {
     dir_created <- dir.create(target_path, showWarnings = FALSE)
@@ -783,7 +799,7 @@ report.tartree <- function(
     )
   }
 
-print(target_path)
+  print(target_path)
   attr(object, "metadata") <- metadata
   saveRDS(object, file.path(target_path, "tar_mod.rds"))
 
@@ -797,10 +813,7 @@ print(target_path)
   # pptx template
   has_pptx_template <- FALSE
 
-  if (("pptx" %in% format) || ("all" %in% format)) {
-    # if default template we will also use powerpoint wlds template (or override
-    # with user provided one)
-    if (default_template || !default_pptx_template) {
+  if (default_template || !default_pptx_template) {
       #pptx_template <- "targeter-report.pptx"
       tmp_pptx_reference_doc <- "report-template.pptx"
       pptx_copied <- file.copy(
@@ -812,56 +825,64 @@ print(target_path)
         pptx_copied,
         msg = "Could not copy pptx template file"
       )
+  }
+
+  if (("pptx" %in% format) || ("all" %in% format)) {
+    # if default template we will also use powerpoint wlds template (or override
+    # with user provided one)
       has_pptx_template <- TRUE
       pptx_reference_doc <- tmp_pptx_reference_doc
     }
   }
 
-  if (!is.null(custom_fields)) {
-    # search in template and replace by yaml equivalent
-    temp <- readLines(file.path(
-      target_path,
-      paste(output_file, "qmd", sep = ".")
-    ))
-    if (any(grepl("##{{custom-fields}}##", temp, fixed = TRUE))) {
-      class(custom_fields) <- c("verbatim", class(custom_fields))
-      # see yZml::as.yaml documentation
-      # custom handler with verbatim output to change how logical vectors are
-      # emitted
 
-      if (has_pptx_template) {
-        custom_fields[["reference-doc"]] <- pptx_reference_doc
-      }
-      out_yaml <- yaml::as.yaml(
-        custom_fields,
-        handlers = list(logical = yaml::verbatim_logical)
-      )
+  yaml <- list(title = title, author = author, date = format(Sys.Date()))
+  custom_fields[["reference-doc"]] <- pptx_reference_doc
 
-      temp <- gsub("##{{custom-fields}}##", out_yaml, temp, fixed = TRUE)
+if (!is.null(custom_fields)) {
+    assertthat::assert_that(
+      !is.null(names(custom_fields)),
+      msg = "custom fields parameter must be a named list."
+    )
+    yaml[names(custom_fields)] <- custom_fields
+  }
+  # search in template and replace by yaml equivalent
+  
+  
+  
+   if (any(grepl("##{{targeter-yaml}}##", temp, fixed = TRUE))) {
+    class(custom_fields) <- c("verbatim", class(custom_fields))
+    # see yaml::as.yaml documentation
+    # custom handler with verbatim output to change how logical vectors are
+    # emitted
 
-      cat(
-        temp,
-        sep = "\n",
-        file = file.path(target_path, paste(output_file, "qmd", sep = ".")),
-        append = FALSE
-      )
-    }
+    out_yaml <- yaml::as.yaml(
+      yaml,
+      handlers = list(logical = yaml::verbatim_logical)
+    )
+
+    temp <- gsub("##{{targeter-yaml}}##", out_yaml, temp, fixed = TRUE)
+
+    cat(
+      temp,
+      sep = "\n",
+      file = file.path(target_path, paste(output_file, "qmd", sep = ".")),
+      append = FALSE
+    )
   }
 
   meta_yml_params <- list(
-    model = "object.rds",
+    model = "tar_mod.rds",
     metadata_var_field = metadata_vars$varname,
-    metadata_var_label = metadata_vars$varlabel,
-    title = title,
-    author = author
+    metadata_var_label = metadata_vars$varlabel
   )
   # pandoc_args <- c()
 
-  infile <- file.path(target_path, paste(output_file, "qmd", sep = "."))
+  # infile <- file.path(target_path, paste(output_file, "qmd", sep = "."))
   print(infile)
   if (render) {
     quarto::quarto_render(
-      input = infile,
+      input = target_path,
       execute_params = meta_yml_params,
       debug = debug,
       output_format = format,
@@ -876,5 +897,3 @@ print(target_path)
   }
   invisible(TRUE)
 }
-
-
