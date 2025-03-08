@@ -500,6 +500,8 @@ tar_report.targeter <- function(
 #' Create a report from a targeter tree object
 #'
 #' @param object - an object of class targeter tartree
+#' @param profiles - logical: do we display targeter profiles's graph for
+#' variables associated to tree.
 #' @param metadata - data.frame - if metadata is  loaded in R environment,
 #' label of the variables can be used. Default value (NULL) corresponds to
 #' no metadata available.
@@ -556,6 +558,7 @@ tar_report.targeter <- function(
 
 tar_report.tartree <- function(
   object,
+  profiles = TRUE,
   metadata = NULL,
   metadata_vars = list(varname = "variable", varlabel = "label"),
   format = "html",

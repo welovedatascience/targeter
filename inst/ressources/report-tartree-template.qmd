@@ -11,7 +11,7 @@ params:
     decision_tree_format: "static"
     metadata_var_field: "variable"
     metadata_var_label: "label"
-    profiles: true
+    profiles: TRUE
     show_toc: TRUE
     show_tables: TRUE
     fullplot_which_plot: "1:2"
