@@ -299,7 +299,7 @@ tartree <- function(
 
   ## subset targeter object and targeter summary object
   tar_object_model <- tar_object
-  tar_object_model$profile <- tar_object_model$profile[dt_vars]
+  tar_object_model$profiles <- tar_object_model$profiles[dt_vars]
   attr(mod, "tar_object") <- tar_object_model
 
   tarsum_model <- tarsum_object[varname %in% dt_vars]

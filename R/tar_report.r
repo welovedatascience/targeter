@@ -418,7 +418,8 @@ tar_report.targeter <- function(
 
   custom_fields[["reference-doc"]] <- pptx_reference_doc
 
-  if (!is.null(report_categories) && (report_categories != '')) {
+  if (!is.null(report_categories) && is.character(report_categories) && 
+  length(report_categories)>0) {
     custom_fields[["categories"]] <- c(
       report_categories, object$target_type
     )
@@ -866,7 +867,7 @@ if (is.null(custom_fields)) {
 
   custom_fields[["reference-doc"]] <- pptx_reference_doc
 
-  if (!is.null(report_categories) && (report_categories != '')) {
+  if (!is.null(report_categories) && is.character(report_categories) && length(report_categories)>0) {
     custom_fields[["categories"]] <- c(
       report_categories,attr(object,"tar_object")$target_type
     )
@@ -914,7 +915,7 @@ if (is.null(custom_fields)) {
 
   if (render) {
     quarto::quarto_render(
-      input = target_path,
+      input = file.path(target_path, paste(output_file, "qmd", sep = ".")),
       execute_params = meta_yml_params,
       debug = debug,
       use_freezer = TRUE,
@@ -927,6 +928,7 @@ if (is.null(custom_fields)) {
       input = file.path(quarto_root_dir, quarto_targeters_project_dir),
       debug = debug,
       output_format = "html",
+      use_freezer = TRUE,
       as_job = FALSE
     )
 

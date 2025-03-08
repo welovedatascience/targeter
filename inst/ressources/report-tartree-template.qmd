@@ -45,6 +45,7 @@ suppressMessages(suppressPackageStartupMessages(library(targeter)))
 
 
 ```{r}
+#| label: import
 mod <- readRDS( file = 'tar_mod.rds')
 object <- attr(mod,"tar_object") # already filtered on tree variables
 metadata <- attr(object, "metadata")
@@ -64,6 +65,7 @@ Tree contains `r  nrow(varimp[which(in_tree=="*"),])` variables, with following 
 
 
 ```{r}
+#| label: var importance
 kableExtra::kable(varimp)
 ```
 
@@ -72,6 +74,7 @@ kableExtra::kable(varimp)
 
 
 ```{r}
+#| label: tree plot
 plot(mod, format = params$decision_tree_format)
 ```
 
@@ -79,6 +82,7 @@ plot(mod, format = params$decision_tree_format)
 
 
 ```{r}
+#| label: model performance AUC curve
 pROC <- attr(mod, "pROC")
 cat("\n\nAUC:", round(pROC$auc, 3),"\n")
 plot(pROC, print.auc=TRUE)
@@ -89,6 +93,7 @@ plot(pROC, print.auc=TRUE)
 
 
 ```{r}
+#| label: model proba histogram
 hist(attr(mod, "model_predictions")$N_TARGET_PROB)
 ```
 
@@ -97,6 +102,7 @@ hist(attr(mod, "model_predictions")$N_TARGET_PROB)
 
 
 ```{r}
+#| model prediction quantiles
 kableExtra::kable(t(t(quantile(attr(mod, "model_predictions")$N_TARGET_PROB, probs= seq(0,1, by = 0.1)))))
 
 ```
@@ -108,6 +114,7 @@ kableExtra::kable(t(t(quantile(attr(mod, "model_predictions")$N_TARGET_PROB, pro
 
 ```{r}
 #| output: asis
+#| label: tree variables profile 
 
 if (params$profiles){
 
