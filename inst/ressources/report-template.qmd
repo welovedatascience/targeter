@@ -1,11 +1,14 @@
 ---
+## targter target analysis default template
+# title and author will be added rihght below byytar_report function,
+## including eventual parameters passsed
+## for custom_fields` list.
+##{{targeter-yaml}}## 
 execute:
   echo: false
 params:
   object: "tar.rds" # will have to be passed - will be a mandatory parameter  -> path to a rds export of a targeter object
   summary_object : "tar_summary.rds"  
-  author: "welovedatascience - targeter"
-  title: "targeter analyis"
   show_details: TRUE
   show_toc: TRUE
   show_tables: TRUE
@@ -31,14 +34,7 @@ format:
     toc: true
   pdf:
     toc: true
-date: "`r format(Sys.Date())`"
-title: "`r params$title`"
-author: "`r params$author`"
-logo: "`r params$logo`"
 report-type: targeter
-## will be replaced by eventual parameters passsed
-## to targter via `custom_fields` paramater.
-##{{custom-fields}}## 
 ---
 
 
