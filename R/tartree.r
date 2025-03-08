@@ -1,3 +1,25 @@
+# to prevent checks of data.table used variables
+# see:  ?globalVariables
+
+if (getRversion() >= "3.1.0")
+  utils::globalVariables(
+    c(
+      "..vars_model",
+      "L_TARGET_PREDICTION",
+      "L_TARGET_PREDICTION_CP",
+      "L_TARGET_PREDICTION_CP_QUANTILE",
+      "N_TARGET_PROB",
+      "importance",
+      "in_tree",
+      "roc",
+      "rpart",
+      "rpart.control",
+      "slice_sample",
+      "weight_target"
+    )
+  )
+
+
 
 
 #' @title tartree
@@ -26,6 +48,7 @@
 #' @importFrom data.table setDT
 #' @importFrom assertthat assert_that
 #' @importFrom pacman p_load
+#' @importFrom stats predict
 
 tartree <- function(
   data,
@@ -37,7 +60,7 @@ tartree <- function(
   decision_tree_sample = 0.8,
   predict_prob_cutpoint = 0.5,
   predict_prob_cutpoint_quantile = 0.5,
-  seed=42,
+  seed = 42,
   ...
 ) {
   assertthat::assert_that(
@@ -73,12 +96,23 @@ tartree <- function(
       )
     }
   }
-  assertthat::assert_that(is.integer(decision_tree_maxdepth) && (decision_tree_maxdepth>0), msg = "decision_tree_maxdepth must to be a positive integer")
-  assertthat::assert_that(is.numeric(decision_tree_cp), msg = "decision_tree_cp must to be a numeric")
+  assertthat::assert_that(
+    is.integer(decision_tree_maxdepth) && (decision_tree_maxdepth > 0),
+    msg = "decision_tree_maxdepth must to be a positive integer"
+  )
+  assertthat::assert_that(
+    is.numeric(decision_tree_cp),
+    msg = "decision_tree_cp must to be a numeric"
+  )
 
-  assertthat::assert_that(is.numeric(decision_tree_sample), msg = "decision_tree_sample must to be a numeric")
-  assertthat::assert_that((0<decision_tree_sample) && (decision_tree_sample<=1), msg = "decision_tree_sample must to be between 0 (excluded) and 1")
-
+  assertthat::assert_that(
+    is.numeric(decision_tree_sample),
+    msg = "decision_tree_sample must to be a numeric"
+  )
+  assertthat::assert_that(
+    (0 < decision_tree_sample) && (decision_tree_sample <= 1),
+    msg = "decision_tree_sample must to be between 0 (excluded) and 1"
+  )
 
   if (is.null(tarsum_object)) {
     cat(
@@ -98,7 +132,7 @@ tartree <- function(
   )
 
   data_model <- data[, ..vars_model]
-  deps <- c("explore", "rpart", "dplyr","pROC")
+  deps <- c("explore", "rpart", "dplyr", "pROC")
   if (getOption("targeter.auto_install_deps", FALSE)) {
     pacman::p_load(char = deps)
   }
@@ -120,13 +154,15 @@ tartree <- function(
     msg = "data_model must to have more than one row"
   )
 
-
   # split train/valid
   set.seed(seed)
   data_model$ID <- 1:nrow(data_model)
 
-
-  formula_txt <- as.formula(paste("L_TARGET", "~ ", paste(dt_vars_exp, collapse = " + "))) # L_TARGET built after
+  formula_txt <- as.formula(paste(
+    "L_TARGET",
+    "~ ",
+    paste(dt_vars_exp, collapse = " + ")
+  )) # L_TARGET built after
 
   if (tar_object$target_type %in% c('binary')) {
     # look in function for categorical targets
@@ -134,10 +170,12 @@ tartree <- function(
     data_model[,
       L_TARGET := ifelse(get(target) == tar_object$target_reference_level, 1, 0)
     ]
-  data_model_train <- slice_sample(data_model, prop = decision_tree_sample, by = "L_TARGET")
-  data_model_valid <- data_model[!data_model$ID %in% data_model_train$ID]
-
-
+    data_model_train <- slice_sample(
+      data_model,
+      prop = decision_tree_sample,
+      by = "L_TARGET"
+    )
+    data_model_valid <- data_model[!data_model$ID %in% data_model_train$ID]
 
     weights <- weight_target(
       data_model[, unique(c("L_TARGET", dt_vars_exp)), with = FALSE],
@@ -196,21 +234,35 @@ tartree <- function(
   if (nrow(data_model_valid) == 0) {
     data_model_valid <- data_model_train
     model_assessed_on <- "train"
-  }  else {
+  } else {
     model_assessed_on <- "valid"
   }
   predictions <- data.table(
-      ID=data_model_valid$ID,
-      L_TARGET = data_model_valid$L_TARGET,
-      L_TARGET_PREDICTION =predict(mod, data_model_valid, type = "class"))
+    ID = data_model_valid$ID,
+    L_TARGET = data_model_valid$L_TARGET,
+    L_TARGET_PREDICTION = stats::predict(mod, data_model_valid, type = "class")
+  )
 
-  predictions[, N_TARGET_PROB := predict(mod, data_model_valid, type = "prob")[, 2]]
-  predictions[, L_TARGET_PREDICTION_CP := ifelse(N_TARGET_PROB > predict_prob_cutpoint, 1, 0)]
-  predictions[, L_TARGET_PREDICTION_CP_QUANTILE := ifelse(N_TARGET_PROB >= quantile(N_TARGET_PROB, predict_prob_cutpoint_quantile), 1, 0)]
-  
-  predictions[, .N, by= list(L_TARGET, L_TARGET_PREDICTION)]
-  predictions[, .N, by= list(L_TARGET,  L_TARGET_PREDICTION_CP_QUANTILE)]
+  predictions[,
+    N_TARGET_PROB := stats::predict(mod, data_model_valid, type = "prob")[, 2]
+  ]
+  predictions[,
+    L_TARGET_PREDICTION_CP := ifelse(
+      N_TARGET_PROB > predict_prob_cutpoint,
+      1,
+      0
+    )
+  ]
+  predictions[,
+    L_TARGET_PREDICTION_CP_QUANTILE := ifelse(
+      N_TARGET_PROB >= quantile(N_TARGET_PROB, predict_prob_cutpoint_quantile),
+      1,
+      0
+    )
+  ]
 
+  predictions[, .N, by = list(L_TARGET, L_TARGET_PREDICTION)]
+  predictions[, .N, by = list(L_TARGET, L_TARGET_PREDICTION_CP_QUANTILE)]
 
   pROC <- roc(predictions$L_TARGET, predictions$N_TARGET_PROB)
 
@@ -222,37 +274,33 @@ tartree <- function(
   vars_imp_df <- data.frame(var = names(vars_imp), importance = round(vars_imp))
   vars_imp_df[["in_tree"]] <- ifelse(vars_imp_df[["var"]] %in% dt_vars, "*", "")
   setDT(vars_imp_df)
-  vars_imp_df <- setorder(vars_imp_df, -in_tree ,-importance)
+  vars_imp_df <- setorder(vars_imp_df, -in_tree, -importance)
   # at min vars: vars_imp_df
   var_nmin <- length(dt_vars)
   n_vars <- max(var_nmin, min(10, nrow(vars_imp_df)))
-  vars_imp_df <- vars_imp_df[1:n_vars,]
-
-
-
+  vars_imp_df <- vars_imp_df[1:n_vars, ]
 
   attr(mod, "model_assessed_on") <- model_assessed_on
   attr(mod, "model_predictions") <- predictions
-  
+
   attr(mod, "pROC") <- pROC
   attr(mod, "model_varimp") <- setDT(vars_imp_df)
   attr(mod, "decision_tree_params") <- list(
     decision_tree_maxdepth = decision_tree_maxdepth,
     decision_tree_cp = decision_tree_cp,
     decision_tree_sample = decision_tree_sample,
-    seed  = seed
+    seed = seed
   )
 
   ## subset targeter object and targeter summary object
   tar_object_model <- tar_object
   tar_object_model$profile <- tar_object_model$profile[dt_vars]
   attr(mod, "tar_object") <- tar_object_model
-  
+
   tarsum_model <- tarsum_object[varname %in% dt_vars]
-  
+
   attr(mod, "tarsum_object") <- tarsum_model
 
-  
   attr(mod, "target") <- target
   class(mod) <- c("tartree", class(mod))
   return(mod)

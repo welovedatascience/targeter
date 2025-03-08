@@ -616,7 +616,7 @@ tar_report.tartree <- function(
   )
   #
 
-  assertthat:::assert_that(
+  assertthat::assert_that(
     inherits(object, "tartree"),
     msg = "object must to be a tartree object"
   )

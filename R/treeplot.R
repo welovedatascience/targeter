@@ -1,3 +1,14 @@
+# to prevent checks of data.table used variables
+# see:  ?globalVariables
+
+if (getRversion() >= "3.1.0")
+  utils::globalVariables(
+    c(
+      "rpart.plot",
+      "viTree")
+  )
+
+
 
 # ' @importFrom visNetwork visTree
 # ' @importFrom rpart.plot rpart.plot
