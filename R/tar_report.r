@@ -1,4 +1,4 @@
-#' @rdname report
+#' @rdname tar_report
 #' @title Generate reports for targeter's analyses
 #'
 #' @description This function creates an automatic report according to a
@@ -92,20 +92,20 @@
 #' \dontrun{
 #' tar <- targeter(adult, target ="ABOVE50K", analysis_name="Analyse",
 #' naming_conventions=FALSE)
-#' report(tar,  author = "this is me")
-#' report(tar,  format= c("pptx","pdf","docx"),author = "this is me")
+#' tar_report(tar,  author = "this is me")
+#' tar_report(tar,  format= c("pptx","pdf","docx"),author = "this is me")
 #' }1
 
 #' @keywords targeter report
 
 #' @export
-report <- function(object, ...) {
-  UseMethod("report")
+tar_report <- function(object, ...) {
+  UseMethod("tar_report")
 }
 
-#' @rdname report
+#' @rdname tar_report
 #' @export
-report.targeter <- function(
+tar_report.targeter <- function(
   object,
   summary_object = NULL,
   metadata = NULL,
@@ -388,31 +388,30 @@ report.targeter <- function(
   has_pptx_template <- FALSE
 
   if (default_template || !default_pptx_template) {
-      #pptx_template <- "targeter-report.pptx"
-      tmp_pptx_reference_doc <- "report-template.pptx"
-      pptx_copied <- file.copy(
-        from = pptx_reference_doc,
-        to = file.path(target_path, tmp_pptx_reference_doc),
-        overwrite = TRUE
-      )
-      assertthat::assert_that(
-        pptx_copied,
-        msg = "Could not copy pptx template file"
-      )
+    #pptx_template <- "targeter-report.pptx"
+    tmp_pptx_reference_doc <- "report-template.pptx"
+    pptx_copied <- file.copy(
+      from = pptx_reference_doc,
+      to = file.path(target_path, tmp_pptx_reference_doc),
+      overwrite = TRUE
+    )
+    assertthat::assert_that(
+      pptx_copied,
+      msg = "Could not copy pptx template file"
+    )
   }
 
   if (("pptx" %in% format) || ("all" %in% format)) {
     # if default template we will also use powerpoint wlds template (or override
     # with user provided one)
-      has_pptx_template <- TRUE
-      pptx_reference_doc <- tmp_pptx_reference_doc
-    }
+    has_pptx_template <- TRUE
+    pptx_reference_doc <- tmp_pptx_reference_doc
   }
 
   yaml <- list(title = title, author = author, date = format(Sys.Date()))
-  
+
   custom_fields[["reference-doc"]] <- pptx_reference_doc
-  
+
   if (!is.null(custom_fields)) {
     assertthat::assert_that(
       !is.null(names(custom_fields)),
@@ -456,8 +455,6 @@ report.targeter <- function(
     show_tables = as.character(show_tables),
     show_toc = as.character(show_toc),
     show_details = as.character(show_details)
-
-    -
   )
   # pandoc_args <- c()
 
@@ -530,10 +527,10 @@ report.targeter <- function(
 #' @return invisibly returns path to the generated specific file (unique format)
 #' or folder (several formats)
 
-#' @rdname report
+#' @rdname tar_report
 #' @export
 
-report.tartree <- function(
+tar_report.tartree <- function(
   object,
   metadata = NULL,
   metadata_vars = list(varname = "variable", varlabel = "label"),
@@ -771,7 +768,6 @@ report.tartree <- function(
     )
   }
 
-
   # subdir reports
   reports_path <- dir.create(
     file.path(
@@ -789,7 +785,7 @@ report.tartree <- function(
     targeter_sub_folder
   )
   target_path <- tolower(target_path) # potential quarto bug for listings
-  
+
   if (verbose) cat("\n- using  targeter report folder:", target_path, "\n")
   if (!dir.exists(target_path)) {
     dir_created <- dir.create(target_path, showWarnings = FALSE)
@@ -814,32 +810,30 @@ report.tartree <- function(
   has_pptx_template <- FALSE
 
   if (default_template || !default_pptx_template) {
-      #pptx_template <- "targeter-report.pptx"
-      tmp_pptx_reference_doc <- "report-template.pptx"
-      pptx_copied <- file.copy(
-        from = pptx_reference_doc,
-        to = file.path(target_path, tmp_pptx_reference_doc),
-        overwrite = TRUE
-      )
-      assertthat::assert_that(
-        pptx_copied,
-        msg = "Could not copy pptx template file"
-      )
+    #pptx_template <- "targeter-report.pptx"
+    tmp_pptx_reference_doc <- "report-template.pptx"
+    pptx_copied <- file.copy(
+      from = pptx_reference_doc,
+      to = file.path(target_path, tmp_pptx_reference_doc),
+      overwrite = TRUE
+    )
+    assertthat::assert_that(
+      pptx_copied,
+      msg = "Could not copy pptx template file"
+    )
   }
 
   if (("pptx" %in% format) || ("all" %in% format)) {
     # if default template we will also use powerpoint wlds template (or override
     # with user provided one)
-      has_pptx_template <- TRUE
-      pptx_reference_doc <- tmp_pptx_reference_doc
-    }
+    has_pptx_template <- TRUE
+    pptx_reference_doc <- tmp_pptx_reference_doc
   }
-
 
   yaml <- list(title = title, author = author, date = format(Sys.Date()))
   custom_fields[["reference-doc"]] <- pptx_reference_doc
 
-if (!is.null(custom_fields)) {
+  if (!is.null(custom_fields)) {
     assertthat::assert_that(
       !is.null(names(custom_fields)),
       msg = "custom fields parameter must be a named list."
@@ -847,10 +841,8 @@ if (!is.null(custom_fields)) {
     yaml[names(custom_fields)] <- custom_fields
   }
   # search in template and replace by yaml equivalent
-  
-  
-  
-   if (any(grepl("##{{targeter-yaml}}##", temp, fixed = TRUE))) {
+
+  if (any(grepl("##{{targeter-yaml}}##", temp, fixed = TRUE))) {
     class(custom_fields) <- c("verbatim", class(custom_fields))
     # see yaml::as.yaml documentation
     # custom handler with verbatim output to change how logical vectors are
