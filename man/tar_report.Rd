@@ -60,7 +60,7 @@ tar_report(object, ...)
     file.path(find.package("targeter", lib.loc = .libPaths()), "ressources",
     "_targeter_brand_default.yml")),
   targeter_sub_folder = paste0(format(Sys.time(), format = "\%Y-\%m-\%d_\%H\%M\%S"),
-    "-targeter-report-tree", ),
+    "-targeter-report-tree"),
   pptx_reference_doc = NULL,
   output_file = "index",
   title = paste0("Decision tree for target '", attr(object, "target"), "' on data:",

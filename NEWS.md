@@ -1,3 +1,11 @@
+
+# targeter 1.5.0
+
+* 20250308
+* New functions to create decision trees adn associated report
+* Global default index for all reports listing with categories
+
+
 # targeter 1.4.1
 
 * 20250306
