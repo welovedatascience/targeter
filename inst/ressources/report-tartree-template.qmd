@@ -111,7 +111,7 @@ kableExtra::kable(t(t(quantile(attr(mod, "model_predictions")$N_TARGET_PROB, pro
 
 if (params$profiles){
 
-  cat("\n\n Tree variables profiles\n\n")
+  cat("\n\n## Tree variables profiles\n\n")
 
 
   ## sort by descending IV
@@ -160,3 +160,6 @@ if (params$profiles){
 
 }
 ```
+
+
+
