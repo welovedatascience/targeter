@@ -1,4 +1,7 @@
-#' @title report
+
+#' @rdname report
+#' @title Generate reports for targeter's analyses
+#' 
 #' @description This function creates an automatic report according to a
 #'  predefined template in the package or a user-generated template.
 #' Create a report from a targeter report object
@@ -94,14 +97,15 @@
 #' report(tar,  format= c("pptx","pdf","docx"),author = "this is me")
 #' }1
 
-#' @export report
+#' @keywords targeter report
 
-
+#' @export 
 report <- function(object, ...) {
   UseMethod("report")
 }
 
-#' @export report.targeter
+#' @rdname report
+#' @export
 report.targeter <- function(
   object,
   summary_object = NULL,
@@ -129,8 +133,8 @@ report.targeter <- function(
     )
   ),
   targeter_sub_folder = paste0(
-    "targeter-report-",
-    format(Sys.time(), format = "%Y-%m-%d_%H%M%S")
+    format(Sys.time(), format = "%Y-%m-%d_%H%M%S"),
+    "-targeter-report"   
   ),
   pptx_reference_doc = NULL, # for pptx format, default template,
   # revealjs_template = "", # todo prepare a revealjs template
@@ -277,6 +281,7 @@ report.targeter <- function(
     # we must create a quarto project to store targeters reports
     quarto::quarto_create_project(
       name = quarto_targeters_project_dir,
+      type = "website",
       dir = quarto_root_dir,
       no_prompt = TRUE,
       quiet = TRUE
@@ -296,7 +301,7 @@ report.targeter <- function(
       to = file.path(
         quarto_root_dir,
         quarto_targeters_project_dir,
-        paste(quarto_targeters_project_dir, "qmd", sep = ".")
+        paste("index.qmd", sep = ".")
       ),
       overwrite = TRUE
     )
@@ -342,9 +347,17 @@ report.targeter <- function(
     )
   }
 
+  # subdir reports
+  reports_path <- dir.create(
+    file.path(
+      quarto_root_dir,
+      quarto_targeters_project_dir,
+      "reports"), showWarnings = FALSE)
+  
   target_path <- file.path(
     quarto_root_dir,
     quarto_targeters_project_dir,
+    "reports",
     targeter_sub_folder
   )
   target_path <- tolower(target_path) # potential quarto bug for listings
@@ -394,7 +407,7 @@ report.targeter <- function(
 
 
   yaml <- list(title = title,
-  author = author, data= format(Sys.Date())
+  author = author, date= format(Sys.Date())
   )
   if (has_pptx_template) {
         custom_fields[["reference-doc"]] <- pptx_reference_doc
@@ -519,7 +532,10 @@ report.targeter <- function(
 #' @return invisibly returns path to the generated specific file (unique format)
 #' or folder (several formats)
 
-#' @exportS trepor.tartree
+
+
+#' @rdname report
+#' @export
 
 report.tartree <- function(
   object,

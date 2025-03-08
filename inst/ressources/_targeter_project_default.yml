@@ -1,16 +1,43 @@
 ---
-title: "targeter"
+title: "targeter analyses repository"
+listing: 
+  id: "targeter-reports"
+  contents:
+    - "reports/**/*.qmd"
+  type: table
+  sort: "date desc"
+  field-display-names:
+    title: "Report"
+  date-format: iso
+  include:
+    report_type: "targeter"
 ---
 
-## Quarto
 
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+## About
+
+This file has been automatically genereated at first project creation by 
+`targeter` package. Once generated, feel free to edit it to suit your company 
+standard.
+
+You might want to move `reports` folder somewhere else in a  company's global
+quarto reports repository. If such, adapt paths in  calls to targeter's `report`
+function and also adapt paths in listing above (or include in ypur own listing).
+
+Targeter's default reports include `report_type` field to can use to filter
+then in any selection.
 
 
 ## targeter reports listing
 
-<!-- todo add Quarto listings !-->
+::: {#targeter-reports}
+:::
 
+## targeter treer reports listing
+
+todo
+
+todo decision trees reports
 
 
 
