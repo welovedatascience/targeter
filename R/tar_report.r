@@ -928,7 +928,6 @@ if (is.null(custom_fields)) {
       input = file.path(quarto_root_dir, quarto_targeters_project_dir),
       debug = debug,
       output_format = "html",
-      use_freezer = TRUE,
       as_job = FALSE
     )
 

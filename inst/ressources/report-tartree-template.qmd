@@ -102,7 +102,7 @@ hist(attr(mod, "model_predictions")$N_TARGET_PROB)
 
 
 ```{r}
-#| model prediction quantiles
+#| label: model prediction quantiles
 kableExtra::kable(t(t(quantile(attr(mod, "model_predictions")$N_TARGET_PROB, probs= seq(0,1, by = 0.1)))))
 
 ```

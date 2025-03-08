@@ -196,8 +196,10 @@ tar_foldername <- function(object){
     txt <- "-targeter-tree"
   }
 
-  analysis <- tolower(make.names(analysis))
-  analysis <- gsub(".", "-", analysis, fixed=TRUE)
+  analysis <- basename(tempfile(pattern="report-"))
+
+  # analysis <- tolower(make.names(analysis))
+  # analysis <- gsub(".", "-", analysis, fixed=TRUE)
 
   folder <- paste0(current_date, txt,"-", analysis)
   return(folder)
