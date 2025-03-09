@@ -118,7 +118,7 @@ tar_report.targeter <- function(
   metadata = NULL,
   metadata_vars = list(varname = "variable", varlabel = "label"),
   format = "html",
-  nmax = 100, #todo implement
+  nmax = 100,
   template = NULL, # default QMD template for slides
   quarto_root_dir = ".",
   quarto_targeters_project_dir = "targeter-reports",
@@ -156,7 +156,6 @@ tar_report.targeter <- function(
   verbose = FALSE,
   custom_fields = list("freeze" = freeze),
   report_categories = c("profile"), # character vector
-  # todo implement
   ... # additional parameters to be passed to quarto
 ) {
   assertthat::assert_that(
@@ -164,7 +163,7 @@ tar_report.targeter <- function(
     msg = "quarto package and runtime are required."
   )
 
-  # todo cover all parameters  assert tests
+  # TODO cover all parameters  assert tests
   assertthat::assert_that(
     is.character(format),
     msg = "format must be a character"
@@ -387,26 +386,26 @@ tar_report.targeter <- function(
   # pptx template
   has_pptx_template <- FALSE
 
-  if (default_template || !default_pptx_template) {
-    #pptx_template <- "targeter-report.pptx"
-    tmp_pptx_reference_doc <- "report-template.pptx"
-    pptx_copied <- file.copy(
-      from = pptx_reference_doc,
-      to = file.path(target_path, tmp_pptx_reference_doc),
-      overwrite = TRUE
-    )
-    assertthat::assert_that(
-      pptx_copied,
-      msg = "Could not copy pptx template file"
-    )
-  }
+  # if (default_template || !default_pptx_template) {
+  #   #pptx_template <- "targeter-report.pptx"
+  #   tmp_pptx_reference_doc <- "report-template.pptx"
+  #   pptx_copied <- file.copy(
+  #     from = pptx_reference_doc,
+  #     to = file.path(target_path, tmp_pptx_reference_doc),
+  #     overwrite = TRUE
+  #   )
+  #   assertthat::assert_that(
+  #     pptx_copied,
+  #     msg = "Could not copy pptx template file"
+  #   )
+  # }
 
-  if (("pptx" %in% format) || ("all" %in% format)) {
-    # if default template we will also use powerpoint wlds template (or override
-    # with user provided one)
-    has_pptx_template <- TRUE
-    pptx_reference_doc <- tmp_pptx_reference_doc
-  }
+  # if (("pptx" %in% format) || ("all" %in% format)) {
+  #   # if default template we will also use powerpoint wlds template (or override
+  #   # with user provided one)
+  #   has_pptx_template <- TRUE
+  #   pptx_reference_doc <- tmp_pptx_reference_doc
+  # }
 
   yaml <- list(title = title, author = author, date = format(Sys.Date()))
 

@@ -30,6 +30,11 @@ format:
     anchor-sections: true
     search: true
     embed-resources: true
+  revealjs:
+    output-ext: -rjs.html # see https://github.com/quarto-dev/quarto-cli/discussions/1751
+    theme: default
+    slide-level: 3
+    embed-resources: true
   docx:
     toc: true
   pdf:
