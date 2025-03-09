@@ -418,6 +418,7 @@ tar_report.targeter <- function(
 
   custom_fields[["reference-doc"]] <- pptx_reference_doc
 
+
   if (!is.null(report_categories) && is.character(report_categories) && 
   length(report_categories)>0) {
     custom_fields[["categories"]] <- c(
