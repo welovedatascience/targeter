@@ -5,9 +5,9 @@ if (getRversion() >= "3.1.0")
   utils::globalVariables(
     c(
       "..vars_model",
-      "L_TARGET_PREDICTION",
-      "L_TARGET_PREDICTION_CP",
-      "L_TARGET_PREDICTION_CP_QUANTILE",
+      "Z_TARGET_PREDICTION",
+      "Z_TARGET_PREDICTION_CP",
+      "Z_TARGET_PREDICTION_CP_QUANTILE",
       "N_TARGET_PROB",
       "importance",
       "in_tree",
@@ -129,7 +129,10 @@ tartree <- function(
     target <- tar_object$target
   }
   dt_vars_exp <- tarsum_object$varname
+  
+  
   vars_targeter <- c(dt_vars_exp, target)
+  
   vars_model <- c(dt_vars_exp, target)
   assertthat::assert_that(
     all(c(vars_targeter %in% names(data))),
@@ -164,37 +167,43 @@ tartree <- function(
   data_model$ID <- 1:nrow(data_model)
 
   formula_txt <- as.formula(paste(
-    "L_TARGET",
+    "Z_TARGET",
     "~ ",
     paste(dt_vars_exp, collapse = " + ")
-  )) # L_TARGET built after
+  )) # Z_TARGET built after
 
+
+
+
+
+  
   if (tar_object$target_type %in% c('binary')) {
-    # look in function for categorical targets
-    # we will use weight
+
     data_model[,
-      L_TARGET := ifelse(get(target) == tar_object$target_reference_level, 1, 0)
+      Z_TARGET := ifelse(get(target) == tar_object$target_reference_level, 1, 0)
     ]
     data_model_train <- slice_sample(
       data_model,
       prop = decision_tree_sample,
-      by = "L_TARGET"
+      by ="Z_TARGET" # binary target: stratified sampling
     )
     data_model_valid <- data_model[!data_model$ID %in% data_model_train$ID]
 
+    # look in function for categorical targets
+    # we will use weight
     weights <- weight_target(
-      data_model[, unique(c("L_TARGET", dt_vars_exp)), with = FALSE],
-      L_TARGET
+      data_model_train[, unique(c("Z_TARGET", dt_vars_exp)), with = FALSE],
+      Z_TARGET
     )
     minsplit <- sum(weights) / 10
 
-    n <- table(data_model[["L_TARGET"]])
+    n <- table(data_model[["Z_TARGET"]])
     prior <- n / sum(n)
     #  decision_tree_cp <- 0 # to be put as parametre
     if (all(weights == 1)) {
       mod <- rpart(
         formula_txt,
-        data = data_model[, unique(c("L_TARGET", dt_vars_exp)), with = FALSE],
+        data = data_model_train[, unique(c("Z_TARGET", dt_vars_exp)), with = FALSE],
         method = "class",
         model = TRUE,
         parms = list(prior = prior),
@@ -205,9 +214,10 @@ tartree <- function(
         )
       )
     } else {
+
       mod <- rpart(
         formula_txt,
-        data = data_model[, unique(c("L_TARGET", dt_vars_exp)), with = FALSE],
+        data = data_model[, unique(c("Z_TARGET", dt_vars_exp)), with = FALSE],
         method = "class",
         weights = weights,
         model = TRUE,
@@ -220,12 +230,20 @@ tartree <- function(
     }
   } else {
     #numeric target
+
+    data[, Z_TARGET := get(target)]
+    data_model_train <- slice_sample(
+      data_model,
+      prop = decision_tree_sample)
+
+    data_model_valid <- data_model[!data_model$ID %in% data_model_train$ID]
+
     minsplit <- 30
-    data[, L_TARGET := get(target)]
+
     mod <- rpart(
       formula_txt,
       model = TRUE,
-      data = data_model[, unique(c("L_TARGET", dt_vars_exp)), with = FALSE],
+      data = data_model_train[, unique(c("Z_TARGET", dt_vars_exp)), with = FALSE],
       method = "anova",
       control = rpart.control(
         maxdepth = decision_tree_maxdepth,
@@ -244,32 +262,32 @@ tartree <- function(
   }
   predictions <- data.table(
     ID = data_model_valid$ID,
-    L_TARGET = data_model_valid$L_TARGET,
-    L_TARGET_PREDICTION = stats::predict(mod, data_model_valid, type = "class")
+    Z_TARGET = data_model_valid$Z_TARGET,
+    Z_TARGET_PREDICTION = stats::predict(mod, data_model_valid, type = "class")
   )
 
   predictions[,
     N_TARGET_PROB := stats::predict(mod, data_model_valid, type = "prob")[, 2]
   ]
   predictions[,
-    L_TARGET_PREDICTION_CP := ifelse(
+    Z_TARGET_PREDICTION_CP := ifelse(
       N_TARGET_PROB > predict_prob_cutpoint,
       1,
       0
     )
   ]
   predictions[,
-    L_TARGET_PREDICTION_CP_QUANTILE := ifelse(
+    Z_TARGET_PREDICTION_CP_QUANTILE := ifelse(
       N_TARGET_PROB >= quantile(N_TARGET_PROB, predict_prob_cutpoint_quantile),
       1,
       0
     )
   ]
 
-  predictions[, .N, by = list(L_TARGET, L_TARGET_PREDICTION)]
-  predictions[, .N, by = list(L_TARGET, L_TARGET_PREDICTION_CP_QUANTILE)]
+  predictions[, .N, by = list(Z_TARGET, Z_TARGET_PREDICTION)]
+  predictions[, .N, by = list(Z_TARGET, Z_TARGET_PREDICTION_CP_QUANTILE)]
 
-  pROC <- roc(predictions$L_TARGET, predictions$N_TARGET_PROB)
+  pROC <- roc(predictions$Z_TARGET, predictions$N_TARGET_PROB)
 
   ## subset targeter object and targeter summary object
 
