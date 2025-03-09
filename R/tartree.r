@@ -80,11 +80,11 @@ tartree <- function(
     )
     tar_object <- targeter(data, target = target, ...)
   }
-  if (is.null(target))
+  if (is.null(target)) {
     assertthat::assert_that(
       inherits(tar_object, "targeter"),
       msg = "tar_object must to be a targeter object when you don't provide a target"
-    ) else {
+    ) } else {
     assertthat::assert_that(
       is.character(target),
       msg = "target must to be a character"
@@ -217,7 +217,7 @@ tartree <- function(
 
       mod <- rpart(
         formula_txt,
-        data = data_model[, unique(c("Z_TARGET", dt_vars_exp)), with = FALSE],
+        data = data_model_train[, unique(c("Z_TARGET", dt_vars_exp)), with = FALSE],
         method = "class",
         weights = weights,
         model = TRUE,
