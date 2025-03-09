@@ -31,7 +31,6 @@ params:
     value: static
     choices: [static, interactive]
 header-includes:
-
   - \usepackage{array}
   - \usepackage{booktabs}
 ---

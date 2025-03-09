@@ -141,7 +141,7 @@ tar_report.targeter <- function(
   targeter_sub_folder = tar_foldername(object),
   pptx_reference_doc = NULL, # for pptx format, default template,
   # revealjs_template = "", # todo prepare a revealjs template
-  output_file = tar_foldername(object),
+  output_file = targeter_sub_folder,
   title = object$analysis,
   author = getOption("targeter.author", "wlds targeter"),
   fullplot_which_plot = "1:2",
@@ -421,7 +421,8 @@ tar_report.targeter <- function(
   if (!is.null(report_categories) && is.character(report_categories) && 
   length(report_categories)>0) {
     custom_fields[["categories"]] <- c(
-      report_categories, object$target_type
+      report_categories, 
+      paste("target",object$target_type, sep = ":")
     )
   }
 
@@ -587,10 +588,8 @@ tar_report.tartree <- function(
   # revealjs_template = "", # todo prepare a revealjs template
   output_file = tar_foldername(object),
   title = paste0(
-    "Decision tree for target '",
-    attr(object, "target"),
-    "' on data:",
-    attr(object, "tar_object")$description_data
+    attr(object, "tar_object")$analysis,
+    " - decision tree"
   ),
   author = getOption("targeter.author", "wlds targeter"),
   render = TRUE,
