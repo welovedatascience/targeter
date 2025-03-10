@@ -1,4 +1,11 @@
 
+
+# targeter 1.5.1
+
+* 20250310
+* New function targeter_big for computations on data with many columns
+
+
 # targeter 1.5.0
 
 * 20250308
