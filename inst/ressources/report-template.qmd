@@ -19,6 +19,11 @@ params:
 format:
   pptx:
     slide-level: 3
+  revealjs:
+    output-ext: -rjs.html # see https://github.com/quarto-dev/quarto-cli/discussions/1751
+    theme: default
+    slide-level: 3
+    embed-resources: false
   html:
     theme: cosmo
     toc: true
@@ -29,11 +34,6 @@ format:
     smooth-scroll: true
     anchor-sections: true
     search: true
-    embed-resources: true
-  revealjs:
-    output-ext: -rjs.html # see https://github.com/quarto-dev/quarto-cli/discussions/1751
-    theme: default
-    slide-level: 3
     embed-resources: true
   docx:
     toc: true

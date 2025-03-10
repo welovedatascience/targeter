@@ -47,9 +47,9 @@ if (getRversion() >= "3.1.0")
       "has_profile",
       # optional methods
       "Ckmeans.1d.dp",
-      "clustering.sc.dp", 
+      "clustering.sc.dp",
       "clustering"
-        )
+    )
   )
 
 #' @title targeter
@@ -154,7 +154,7 @@ if (getRversion() >= "3.1.0")
 #' number of clusters to be used.
 #' @param smart_quantile_by numeric, for binning method 'smart',
 #' quantile step - default y step of 0.01.
-#' @param ... additional parameters (might be used by other targeter functions, 
+#' @param ... additional parameters (might be used by other targeter functions,
 #' no special side effect for user).
 #'
 #'
@@ -190,7 +190,6 @@ if (getRversion() >= "3.1.0")
 #' @importFrom data.table .N
 #' @importFrom data.table uniqueN
 #' @importFrom data.table `:=`
-
 
 ## <idea> check for WOE monotonicity
 targeter <- function(
@@ -306,9 +305,7 @@ targeter <- function(
     msg = "The parameter nbins must to be numeric"
   )
 
-
-
-   #   if (woe_post_cluster) {
+  #   if (woe_post_cluster) {
   #   assertthat::assert_that(
   #     requireNamespace('Ckmeans.1d.dp', quietly = TRUE),
   #     msg = 'Ckmeans.1d.dp package required for WOE post clustering.'
@@ -324,47 +321,52 @@ targeter <- function(
     several.ok = FALSE
   )
 
-
-
-## checks > specific methods optional package dependencies -----
-  if (binning_method == "clustering"){
-    
+  ## checks > specific methods optional package dependencies -----
+  if (binning_method == "clustering") {
     deps <- c("Ckmeans.1d.dp")
-    if (getOption("targeter.auto_install_deps", FALSE)){
+    if (getOption("targeter.auto_install_deps", FALSE)) {
       pacman::p_load(deps, install = FALSE)
     }
-    assertthat::assert_that(pacman::p_load(deps), 
-    msg=paste('some of targeter following optional packages are not available:',
-    paste(deps, collapse=",")))
-
+    assertthat::assert_that(
+      pacman::p_load(deps),
+      msg = paste(
+        'some of targeter following optional packages are not available:',
+        paste(deps, collapse = ",")
+      )
+    )
   }
-  
-  if (binning_method == "smart"){
 
+  if (binning_method == "smart") {
     deps <- c("clustering.sc.dp")
-    if (getOption("targeter.auto_install_deps", FALSE)){
+    if (getOption("targeter.auto_install_deps", FALSE)) {
       pacman::p_load(deps, install = FALSE)
     }
-    assertthat::assert_that(pacman::p_load(deps), 
-    msg=paste('some of targeter following optional packages are not available:',
-    paste(deps, collapse=",")))
-
+    assertthat::assert_that(
+      pacman::p_load(deps),
+      msg = paste(
+        'some of targeter following optional packages are not available:',
+        paste(deps, collapse = ",")
+      )
+    )
   }
 
-if (woe_post_cluster){
-  deps <- c("clustering.sc.dp","Ckmeans.1d.dp")
-    if (getOption("targeter.auto_install_deps", FALSE)){
+  if (woe_post_cluster) {
+    deps <- c("clustering.sc.dp", "Ckmeans.1d.dp")
+    if (getOption("targeter.auto_install_deps", FALSE)) {
       pacman::p_load(deps, install = FALSE)
     }
-    assertthat::assert_that(pacman::p_load(deps), 
-    msg=paste('some of targeter following optional packages are not available:',
-    paste(deps, collapse=",")))
+    assertthat::assert_that(
+      pacman::p_load(deps),
+      msg = paste(
+        'some of targeter following optional packages are not available:',
+        paste(deps, collapse = ",")
+      )
+    )
+  }
 
-}
+  ## analysis start -----------
 
-## analysis start -----------
-
- ##retrieve the name of the data
+  ##retrieve the name of the data
   dataname <- deparse(substitute(data))
   data <- data.table::setDT(data)
   msg <- vector(mode = 'list')
@@ -405,8 +407,6 @@ if (woe_post_cluster){
   ## the variable useNA can only  accept the two values
   ## todo: introduce a yes or always
   useNA <- match.arg(useNA, c("ifany", "no"), several.ok = FALSE)
-
-
 
   ## By default the variable order_label is equal to auto
   # order_label <- order_label[1]
@@ -754,7 +754,6 @@ if (woe_post_cluster){
   )
 
   binning_foo <- binning_foos[[binning_method]]
- 
 
   ## for numeric variables, we must to apply the function quickCut to cut the variable into classes.
   ## create a list called txt
@@ -1159,14 +1158,12 @@ if (woe_post_cluster){
   }
 
   ## compute > drop variables with only one value -----
-  if (target_type %in% c("binary","categorical")){
+  if (target_type %in% c("binary", "categorical")) {
     vars_one_value <- sapply(crossvars, function(x) nrow(x$counts) == 1)
-  
-  } else if (target_type == "numeric"){
+  } else if (target_type == "numeric") {
     vars_one_value <- sapply(crossvars, function(x) nrow(x$stats) == 1)
-  
   }
-  
+
   if (any(vars_one_value)) {
     crossvars <- crossvars[which(!(vars_one_value))]
     vars[,
@@ -1194,7 +1191,7 @@ if (woe_post_cluster){
   if (target_type %in% c('binary', 'categorical')) {
     out$target_reference_level <- target_reference_level
   }
-  
+
   ## assign class
   ## output > final return ----------
   class(out) <- c("targeter", class(out))
@@ -1233,4 +1230,89 @@ print.targeter <- function(x, ...) {
       "\nYou can also directly invoke a global `summary` function on this object."
     )
   )
+}
+
+#' @title Process targeter by blocks for datasets with many variables
+#' @description This function processes large datasets by splitting them into smaller groups and applying the `targeter` function to each group.
+#' @param data data - data.table or data.frame.
+#' @param target character - name of the variable to explain.
+#' @param by_nvars integer - number of variables to process in each group. Default is 250.
+#' @param verbose boolean - if TRUE, prints progress information. Default is TRUE.
+#' @param ... additional parameters passed to the `targeter` function.
+#' @return A combined targeter object from all processed groups.
+#' @export
+#' @examples
+#' \dontrun{
+#' targeter_big(data, target = "ABOVE50K", by_nvars = 100)
+#' }
+
+targeter_big <- function(data, target, by_nvars = 250, verbose = TRUE, ...) {
+  assertthat::assert_that(
+    is.data.frame(data) | is.data.table(data),
+    msg = "data must be a data.frame or data.table"
+  )
+  assertthat::assert_that(
+    is.character(target),
+    msg = "target must be a character"
+  )
+  assertthat::assert_that(
+    is.numeric(by_nvars),
+    msg = "by_nvars must be a numeric"
+  )
+  assertthat::assert_that(
+    by_nvars > 0,
+    msg = "by_nvars must be greater than 0"
+  )
+  assertthat::assert_that(
+    by_nvars %% 1 == 0,
+    msg = "by_nvars must be an integer"
+  )
+  assertthat::assert_that(
+    by_nvars <= ncol(data),
+    msg = "by_nvars must be less than or equal to the number of columns in data"
+  )
+  assertthat::assert_that(
+    is.logical(verbose),
+    msg = "verbose must be a logical"
+  )
+
+  if (!inherits(data, "data.table")) {
+    data <- data.table::as.data.table(data)
+  }
+
+  vars <- names(data)
+  by_groups <- (1 + seq_along(vars) %/% by_nvars)
+
+  groups <- unique(by_groups)
+
+  if (verbose) cat("\nNumber of groups to be processed:", length(groups))
+  out_tar <- vector(mode = 'list', length(groups))
+
+  for (igroup in groups) {
+    if (verbose) {
+      cat('\nProcessing group:', igroup, " over ", length(groups))
+    }
+    # TMP_I <<- igroup
+    ivars <- vars[by_groups == igroup]
+    ivars <- unique(c(target, ivars))
+    data_igroup <- data[, ..ivars]
+    # TMP_DATA <<- data_igroup
+    itar <- try(targeter::targeter(
+      data_igroup,
+      target = target,
+      verbose = FALSE,
+      ...
+    ))
+    if (!inherits(itar, "try-error")) {
+      out_tar[[igroup]] <- itar
+      cat(' - Done.')
+    } else {
+      cat(" - Nothing to do")
+      out_tar[[igroup]] <- NULL
+    }
+  }
+  out_tar <- out_tar[sapply(out_tar, function(check) !is.null(check))]
+
+  tar <- targeter:::tbind(out_tar)
+  return(tar)
 }

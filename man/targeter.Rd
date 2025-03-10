@@ -134,7 +134,7 @@ number of clusters to be used.}
 \item{smart_quantile_by}{numeric, for binning method 'smart',
 quantile step - default y step of 0.01.}
 
-\item{...}{additional parameters (might be used by other targeter functions, 
+\item{...}{additional parameters (might be used by other targeter functions,
 no special side effect for user).}
 }
 \value{
