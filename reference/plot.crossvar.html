@@ -156,8 +156,7 @@ The label will be used for the title and the x-axis of the graph.</p></dd>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">t</span> <span class="op">&lt;-</span> <span class="fu"><a href="crossvar.html">crossvar</a></span><span class="op">(</span><span class="va">adult</span>,target<span class="op">=</span><span class="st">"ABOVE50K"</span>, var<span class="op">=</span><span class="st">"AGE"</span>,<span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO:target ABOVE50K detected as type: binary</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO:binary target contains number, automatic chosen level: 1; override using `target_reference_level`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">t</span>,<span class="st">"counts"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot.crossvar-1.png" alt="" width="700" height="433"></span>
 <span class="r-plt img"><img src="plot.crossvar-2.png" alt="" width="700" height="433"></span>
