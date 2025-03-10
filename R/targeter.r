@@ -1201,7 +1201,8 @@ if (woe_post_cluster){
 
   ## display messages
   cat("\n")
-  cat(paste(names(msg), msg, sep = ":", collapse = "\n"))
+  # TODO log messages depending on STATUS INFO/WARNING
+  if (verbose) cat(paste(names(msg), msg, sep = ":", collapse = "\n"))
   cat("\n")
   ## return object
   return(out)
