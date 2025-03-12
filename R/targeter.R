@@ -154,6 +154,10 @@ if (getRversion() >= "3.1.0")
 #' number of clusters to be used.
 #' @param smart_quantile_by numeric, for binning method 'smart',
 #' quantile step - default y step of 0.01.
+#' @param by_nvars integer (default 200). Number of variables to process in 
+#' iterations when data has many columns (we then have a loop for better 
+#' performamnces). Note that targeter function has been tested on datasets with
+#' as many as 10 thousands columns.
 #' @param ... additional parameters (might be used by other targeter functions,
 #' no special side effect for user).
 #'
@@ -191,8 +195,117 @@ if (getRversion() >= "3.1.0")
 #' @importFrom data.table uniqueN
 #' @importFrom data.table `:=`
 
-## <idea> check for WOE monotonicity
+
+
 targeter <- function(
+  data,
+  target,
+  description_data = NULL,
+  target_type = c("autoguess", "binary", "categorical", "numeric"),
+  target_reference_level = NULL, # NULL: auto will check for 1, TRUE
+  description_target = NULL,
+  analysis_name = NULL,
+  select_vars = NULL,
+  exclude_vars = NULL,
+  nbins = 12,
+  binning_method = c("quantile", "clustering", "smart"),
+  # todo: tree (min size)+ constrained clustrering  https://cran.r-project.org/web/packages/scclust/scclust.pdf
+  naming_conventions = getOption(
+    "targeter.use_naming_conventions",
+    default = FALSE
+  ),
+  useNA = getOption("targeter.useNA", default = TRUE), #option package by default
+  verbose = FALSE,
+  dec = 2,
+  order_label = c("auto", "alpha", "count", "props", "means"),
+  cont_target_trim = 0.01,
+  bxp_factor = 1.5,
+  num_as_categorical_nval = 5,
+  autoguess_nrows = 1000, # 0: use all rows
+  woe_alternate_version = c("if_continuous", "always"),
+  woe_shift = 0.01,
+  woe_post_cluster = FALSE,
+  woe_post_cluster_n = 6,
+  smart_quantile_by = 0.01,
+  by_nvars = 200,...) {
+  
+  
+  assertthat::assert_that(
+    is.data.frame(data) | is.data.table(data),
+    msg = "data must be a data.frame or data.table"
+  )
+  assertthat::assert_that(
+    is.character(target),
+    msg = "target must be a character"
+  )
+  assertthat::assert_that(
+    is.numeric(by_nvars),
+    msg = "by_nvars must be a numeric"
+  )
+  assertthat::assert_that(
+    by_nvars > 0,
+    msg = "by_nvars must be greater than 0"
+  )
+  assertthat::assert_that(
+    by_nvars %% 1 == 0 & by_nvars>1,
+    msg = "by_nvars must be a positive an integer"
+  )
+  # assertthat::assert_that(
+  #   by_nvars <= ncol(data),
+  #   msg = "by_nvars must be less than or equal to the number of columns in data"
+  # )
+  assertthat::assert_that(
+    is.logical(verbose),
+    msg = "verbose must be a logical"
+  )
+
+
+  thiscall <- match.call(expand.dots = TRUE)
+  thiscall[[1]] <- as.name("targeter_internal")
+
+  if (!inherits(data, "data.table")) {
+    data <- data.table::as.data.table(data)
+  }
+
+  vars <- names(data)
+  by_groups <- (1 + seq_along(vars) %/% by_nvars)
+
+  groups <- unique(by_groups)
+
+  if (verbose) cat("\nNumber of groups to be processed:", length(groups))
+  out_tar <- vector(mode = 'list', length(groups))
+
+  for (igroup in groups) {
+    if (verbose) {
+      cat('\nProcessing group:', igroup, " over ", length(groups))
+    }
+    # TMP_I <<- igroup
+    ivars <- vars[by_groups == igroup]
+    ivars <- unique(c(target, ivars))
+    data_igroup <- data[, ..ivars]
+    # TMP_DATA <<- data_igroup
+  # adapted from https://stackoverflow.com/questions/56811073/passing-all-arguments-to-another-function
+    thiscall[[2]] <- data_igroup # pass idata to internal targeter
+
+    itar <- try( eval.parent(thiscall), silent = TRUE)
+
+    if (!inherits(itar, "try-error")) {
+      out_tar[[igroup]] <- itar
+      cat(' - Done.')
+    } else {
+      cat(" - Nothing to do")
+      out_tar[[igroup]] <- NULL
+    }
+  }
+  out_tar <- out_tar[sapply(out_tar, function(check) !is.null(check))]
+
+  tar <- targeter:::tbind(out_tar)
+  return(tar)
+}
+
+
+## <idea> check for WOE monotonicity
+targeter_internal <- function(
   data,
   description_data = NULL,
   target,
@@ -1230,89 +1343,4 @@ print.targeter <- function(x, ...) {
       "\nYou can also directly invoke a global `summary` function on this object."
     )
   )
-}
-
-#' @title Process targeter by blocks for datasets with many variables
-#' @description This function processes large datasets by splitting them into smaller groups and applying the `targeter` function to each group.
-#' @param data data - data.table or data.frame.
-#' @param target character - name of the variable to explain.
-#' @param by_nvars integer - number of variables to process in each group. Default is 250.
-#' @param verbose boolean - if TRUE, prints progress information. Default is TRUE.
-#' @param ... additional parameters passed to the `targeter` function.
-#' @return A combined targeter object from all processed groups.
-#' @export
-#' @examples
-#' \dontrun{
-#' targeter_big(data, target = "ABOVE50K", by_nvars = 100)
-#' }
-
-targeter_big <- function(data, target, by_nvars = 250, verbose = TRUE, ...) {
-  assertthat::assert_that(
-    is.data.frame(data) | is.data.table(data),
-    msg = "data must be a data.frame or data.table"
-  )
-  assertthat::assert_that(
-    is.character(target),
-    msg = "target must be a character"
-  )
-  assertthat::assert_that(
-    is.numeric(by_nvars),
-    msg = "by_nvars must be a numeric"
-  )
-  assertthat::assert_that(
-    by_nvars > 0,
-    msg = "by_nvars must be greater than 0"
-  )
-  assertthat::assert_that(
-    by_nvars %% 1 == 0,
-    msg = "by_nvars must be an integer"
-  )
-  assertthat::assert_that(
-    by_nvars <= ncol(data),
-    msg = "by_nvars must be less than or equal to the number of columns in data"
-  )
-  assertthat::assert_that(
-    is.logical(verbose),
-    msg = "verbose must be a logical"
-  )
-
-  if (!inherits(data, "data.table")) {
-    data <- data.table::as.data.table(data)
-  }
-
-  vars <- names(data)
-  by_groups <- (1 + seq_along(vars) %/% by_nvars)
-
-  groups <- unique(by_groups)
-
-  if (verbose) cat("\nNumber of groups to be processed:", length(groups))
-  out_tar <- vector(mode = 'list', length(groups))
-
-  for (igroup in groups) {
-    if (verbose) {
-      cat('\nProcessing group:', igroup, " over ", length(groups))
-    }
-    # TMP_I <<- igroup
-    ivars <- vars[by_groups == igroup]
-    ivars <- unique(c(target, ivars))
-    data_igroup <- data[, ..ivars]
-    # TMP_DATA <<- data_igroup
-    itar <- try(targeter::targeter(
-      data_igroup,
-      target = target,
-      verbose = FALSE,
-      ...
-    ))
-    if (!inherits(itar, "try-error")) {
-      out_tar[[igroup]] <- itar
-      cat(' - Done.')
-    } else {
-      cat(" - Nothing to do")
-      out_tar[[igroup]] <- NULL
-    }
-  }
-  out_tar <- out_tar[sapply(out_tar, function(check) !is.null(check))]
-
-  tar <- targeter:::tbind(out_tar)
-  return(tar)
 }

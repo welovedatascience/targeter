@@ -23,7 +23,7 @@ tbind <- function(list_targeters, check = TRUE) {
     c(FUN = c, lapply(list_targeters, `[`, 'profiles'))
   )
 
-  vars <<- rbindlist(lapply(list_targeters, function(t) t$variables), use.names = TRUE, fill = TRUE)
+  vars <- rbindlist(lapply(list_targeters, function(t) t$variables), use.names = TRUE, fill = TRUE)
   vars <- vars[!duplicated(variable)]
   all$variables <- vars
   names(all$profiles) <- unlist(

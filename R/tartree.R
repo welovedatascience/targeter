@@ -129,16 +129,17 @@ tartree <- function(
     target <- tar_object$target
   }
   dt_vars_exp <- tarsum_object$varname
+  # TODO: add a warning if some of the variables are not in data
+  dt_vars_exp <- dt_vars_exp[which(dt_vars_exp %in% names(data))]
+    
+    vars_model <- c(dt_vars_exp, target)
+  vars_model <- vars_model[vars_model %in% names(data)]
   
+    assertthat::assert_that(
+      all(vars_model %in% names(data)),
+      msg = "some of required  variables are not in data"
+    )
   
-  vars_targeter <- c(dt_vars_exp, target)
-  
-  vars_model <- c(dt_vars_exp, target)
-  assertthat::assert_that(
-    all(c(vars_targeter %in% names(data))),
-    msg = "some of required  variables are not in data"
-  )
-
   data_model <- data[, ..vars_model]
   deps <- c("explore", "rpart", "dplyr", "pROC")
   if (getOption("targeter.auto_install_deps", FALSE)) {

@@ -6,8 +6,8 @@
 \usage{
 targeter(
   data,
-  description_data = NULL,
   target,
+  description_data = NULL,
   target_type = c("autoguess", "binary", "categorical", "numeric"),
   target_reference_level = NULL,
   description_target = NULL,
@@ -30,15 +30,16 @@ targeter(
   woe_post_cluster = FALSE,
   woe_post_cluster_n = 6,
   smart_quantile_by = 0.01,
+  by_nvars = 200,
   ...
 )
 }
 \arguments{
 \item{data}{data - data.table or data.frame.}
 
-\item{description_data}{text on the description of data.}
-
 \item{target}{character - name of the variable to explain.}
+
+\item{description_data}{text on the description of data.}
 
 \item{target_type}{character: type of target - one of 'autoguess' (default),
 'binary','categorical' (>2 modalities) or 'numeric'.}
