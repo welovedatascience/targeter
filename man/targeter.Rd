@@ -135,6 +135,11 @@ number of clusters to be used.}
 \item{smart_quantile_by}{numeric, for binning method 'smart',
 quantile step - default y step of 0.01.}
 
+\item{by_nvars}{integer (default 200). Number of variables to process in 
+iterations when data has many columns (we then have a loop for better 
+performamnces). Note that targeter function has been tested on datasets with
+as many as 10 thousands columns.}
+
 \item{...}{additional parameters (might be used by other targeter functions,
 no special side effect for user).}
 }

@@ -141,7 +141,7 @@ tartree <- function(
     )
   
   data_model <- data[, ..vars_model]
-  deps <- c("explore", "rpart", "dplyr", "pROC")
+  deps <- c("rpart", "dplyr", "pROC")
   if (getOption("targeter.auto_install_deps", FALSE)) {
     pacman::p_load(char = deps)
   }
@@ -178,8 +178,8 @@ tartree <- function(
 
 
   
-  if (tar_object$target_type %in% c('binary')) {
-
+  if (tar_object$target_type %in% c('binary')) {  
+    
     data_model[,
       Z_TARGET := ifelse(get(target) == tar_object$target_reference_level, 1, 0)
     ]
@@ -194,7 +194,7 @@ tartree <- function(
     # we will use weight
     weights <- weight_target(
       data_model_train[, unique(c("Z_TARGET", dt_vars_exp)), with = FALSE],
-      Z_TARGET
+      "Z_TARGET"
     )
     minsplit <- sum(weights) / 10
 

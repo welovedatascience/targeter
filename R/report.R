@@ -1,4 +1,4 @@
-#' @rdname tar_report
+#' @rdname report
 #' @title Generate reports for targeter's analyses
 #'
 #' @description This function creates an automatic report according to a
@@ -96,8 +96,8 @@
 #' \dontrun{
 #' tar <- targeter(adult, target ="ABOVE50K", analysis_name="Analyse",
 #' naming_conventions=FALSE)
-#' tar_report(tar,  author = "this is me")
-#' tar_report(tar,  format= c("pptx","pdf","docx"),author = "this is me")
+#' report(tar,  author = "this is me")
+#' report(tar,  format= c("pptx","pdf","docx"),author = "this is me")
 #' }1
 
 #' @keywords targeter report
@@ -106,13 +106,13 @@
 
 
 #' @export
-tar_report <- function(object, ...) {
-  UseMethod("tar_report")
+report <- function(object, ...) {
+  UseMethod("report")
 }
 
-#' @rdname tar_report
+#' @rdname report
 #' @export
-tar_report.targeter <- function(
+report.targeter <- function(
   object,
   summary_object = NULL,
   metadata = NULL,
@@ -555,10 +555,10 @@ tar_report.targeter <- function(
 #' @return invisibly returns path to the generated specific file (unique format)
 #' or folder (several formats)
 
-#' @rdname tar_report
+#' @rdname report
 #' @export
 
-tar_report.tartree <- function(
+report.tartree <- function(
   object,
   profiles = TRUE,
   metadata = NULL,
