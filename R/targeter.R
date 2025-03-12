@@ -154,8 +154,8 @@ if (getRversion() >= "3.1.0")
 #' number of clusters to be used.
 #' @param smart_quantile_by numeric, for binning method 'smart',
 #' quantile step - default y step of 0.01.
-#' @param by_nvars integer (default 200). Number of variables to process in 
-#' iterations when data has many columns (we then have a loop for better 
+#' @param by_nvars integer (default 200). Number of variables to process in
+#' iterations when data has many columns (we then have a loop for better
 #' performamnces). Note that targeter function has been tested on datasets with
 #' as many as 10 thousands columns.
 #' @param ... additional parameters (might be used by other targeter functions,
@@ -195,8 +195,6 @@ if (getRversion() >= "3.1.0")
 #' @importFrom data.table uniqueN
 #' @importFrom data.table `:=`
 
-
-
 targeter <- function(
   data,
   target,
@@ -227,9 +225,9 @@ targeter <- function(
   woe_post_cluster = FALSE,
   woe_post_cluster_n = 6,
   smart_quantile_by = 0.01,
-  by_nvars = 200,...) {
-  
-  
+  by_nvars = 200,
+  ...
+) {
   assertthat::assert_that(
     is.data.frame(data) | is.data.table(data),
     msg = "data must be a data.frame or data.table"
@@ -247,7 +245,7 @@ targeter <- function(
     msg = "by_nvars must be greater than 0"
   )
   assertthat::assert_that(
-    by_nvars %% 1 == 0 & by_nvars>1,
+    by_nvars %% 1 == 0 & by_nvars > 1,
     msg = "by_nvars must be a positive an integer"
   )
   # assertthat::assert_that(
@@ -259,9 +257,8 @@ targeter <- function(
     msg = "verbose must be a logical"
   )
 
-
-  thiscall <- match.call(expand.dots = TRUE)
-  thiscall[[1]] <- as.name("targeter_internal")
+  # thiscall <- match.call(expand.dots = TRUE)
+  # thiscall[[1]] <- as.name("targeter_internal")
 
   if (!inherits(data, "data.table")) {
     data <- data.table::as.data.table(data)
@@ -284,10 +281,38 @@ targeter <- function(
     ivars <- unique(c(target, ivars))
     data_igroup <- data[, ..ivars]
     # TMP_DATA <<- data_igroup
-  # adapted from https://stackoverflow.com/questions/56811073/passing-all-arguments-to-another-function
-    thiscall[[2]] <- data_igroup # pass idata to internal targeter
-
-    itar <- try( eval.parent(thiscall), silent = TRUE)
+    # adapted from https://stackoverflow.com/questions/56811073/passing-all-arguments-to-another-function
+    # thiscall[[2]] <- data_igroup # pass idata to internal targeter
+    print(head(data_igroup),1)
+    itar <- try(targeter_internal(
+      data = data_igroup,
+      target = target,
+      description_data = description_data,
+      target_type = target_type,
+      target_reference_level = target_reference_level,
+      description_target = description_target,
+      analysis_name = analysis_name,
+      select_vars = select_vars,
+      exclude_vars = exclude_vars,
+      nbins = nbins,
+      binning_method = binning_method,
+      naming_conventions = naming_conventions,
+      useNA = useNA,
+      verbose = verbose,
+      dec = dec,
+      order_label = order_label,
+      cont_target_trim = cont_target_trim,
+      bxp_factor = bxp_factor,
+      num_as_categorical_nval = num_as_categorical_nval,
+      autoguess_nrows = autoguess_nrows,
+      woe_alternate_version = woe_alternate_version,
+      woe_shift = woe_shift,
+      woe_post_cluster = woe_post_cluster,
+      woe_post_cluster_n = woe_post_cluster_n,
+      smart_quantile_by = smart_quantile_by,
+      by_nvars = by_nvars,
+      ...
+    ))
 
     if (!inherits(itar, "try-error")) {
       out_tar[[igroup]] <- itar

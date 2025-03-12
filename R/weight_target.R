@@ -7,7 +7,6 @@
 # TODO: add tests
 
 weight_target <- function (data, target) {
-    print("test2")
     observed_prop <- table(data[[target]])/nrow(data)
     minClass <- min(observed_prop)
     names(minClass) <- names(which(observed_prop == minClass))
