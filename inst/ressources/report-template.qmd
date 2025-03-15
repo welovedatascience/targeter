@@ -105,7 +105,7 @@ cat(slideTitle("Analysis parameters"))
 
 ::: {.content-hidden unless-meta="params.show_details"}
 
-<!-- TODO: adapt text to traget type -->
+<!-- DONE: adapt text to traget type -->
 
 ```{r}
 #| label: intro

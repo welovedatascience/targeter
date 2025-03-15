@@ -40,7 +40,7 @@ if (getRversion() >= "3.1.0")
       "is_target",
       "is_in_exclude",
       "respect_naming_convention",
-      "keep_naming_convention",
+      "respect_naming_convention",
       "dropped_one_single_value",
       "var_type",
       "silently_renamed",
@@ -566,7 +566,7 @@ targeter_internal <- function(
           c("L_", "N_", "M_", "F_", "J_", "C_", "R_", "P_", "O_", "Z_")
       ]
       #select_vars <- select_vars[select_vars != target]
-      vars[, keep_naming_convention := (variable %in% c(select_vars, target))]
+      vars[, respect_naming_convention := (variable %in% c(select_vars, target))]
     }
   }
 
@@ -798,7 +798,7 @@ targeter_internal <- function(
     cat("\n")
     vars[
       which(variable %in% c(num_vars, ord_vars, other_vars, target)),
-      keep_naming_convention := TRUE
+      respect_naming_convention := TRUE
     ]
     stop(
       "\nNo explanatory variable remaining. Check variables 

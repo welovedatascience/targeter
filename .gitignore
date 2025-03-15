@@ -39,3 +39,4 @@ tmp/
 _targeter-quarto-tmp*
 targeter-reports/
 TODO.md
+inst/doc

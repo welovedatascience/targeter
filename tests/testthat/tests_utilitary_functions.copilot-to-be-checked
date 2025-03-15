@@ -1,0 +1,176 @@
+library(testthat)
+library(data.table)
+
+# Tests for create_binning_expression function
+test_that("create_binning_expression generates correct expression string", {
+  # Test with both numeric and categorical variables
+  expr <- create_binning_expression(
+    target = "target_var",
+    num_vars = c("num1", "num2"),
+    other_vars = c("cat1", "cat2"),
+    binning_function = function() {}
+  )
+  
+  expect_is(expr, "character")
+  expect_true(grepl("^data\\[,\\.\\(target_var", expr))
+  expect_true(grepl("cat1,cat2", expr))
+  expect_true(grepl("num1=binning_foo\\(num1", expr))
+  expect_true(grepl("num2=binning_foo\\(num2", expr))
+  
+  # Test with only numeric variables
+  num_only_expr <- create_binning_expression(
+    target = "target_var",
+    num_vars = c("num1", "num2"),
+    other_vars = character(0),
+    binning_function = function() {}
+  )
+  
+  expect_is(num_only_expr, "character")
+  expect_false(grepl("cat1|cat2", num_only_expr))
+  
+  # Test with only categorical variables
+  cat_only_expr <- create_binning_expression(
+    target = "target_var",
+    num_vars = character(0),
+    other_vars = c("cat1", "cat2"),
+    binning_function = function() {}
+  )
+  
+  expect_is(cat_only_expr, "character")
+  expect_true(grepl("cat1,cat2", cat_only_expr))
+  expect_false(grepl("num1|num2", cat_only_expr))
+})
+
+# Tests for check_dependencies function
+test_that("check_dependencies detects missing packages", {
+  # Skip this test if the packages are installed
+  skip_if(requireNamespace("cluster", quietly = TRUE) && 
+          requireNamespace("Ckmeans.1d.dp", quietly = TRUE) &&
+          requireNamespace("clustering.sc.dp", quietly = TRUE),
+          "Required packages are installed, skipping dependency check")
+  
+  # Test required packages for clustering binning method
+  expect_error(
+    check_dependencies(binning_method = "clustering", woe_post_cluster = FALSE),
+    "cluster package required for clustering binning method"
+  )
+  
+  # Test required packages for WOE post clustering
+  expect_error(
+    check_dependencies(binning_method = "quantile", woe_post_cluster = TRUE),
+    "Ckmeans.1d.dp package required for WOE post clustering."
+  )
+})
+
+# Tests for detect_variables_types function
+test_that("detect_variables_types correctly classifies variables", {
+  # Create test data with various variable types
+  test_data <- data.table(
+    target = sample(c(0, 1), 100, replace = TRUE),
+    numeric_var = rnorm(100),
+    categorical_var = sample(letters[1:5], 100, replace = TRUE),
+    binary_var = sample(c("yes", "no"), 100, replace = TRUE),
+    ordinal_var = ordered(sample(c("low", "medium", "high"), 100, replace = TRUE)),
+    few_values_num = sample(1:3, 100, replace = TRUE)
+  )
+  
+  # Test auto-detection without naming conventions
+  result <- detect_variables_types(
+    data = test_data,
+    target = "target",
+    naming_conventions = FALSE,
+    num_as_categorical_nval = 5
+  )
+  
+  expect_equal(result$status, "ok")
+  expect_true("numeric_var" %in% result$numeric_vars)
+  expect_true("categorical_var" %in% result$categorical_vars)
+  expect_true("binary_var" %in% result$categorical_vars)
+  expect_true("ordinal_var" %in% result$ordinal_vars)
+  expect_true("few_values_num" %in% result$categorical_vars) # Should be categorical due to num_as_categorical_nval = 5
+  
+  # Test auto-detection with higher threshold for numeric as categorical
+  result_high_thresh <- detect_variables_types(
+    data = test_data,
+    target = "target",
+    naming_conventions = FALSE,
+    num_as_categorical_nval = 2
+  )
+  
+  expect_true("few_values_num" %in% result_high_thresh$numeric_vars) # Should be numeric now due to higher threshold
+})
+
+# Tests for filter_variables function
+test_that("filter_variables removes variables with insufficient variance", {
+  # Create test data with a single-value variable
+  test_data <- data.table(
+    target = sample(c(0, 1), 100, replace = TRUE),
+    good_var = rnorm(100),
+    single_value = rep(1, 100)
+  )
+  
+  # Create metadata for variables
+  vars_metadata <- data.table(
+    variable = c("target", "good_var", "single_value"),
+    var_type = c("binary", "numeric", "numeric"),
+    is_in_data = TRUE,
+    is_target = c(TRUE, FALSE, FALSE)
+  )
+  
+  result <- filter_variables(
+    data = test_data,
+    numeric_vars = c("good_var", "single_value"),
+    ordinal_vars = character(0),
+    categorical_vars = character(0),
+    vars_metadata = vars_metadata
+  )
+  
+  expect_true("good_var" %in% result$numeric_vars)
+  expect_false("single_value" %in% result$numeric_vars)
+  expect_true(length(result$messages) > 0) # Should have warning message
+  
+  # Check if metadata was updated correctly
+  expect_true("dropped_one_single_value" %in% names(result$vars_metadata))
+})
+
+# Tests for prepare_data function
+test_that("prepare_data handles variable selection and exclusion correctly", {
+  test_data <- data.table(
+    target = sample(c(0, 1), 100, replace = TRUE),
+    var1 = rnorm(100),
+    var2 = rnorm(100),
+    var3 = sample(letters[1:5], 100, replace = TRUE)
+  )
+  
+  # Test selection of specific variables
+  select_result <- prepare_data(
+    data = test_data,
+    target = "target",
+    select_vars = c("var1", "var3")
+  )
+  
+  expect_equal(ncol(select_result), 3) # target + var1 + var3
+  expect_true(all(c("target", "var1", "var3") %in% names(select_result)))
+  expect_false("var2" %in% names(select_result))
+  
+  # Test exclusion of specific variables
+  exclude_result <- prepare_data(
+    data = test_data,
+    target = "target",
+    exclude_vars = "var2"
+  )
+  
+  expect_equal(ncol(exclude_result), 3) # target + var1 + var3
+  expect_true(all(c("target", "var1", "var3") %in% names(exclude_result)))
+  expect_false("var2" %in% names(exclude_result))
+  
+  # Test that target is always included, even if in exclude_vars
+  exclude_target_result <- prepare_data(
+    data = test_data,
+    target = "target",
+    exclude_vars = c("target", "var2")
+  )
+  
+  expect_true("target" %in% names(exclude_target_result)) # Target should still be included
+  expect_false("var2" %in% names(exclude_target_result))
+})

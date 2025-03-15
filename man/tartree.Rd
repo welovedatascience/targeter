@@ -15,6 +15,8 @@ tartree(
   predict_prob_cutpoint = 0.5,
   predict_prob_cutpoint_quantile = 0.5,
   seed = 42,
+  rpart.control = list(minsplit = 20, minbucket = 8, cp = 0.01, maxcompete = 4,
+    maxsurrogate = 5, usesurrogate = 2, xval = 10, surrogatestyle = 0, maxdepth = 30),
   ...
 )
 }

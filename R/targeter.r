@@ -279,7 +279,7 @@ detect_variables_types <- function(
         substr(select_vars, 1, 2) %in%
           c("L_", "N_", "M_", "F_", "J_", "C_", "R_", "P_", "O_", "Z_")
       ]
-      vars[, keep_naming_convention := (variable %in% c(select_vars, target))]
+      vars[, respect_naming_convention := (variable %in% c(select_vars, target))]
     }
   }
 
@@ -418,7 +418,7 @@ detect_variables_types <- function(
     )
     vars[
       which(variable %in% c(num_vars, ord_vars, other_vars, target)),
-      keep_naming_convention := TRUE
+      respect_naming_convention := TRUE
     ]
     return(list(
       numeric_vars = NULL,
@@ -426,7 +426,7 @@ detect_variables_types <- function(
       categorical_vars = NULL,
       all_vars = NULL,
       target = target,
-      vars_metadata = vars,
+      vars = vars,
       messages = messages,
       status = "error"
     ))
@@ -438,7 +438,7 @@ detect_variables_types <- function(
     categorical_vars = other_vars,
     all_vars = dt_vars_exp,
     target = target,
-    vars_metadata = vars,
+    vars = vars,
     messages = messages,
     status = "ok",
     data = data
@@ -765,7 +765,7 @@ prepare_data <- function(
 #' @param numeric_vars character - vector of numeric variables
 #' @param ordinal_vars character - vector of ordinal variables
 #' @param categorical_vars character - vector of categorical variables
-#' @param vars_metadata data.table - metadata about variables
+#' @param vars data.table - information on variables at analysis step
 #' @param verbose logical - whether to print verbose output
 #'
 #' @return list with filtered variable lists and metadata
@@ -776,7 +776,7 @@ filter_variables <- function(
   numeric_vars,
   ordinal_vars,
   categorical_vars,
-  vars_metadata,
+  vars,
   verbose = FALSE
 ) {
   messages <- list()
@@ -813,8 +813,8 @@ filter_variables <- function(
     all_vars <- setdiff(all_vars, single_value_vars)
 
     # Update metadata
-    vars_metadata[
-      which(vars_metadata$variable %in% single_value_vars),
+    vars[
+      which(vars$variable %in% single_value_vars),
       dropped_one_single_value := TRUE
     ]
   }
@@ -824,7 +824,7 @@ filter_variables <- function(
     ordinal_vars = ordinal_vars,
     categorical_vars = categorical_vars,
     all_vars = all_vars,
-    vars_metadata = vars_metadata,
+    vars = vars,
     messages = messages
   ))
 }
@@ -881,7 +881,7 @@ analyze_variables <- function(
   ordinal_vars <- var_detection$ordinal_vars
   categorical_vars <- var_detection$categorical_vars
   all_vars <- var_detection$all_vars
-  vars_metadata <- var_detection$vars_metadata
+  vars <- var_detection$vars
   target <- var_detection$target
   data <- var_detection$data
   messages <- c(messages, var_detection$messages)
@@ -892,7 +892,7 @@ analyze_variables <- function(
     numeric_vars = numeric_vars,
     ordinal_vars = ordinal_vars,
     categorical_vars = categorical_vars,
-    vars_metadata = vars_metadata,
+    vars = vars,
     verbose = verbose
   )
 
@@ -916,7 +916,7 @@ analyze_variables <- function(
       categorical_vars = NULL,
       all_vars = NULL,
       target = target,
-      vars_metadata = vars_metadata,
+      vars = vars,
       messages = messages,
       status = "error",
       data = data
@@ -930,7 +930,7 @@ analyze_variables <- function(
     categorical_vars = vars_filtered$categorical_vars,
     all_vars = vars_filtered$all_vars,
     target = target,
-    vars_metadata = vars_filtered$vars_metadata,
+    vars = vars_filtered$vars,
     messages = messages,
     status = "ok",
     data = data
@@ -1130,7 +1130,7 @@ detect_variables_types <- function(
         substr(select_vars, 1, 2) %in%
           c("L_", "N_", "M_", "F_", "J_", "C_", "R_", "P_", "O_", "Z_")
       ]
-      vars[, keep_naming_convention := (variable %in% c(select_vars, target))]
+      vars[, respect_naming_convention := (variable %in% c(select_vars, target))]
     }
   }
 
@@ -1269,7 +1269,7 @@ detect_variables_types <- function(
     )
     vars[
       which(variable %in% c(num_vars, ord_vars, other_vars, target)),
-      keep_naming_convention := TRUE
+      respect_naming_convention := TRUE
     ]
     return(list(
       numeric_vars = NULL,
@@ -1277,7 +1277,7 @@ detect_variables_types <- function(
       categorical_vars = NULL,
       all_vars = NULL,
       target = target,
-      vars_metadata = vars,
+      vars = vars,
       messages = messages,
       status = "error"
     ))
@@ -1289,7 +1289,7 @@ detect_variables_types <- function(
     categorical_vars = other_vars,
     all_vars = dt_vars_exp,
     target = target,
-    vars_metadata = vars,
+    vars = vars,
     messages = messages,
     status = "ok",
     data = data
@@ -1616,7 +1616,7 @@ prepare_data <- function(
 #' @param numeric_vars character - vector of numeric variables
 #' @param ordinal_vars character - vector of ordinal variables
 #' @param categorical_vars character - vector of categorical variables
-#' @param vars_metadata data.table - metadata about variables
+#' @param vars data.table - metadata about variables
 #' @param verbose logical - whether to print verbose output
 #'
 #' @return list with filtered variable lists and metadata
@@ -1627,7 +1627,7 @@ filter_variables <- function(
   numeric_vars,
   ordinal_vars,
   categorical_vars,
-  vars_metadata,
+  vars,
   verbose = FALSE
 ) {
   messages <- list()
@@ -1664,8 +1664,8 @@ filter_variables <- function(
     all_vars <- setdiff(all_vars, single_value_vars)
 
     # Update metadata
-    vars_metadata[
-      which(vars_metadata$variable %in% single_value_vars),
+    vars[
+      which(vars$variable %in% single_value_vars),
       dropped_one_single_value := TRUE
     ]
   }
@@ -1675,7 +1675,7 @@ filter_variables <- function(
     ordinal_vars = ordinal_vars,
     categorical_vars = categorical_vars,
     all_vars = all_vars,
-    vars_metadata = vars_metadata,
+    vars = vars,
     messages = messages
   ))
 }
@@ -1732,7 +1732,7 @@ analyze_variables <- function(
   ordinal_vars <- var_detection$ordinal_vars
   categorical_vars <- var_detection$categorical_vars
   all_vars <- var_detection$all_vars
-  vars_metadata <- var_detection$vars_metadata
+  vars <- var_detection$vars
   target <- var_detection$target
   data <- var_detection$data
   messages <- c(messages, var_detection$messages)
@@ -1743,7 +1743,7 @@ analyze_variables <- function(
     numeric_vars = numeric_vars,
     ordinal_vars = ordinal_vars,
     categorical_vars = categorical_vars,
-    vars_metadata = vars_metadata,
+    vars = vars,
     verbose = verbose
   )
 
@@ -1767,7 +1767,7 @@ analyze_variables <- function(
       categorical_vars = NULL,
       all_vars = NULL,
       target = target,
-      vars_metadata = vars_metadata,
+      vars = vars,
       messages = messages,
       status = "error",
       data = data
@@ -1781,7 +1781,7 @@ analyze_variables <- function(
     categorical_vars = vars_filtered$categorical_vars,
     all_vars = vars_filtered$all_vars,
     target = target,
-    vars_metadata = vars_filtered$vars_metadata,
+    vars = vars_filtered$vars,
     messages = messages,
     status = "ok",
     data = data
@@ -2184,7 +2184,7 @@ targeter_internal <- function(
   ordinal_vars <- var_analysis$ordinal_vars
   categorical_vars <- var_analysis$categorical_vars
   all_vars <- var_analysis$all_vars
-  vars_metadata <- var_analysis$vars_metadata
+  vars <- var_analysis$vars
   data <- var_analysis$data
   var_messages <- var_analysis$messages
 
@@ -2196,9 +2196,7 @@ targeter_internal <- function(
     smart_quantile_by = smart_quantile_by,
     verbose = verbose
   )
-  print("binning")
-  print(binning)
-
+  # 
   # Step 8: Create expression for binning data
   binning_expr <- create_binning_expression(
     target = target,
@@ -2251,16 +2249,16 @@ targeter_internal <- function(
 
   if (any(vars_one_value)) {
     crossvars <- crossvars[which(!(vars_one_value))]
-    vars_metadata[
+    vars[
       which(
-        vars_metadata$variable %in% names(vars_one_value)[which(vars_one_value)]
+        vars$variable %in% names(vars_one_value)[which(vars_one_value)]
       ),
       dropped_one_single_value := TRUE
     ]
   }
 
   # Update metadata with profile information
-  vars_metadata[, has_profile := (variable %in% names(crossvars))]
+  vars[, has_profile := (variable %in% names(crossvars))]
 
   # Step 11: Format results
   if (verbose) cat("\nFormatting results...")
@@ -2273,6 +2271,7 @@ targeter_internal <- function(
   # Combine messages from all steps
   all_messages <- c(target_messages, var_messages)
 
+  print(vars)
   # Create final output object
   out <- list(
     dataname = dataname,
@@ -2284,7 +2283,7 @@ targeter_internal <- function(
     analysis_name = analysis_name,
     date = Sys.Date(),
     profiles = crossvars,
-    variables = vars_metadata,
+    variables = vars,
     messages = all_messages,
     session = targeter_session_info()
   )
@@ -2994,6 +2993,7 @@ process_crossings <- function(
       )
       cross$woe <- woe_results$WOE
       cross$IV <- woe_results$IV
+      cross$target_reference_level <- target_reference_level
       cross$woe_cluster <- woe_results$has_clusters
     }
     if (variable %in% numeric_vars) {
@@ -3170,6 +3170,7 @@ targeter <- function(
   exclude_vars = NULL,
   nbins = 12,
   binning_method = c("quantile", "clustering", "smart"),
+  # TODO fix alternate binning method not working
   naming_conventions = getOption(
     "targeter.use_naming_conventions",
     default = FALSE

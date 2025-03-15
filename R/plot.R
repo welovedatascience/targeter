@@ -1013,3 +1013,10 @@ quadrant_plot <- function(
   ## return graph
   return(p1)
 }
+
+
+#' @method plot targeter
+#' @export
+plot.targeter <- function(x, var = names(x$profiles)[1], ...) {
+  plot(x$profiles[[var]], ...)
+}
