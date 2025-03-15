@@ -3073,38 +3073,258 @@ compute_woe_iv <- function(
 
 
 
-dt_vartype_autoguess_onevar <- function (data, var, num_as_nominal_nval = 5, ...) 
-{
-    assertthat::assert_that(inherits(data, "data.table"), msg = "data is not a data table")
-    if (inherits(data[, get(var)], c("logical"))) 
-        return("binary")
-    if (inherits(data[, get(var)], c("ordered"))) 
-        return("ordinal")
-    ncat <- data[, uniqueN(get(var))]
-    if (inherits(data[, get(var)], c("factor", "character"))) {
-        if (ncat == 2) 
-            return("binary")
-        else if (ncat == 1) 
-            return("unimode")
-        else return("categorical")
-    }
-    if (inherits(data[, get(var)], c("numeric", "integer", "Date", 
-        "POSIXct", "POSIXlt", "IDate"))) {
-        if (ncat == 2) 
-            return("binary")
-        else if (ncat == 1) 
-            return("unimode")
-        else if (ncat <= num_as_nominal_nval) 
-            return("categorical")
-        else return("numeric")
-    }
-    return("unknown")
-}
+# dt_vartype_autoguess_onevar <- function (data, var, num_as_nominal_nval = 5, ...) 
+# {
+#     assertthat::assert_that(inherits(data, "data.table"), msg = "data is not a data table")
+#     if (inherits(data[, get(var)], c("logical"))) 
+#         return("binary")
+#     if (inherits(data[, get(var)], c("ordered"))) 
+#         return("ordinal")
+#     ncat <- data[, uniqueN(get(var))]
+#     if (inherits(data[, get(var)], c("factor", "character"))) {
+#         if (ncat == 2) 
+#             return("binary")
+#         else if (ncat == 1) 
+#             return("unimode")
+#         else return("categorical")
+#     }
+#     if (inherits(data[, get(var)], c("numeric", "integer", "Date", 
+#         "POSIXct", "POSIXlt", "IDate"))) {
+#         if (ncat == 2) 
+#             return("binary")
+#         else if (ncat == 1) 
+#             return("unimode")
+#         else if (ncat <= num_as_nominal_nval) 
+#             return("categorical")
+#         else return("numeric")
+#     }
+#     return("unknown")
+# }
 
 
-dt_vartype_autoguess <- function (data, num_as_nominal_nval = 5, ...) 
-{
-    assertthat::assert_that(inherits(data, "data.table"), msg = "data is not a data table")
-    sapply(names(data), function(var) dt_vartype_autoguess_onevar(data, 
-        var, num_as_nominal_nval = num_as_nominal_nval, ...))
+# dt_vartype_autoguess <- function (data, num_as_nominal_nval = 5, ...) 
+# {
+#     assertthat::assert_that(inherits(data, "data.table"), msg = "data is not a data table")
+#     sapply(names(data), function(var) dt_vartype_autoguess_onevar(data, 
+#         var, num_as_nominal_nval = num_as_nominal_nval, ...))
+# }
+
+
+#' Target Variable Profiling
+#'
+#' @description
+#' For each explanatory variable, this function analyzes its relationship with a target
+#' variable by calculating statistics, WOE, IV, and other metrics.
+#'
+#' The analysis includes:
+#' \itemize{
+#'   \item Automatic or custom binning of numeric variables
+#'   \item Contingency tables with counts of each variable class vs. target values
+#'   \item Proportions (count per class/target divided by sum of class counts)
+#'   \item Index values showing over/under-representation
+#'   \item Weight of Evidence and Information Value for binary and numeric targets
+#' }
+#'
+#' @param data data.frame or data.table - Data to analyze
+#' @param target character - Name of the target variable to explain
+#' @param description_data character - Description of the dataset (optional)
+#' @param target_type character - Type of target: "autoguess" (default), "binary", "categorical", or "numeric"
+#' @param target_reference_level any - Reference level for binary/categorical targets (if NULL, will be inferred)
+#' @param description_target character - Description of the target variable (optional)
+#' @param analysis_name character - Name for the analysis (optional)
+#' @param select_vars character vector - Variables to include (if NULL, all columns are considered)
+#' @param exclude_vars character vector - Variables to exclude from analysis
+#' @param nbins integer - Number of bins for numeric variables (default: 12)
+#' @param binning_method character - Method for binning: "quantile" (default), "clustering", or "smart"
+#' @param naming_conventions logical - Whether to enforce naming conventions (default: FALSE)
+#' @param useNA character - How to handle NAs: "ifany" (default) or "no"
+#' @param verbose logical - Whether to print detailed progress information (default: FALSE)
+#' @param dec integer - Number of decimals for numeric display (default: 2)
+#' @param order_label character - Method for ordering labels in output (default: "auto")
+#' @param cont_target_trim numeric - Trimming factor for continuous targets, as percentage between 0 and 1 (default: 0.01)
+#' @param bxp_factor numeric - Factor for boxplot whiskers calculation (default: 1.5)
+#' @param num_as_categorical_nval integer - Threshold for treating numeric as categorical (default: 5)
+#' @param autoguess_nrows integer - Rows to use for variable type detection (default: 1000, 0 means all rows)
+#' @param woe_alternate_version character - When to use alternate WOE definition: "if_continuous" (default) or "always"
+#' @param woe_shift numeric - Shift value for WOE calculation to prevent issues with 0% or 100% classes (default: 0.01)
+#' @param woe_post_cluster logical - Whether to cluster WOE values (default: FALSE)
+#' @param woe_post_cluster_n integer - Number of clusters for WOE clustering (default: 6)
+#' @param smart_quantile_by numeric - Quantile step for smart binning (default: 0.01)
+#' @param by_nvars integer - Number of variables to process in each batch (default: 200)
+#' @param ... Additional parameters passed to targeter_internal
+#'
+#' @return An object of class "targeter" with detailed profiling information
+#'
+#' @importFrom data.table setDT
+#' @importFrom assertthat assert_that
+#' @export
+targeter <- function(
+  data,
+  target,
+  description_data = NULL,
+  target_type = c("autoguess", "binary", "categorical", "numeric"),
+  target_reference_level = NULL,
+  description_target = NULL,
+  analysis_name = NULL,
+  select_vars = NULL,
+  exclude_vars = NULL,
+  nbins = 12,
+  binning_method = c("quantile", "clustering", "smart"),
+  naming_conventions = getOption(
+    "targeter.use_naming_conventions",
+    default = FALSE
+  ),
+  useNA = getOption("targeter.useNA", default = "ifany"),
+  verbose = FALSE,
+  dec = 2,
+  order_label = c("auto", "alpha", "count", "props", "means"),
+  cont_target_trim = 0.01,
+  bxp_factor = 1.5,
+  num_as_categorical_nval = 5,
+  autoguess_nrows = 1000,
+  woe_alternate_version = c("if_continuous", "always"),
+  woe_shift = 0.01,
+  woe_post_cluster = FALSE,
+  woe_post_cluster_n = 6,
+  smart_quantile_by = 0.01,
+  by_nvars = 200,
+  ...
+) {
+  # Validate core inputs
+  assertthat::assert_that(
+    inherits(data, "data.frame") || inherits(data, "data.table"),
+    msg = "data must be a data.frame or data.table"
+  )
+  
+  assertthat::assert_that(
+    is.character(target) && length(target) == 1,
+    msg = "target must be a single character string"
+  )
+  
+  assertthat::assert_that(
+    target %in% colnames(data),
+    msg = "target variable not found in data"
+  )
+  
+  assertthat::assert_that(
+    length(unique(data[[target]])) > 1,
+    msg = "target variable must have more than one unique value"
+  )
+  
+  # Validate batch processing parameter
+  assertthat::assert_that(
+    is.numeric(by_nvars) && by_nvars > 0 && by_nvars %% 1 == 0,
+    msg = "by_nvars must be a positive integer"
+  )
+  
+  # Convert to data.table for efficient processing
+  if (!inherits(data, "data.table")) {
+    data <- data.table::setDT(copy(data))
+  }
+  
+  # Match arguments
+  target_type <- match.arg(target_type)
+  binning_method <- match.arg(binning_method)
+  woe_alternate_version <- match.arg(woe_alternate_version)
+  order_label <- match.arg(order_label)
+  
+  # Setup batch processing
+  vars <- names(data)
+  by_groups <- (1 + seq_along(vars) %/% by_nvars)
+  groups <- unique(by_groups)
+  
+  # Initialize progress tracking
+  if (verbose) {
+    cat(sprintf("\nProcessing %d variables in %d groups (batch size: %d)\n", 
+                length(vars), length(groups), by_nvars))
+  }
+  
+  # Prepare result container
+  out_tar <- vector(mode = 'list', length(groups))
+  success_count <- 0
+  error_count <- 0
+  
+  # Process each batch
+  for (igroup in groups) {
+    if (verbose) {
+      cat(sprintf('\nProcessing group: %d of %d', igroup, length(groups)))
+    }
+    
+    # Get variables for this batch
+    ivars <- vars[by_groups == igroup]
+    ivars <- unique(c(target, ivars))
+    data_igroup <- data[, ..ivars]
+    
+    # Process batch
+    if (verbose) {
+      cat(sprintf('\n  Variables in batch: %d', length(ivars)))
+    }
+    
+    itar <- tryCatch({
+      targeter_internal(
+        data = data_igroup,
+        target = target,
+        description_data = description_data,
+        target_type = target_type,
+        target_reference_level = target_reference_level,
+        description_target = description_target,
+        analysis_name = analysis_name,
+        select_vars = select_vars,
+        exclude_vars = exclude_vars,
+        nbins = nbins,
+        binning_method = binning_method,
+        naming_conventions = naming_conventions,
+        useNA = useNA,
+        verbose = verbose,
+        dec = dec,
+        order_label = order_label,
+        cont_target_trim = cont_target_trim,
+        bxp_factor = bxp_factor,
+        num_as_categorical_nval = num_as_categorical_nval,
+        autoguess_nrows = autoguess_nrows,
+        woe_alternate_version = woe_alternate_version,
+        woe_shift = woe_shift,
+        woe_post_cluster = woe_post_cluster,
+        woe_post_cluster_n = woe_post_cluster_n,
+        smart_quantile_by = smart_quantile_by,
+        ...
+      )
+    }, error = function(e) {
+      if (verbose) {
+        cat(sprintf("\n  Error in group %d: %s", igroup, e$message))
+      }
+      return(NULL)
+    })
+    
+    if (!is.null(itar)) {
+      out_tar[[igroup]] <- itar
+      success_count <- success_count + 1
+      if (verbose) cat(' - Done')
+    } else {
+      error_count <- error_count + 1
+      out_tar[[igroup]] <- NULL
+      if (verbose) cat(' - Failed')
+    }
+  }
+  
+  # Filter out NULL results
+  out_tar <- out_tar[!sapply(out_tar, is.null)]
+  
+  # Combine results if we have any
+  if (length(out_tar) > 0) {
+    if (verbose) {
+      cat(sprintf("\n\nCombining results from %d successful groups (errors: %d)\n", 
+                  success_count, error_count))
+    }
+    tar <- targeter:::tbind(out_tar)
+    
+    if (verbose) {
+      cat(sprintf("\nProfiling complete: %d variables analyzed\n", 
+                  length(tar$profiles)))
+    }
+    
+    return(tar)
+  } else {
+    stop("All processing groups failed - check input data and parameters")
+  }
 }
