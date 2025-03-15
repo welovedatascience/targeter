@@ -66,6 +66,9 @@ tartree <- function(
   predict_prob_cutpoint = 0.5,
   predict_prob_cutpoint_quantile = 0.5,
   seed = 42,
+  rpart.control=list(minsplit = 20, minbucket = 8, cp = 0.01, 
+              maxcompete = 4, maxsurrogate = 5, usesurrogate = 2, xval = 10,
+              surrogatestyle = 0, maxdepth = 30),
   ...
 ) {
   assertthat::assert_that(
@@ -196,7 +199,7 @@ tartree <- function(
       data_model_train[, unique(c("Z_TARGET", dt_vars_exp)), with = FALSE],
       "Z_TARGET"
     )
-    minsplit <- sum(weights) / 10
+    #minsplit <- sum(weights) / 10
 
     n <- table(data_model[["Z_TARGET"]])
     prior <- n / sum(n)
@@ -208,11 +211,7 @@ tartree <- function(
         method = "class",
         model = TRUE,
         parms = list(prior = prior),
-        control = rpart.control(
-          maxdepth = decision_tree_maxdepth,
-          minsplit = minsplit,
-          cp = decision_tree_cp
-        )
+        control = rpart.control
       )
     } else {
 
@@ -222,11 +221,7 @@ tartree <- function(
         method = "class",
         weights = weights,
         model = TRUE,
-        control = rpart.control(
-          maxdepth = decision_tree_maxdepth,
-          minsplit = minsplit,
-          cp = decision_tree_cp
-        )
+        control = rpart.control
       )
     }
   } else {
@@ -239,18 +234,14 @@ tartree <- function(
 
     data_model_valid <- data_model[!data_model$ID %in% data_model_train$ID]
 
-    minsplit <- 30
+    # minsplit <- 30
 
     mod <- rpart(
       formula_txt,
       model = TRUE,
       data = data_model_train[, unique(c("Z_TARGET", dt_vars_exp)), with = FALSE],
       method = "anova",
-      control = rpart.control(
-        maxdepth = decision_tree_maxdepth,
-        minsplit = minsplit,
-        cp = decision_tree_cp
-      )
+      control = rpart.control
     )
   }
 
