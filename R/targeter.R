@@ -1892,11 +1892,19 @@ calculate_statistics <- function(
     p_col <- prop.table(as.table(as.matrix(tab)), margin = 2)
 
     # Calculate index (proportion relative to overall proportion)
-    ind <- matrix(nrow = length(p[, 1]), ncol = length(colnames(p)))
-    for (i in seq_along(colnames(p))) {
-      avgpeni <- sum(tab[, i]) / sum(tab)
-      ind[, i] <- p[, i] / avgpeni
-    }
+
+    # ind <- matrix(nrow = length(p[, 1]), ncol = length(colnames(p)))
+    # for (i in seq_along(colnames(p))) {
+    #   avgpeni <- sum(tab[, i]) / sum(tab)
+    #   ind[, i] <- p[, i] / avgpeni
+    # }
+    # Use vectorized operations:
+
+    col_sums <- colSums(tab)
+    total_sum <- sum(tab)
+    avgpen <- col_sums / total_sum
+    ind <- sweep(p, 2, avgpen, "/")
+
     colnames(ind) <- colnames(p)
     rownames(ind) <- rownames(p)
 
@@ -2121,26 +2129,34 @@ targeter_internal <- function(
 
   # Step 7: Create binning functions
   if (verbose) cat("\nSetting up variable binning...")
+
   binning <- binning_factory(
     method = binning_method,
     nbins = nbins,
     smart_quantile_by = smart_quantile_by,
     verbose = verbose
   )
-  binning_foo <- binning$binning_function
   #
+  # binning_foo <- binning$binning_function
   # Step 8: Create expression for binning data
-  binning_expr <- create_binning_expression(
-    target = target,
-    num_vars = numeric_vars,
-    other_vars = categorical_vars,
-    binning_function = "binning_foo"
-  )
+  # binning_expr <- create_binning_expression(
+  #   target = target,
+  #   num_vars = numeric_vars,
+  #   other_vars = categorical_vars,
+  #   binning_function = "binning_foo"
+  # )
 
   if (verbose) cat("\nApplying binning to variables...")
 
   # Execute binning on the data
-  dataCut <- eval(parse(text = binning_expr))
+  
+  # Instead of creating complex strings and using eval(parse()):
+  # Use direct data.table operations:
+  dataCut <- data[, c(target, categorical_vars), with = FALSE]
+  for (var in numeric_vars) {
+    dataCut[, (var) := binning$binning_function(data[[var]], var)]
+  }
+  # dataCut <- eval(parse(text = binning_expr))
 
   # Step 9: Compute target statistics
   if (verbose) cat("\nComputing target statistics...")
@@ -2244,43 +2260,43 @@ targeter_internal <- function(
 #' @param binning_function character - the name of binning function to use
 #'
 #' @return character string with the expression to evaluate
-create_binning_expression <- function(
-  target,
-  num_vars,
-  other_vars,
-  binning_function
-) {
-  # Start with target variable
-  txt <- paste0("data[,.(", target)
+# create_binning_expression <- function(
+#   target,
+#   num_vars,
+#   other_vars,
+#   binning_function
+# ) {
+#   # Start with target variable
+#   txt <- paste0("data[,.(", target)
 
-  # Add categorical variables directly
-  if (length(other_vars) > 0) {
-    txt <- paste0(txt, ",", paste(other_vars, collapse = ","))
-  }
-  # binning_foo <<- binning_function
-  # Add numeric variables with binning function
-  if (length(num_vars) > 0) {
-    txtQuickcut <- paste0(
-      paste0(
-        num_vars,
-        "=",
-        binning_function,
-        "(",
-        num_vars,
-        ", variable='",
-        num_vars,
-        "')"
-      ),
-      collapse = ","
-    )
-    txt <- paste0(txt, ",", txtQuickcut)
-  }
+#   # Add categorical variables directly
+#   if (length(other_vars) > 0) {
+#     txt <- paste0(txt, ",", paste(other_vars, collapse = ","))
+#   }
+#   # binning_foo <<- binning_function
+#   # Add numeric variables with binning function
+#   if (length(num_vars) > 0) {
+#     txtQuickcut <- paste0(
+#       paste0(
+#         num_vars,
+#         "=",
+#         binning_function,
+#         "(",
+#         num_vars,
+#         ", variable='",
+#         num_vars,
+#         "')"
+#       ),
+#       collapse = ","
+#     )
+#     txt <- paste0(txt, ",", txtQuickcut)
+#   }
 
-  # Complete the expression
-  txt <- paste0(txt, ")]")
+#   # Complete the expression
+#   txt <- paste0(txt, ")]")
 
-  return(txt)
-}
+#   return(txt)
+# }
 
 #' Process all variable crossings
 #'
@@ -2658,30 +2674,42 @@ calculate_statistics <- function(
   # Process based on target type
   if (target_type %in% c("binary", "categorical")) {
     # Compute counts by variable and target
-    txt <- paste0("data[,.(N=.N),by=.(", variable, ",", target, ")]")
-    x <- eval(parse(text = txt))
 
+    # txt <- paste0("data[,.(N=.N),by=.(", variable, ",", target, ")]")
+    # x <- eval(parse(text = txt))
+    by_cols <- c(variable, target)
+    x <- data[, .(N = .N), by = by_cols]
     # Rename columns
-    colnames(x)[1:2] <- c(variable, target)
+    setnames(x, c(1:2), c(variable, target))
 
     # Reshape to have target values as columns
     tab <- data.table::dcast(x, get(variable) ~ get(target), value.var = "N")
+    
   } else if (target_type == "numeric") {
     # Compute statistics for numeric target
-    txt <- paste0(
-      "data[,.(
-          count = .N,
-          varsum = sum(get(target), na.rm=TRUE),
-          avg = mean(get(target),na.rm=TRUE),
-          std = sd(get(target), na.rm=TRUE),
-          q25 = quantile(get(target), prob=c(0.25), na.rm=TRUE),
-          median = quantile(get(target), prob=c(0.5), na.rm=TRUE),
-          q75 = quantile(get(target), prob=c(0.75), na.rm=TRUE)),
-          by=.(",
-      variable,
-      ")]"
-    )
-    tab <- eval(parse(text = txt))
+    # txt <- paste0(
+    #   "data[,.(
+    #       count = .N,
+    #       varsum = sum(get(target), na.rm=TRUE),
+    #       avg = mean(get(target),na.rm=TRUE),
+    #       std = sd(get(target), na.rm=TRUE),
+    #       q25 = quantile(get(target), prob=c(0.25), na.rm=TRUE),
+    #       median = quantile(get(target), prob=c(0.5), na.rm=TRUE),
+    #       q75 = quantile(get(target), prob=c(0.75), na.rm=TRUE)),
+    #       by=.(",
+    #   variable,
+    #   ")]"
+    # )
+    # tab <- eval(parse(text = txt))
+    tab <- data[, .(
+      count = .N,
+      varsum = sum(get(target), na.rm = TRUE),
+      avg = mean(get(target), na.rm = TRUE),
+      std = stats::sd(get(target), na.rm = TRUE),
+      q25 = stats::quantile(get(target), probs = 0.25, na.rm = TRUE),
+      median = stats::quantile(get(target), probs = 0.5, na.rm = TRUE),
+      q75 = stats::quantile(get(target), probs = 0.75, na.rm = TRUE)
+    ), by = variable]
     setnames(tab, variable, "variable")
   }
 
