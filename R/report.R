@@ -160,6 +160,7 @@ report.targeter <- function(
     msg = "quarto package and runtime are required."
   )
 
+# TODO fix quato folder creation
   # TODO cover all parameters  assert tests
   assertthat::assert_that(
     is.character(format),
