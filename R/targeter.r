@@ -1545,7 +1545,7 @@ check_dependencies <- function(binning_method, woe_post_cluster) {
   deps <- c()
 
   if (binning_method == "clustering") {
-      deps <- c(deps, "Ckmeans.1d.dp")
+    deps <- c(deps, "Ckmeans.1d.dp")
   }
 
   if (binning_method == "smart") {
@@ -1553,18 +1553,19 @@ check_dependencies <- function(binning_method, woe_post_cluster) {
   }
 
   if (woe_post_cluster) {
-    deps <- c(deps, "clustering.sc.dp","Ckmeans.1d.dp")
+    deps <- c(deps, "clustering.sc.dp", "Ckmeans.1d.dp")
   }
   if (getOption("targeter.auto_install_deps", FALSE)) {
-        pacman::p_load(char = deps)
-      }
+    pacman::p_load(char = deps)
+  }
   assertthat::assert_that(
-    all(pacman::p_load(char = deps, install = FALSE)),
+    all(pacman::p_load(char = unique(deps), install = FALSE)),
     msg = paste(
-      'some of targeter following optional packages required for decision trees are not available:',
-      paste(deps, collapse = ","))
+      'some of targeter following optional packages required for 
+      clustering are not available:',
+      paste(deps, collapse = ",")
+    )
   )
-    
 }
 
 #' Prepare data and select variables for analysis
@@ -2063,26 +2064,26 @@ targeter_internal <- function(
   target,
   target_type,
   target_reference_level, # NULL: auto will check for 1, TRUE
-  description_target ,
-  analysis_name ,
-  select_vars ,
-  exclude_vars ,
+  description_target,
+  analysis_name,
+  select_vars,
+  exclude_vars,
   nbins,
-  binning_method ,
-  naming_conventions ,
-  useNA ,
+  binning_method,
+  naming_conventions,
+  useNA,
   verbose,
   dec,
-  order_label ,
-  cont_target_trim ,
-  bxp_factor ,
-  num_as_categorical_nval ,
+  order_label,
+  cont_target_trim,
+  bxp_factor,
+  num_as_categorical_nval,
   autoguess_nrows,
-  woe_alternate_version ,
+  woe_alternate_version,
   woe_shift,
-  woe_post_cluster ,
-  woe_post_cluster_n ,
-  smart_quantile_by ,
+  woe_post_cluster,
+  woe_post_cluster_n,
+  smart_quantile_by,
   ...
 ) {
   # Step 6: Analyze variables
@@ -2262,7 +2263,9 @@ create_binning_expression <- function(
     txtQuickcut <- paste0(
       paste0(
         num_vars,
-        "=",binning_function,"(",
+        "=",
+        binning_function,
+        "(",
         num_vars,
         ", variable='",
         num_vars,
@@ -2998,7 +3001,7 @@ compute_woe_iv <- function(
     is_numeric = (variable_type == "numeric"),
     cutpoints_list
   )
-  WOE <- WOE[ , which(!colnames(WOE) %in% "variable"), drop = FALSE]
+  WOE <- WOE[, which(!colnames(WOE) %in% "variable"), drop = FALSE]
   IV <- woe_iv$IV
   if (woe_post_cluster) {
     var_nvalues <- data[!is.na(get(variable)), uniqueN(get(variable))]
@@ -3141,7 +3144,6 @@ targeter <- function(
   by_nvars = 200,
   ...
 ) {
-
   dataname <- deparse(substitute(data))
   if (verbose) {
     cat("\nStarting targeter analysis")
@@ -3215,7 +3217,7 @@ targeter <- function(
 
   # Step 4: Prepare data
   if (verbose) cat("\nPreparing data...")
-  
+
   data <- data.table::setDT(data)
 
   # Step 5: Analyze target variable
@@ -3245,18 +3247,20 @@ targeter <- function(
   target_reference_level <- target_analysis$reference_level
   target_messages <<- target_analysis$messages
 
-  
   analysis_description <- analysis_description_default(
     target,
     target_type,
     description_target,
-    description_data = ifelse(is.null(description_data), dataname, description_data),
+    description_data = ifelse(
+      is.null(description_data),
+      dataname,
+      description_data
+    ),
     analysis_name
   )
   description_data <- analysis_description$description_data
   description_target <- analysis_description$description_target
   analysis_name <- analysis_description$analysis_name
-
 
   if (verbose) {
     cat("\nInput validated.")
