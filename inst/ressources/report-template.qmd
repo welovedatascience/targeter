@@ -1,24 +1,22 @@
 ---
-## targter target analysis default template
-# title and author will be added rihght below byytar_report function,
+## targeter target analysis default template
+# title and author will be added rihght below by report function,
 ## including eventual parameters passsed
 ## for custom_fields` list.
 ##{{targeter-yaml}}## 
 execute:
   echo: false
 params:
-  object: "tar.rds" # will have to be passed - will be a mandatory parameter  -> path to a rds export of a targeter object
+  object: "tar.rds" 
   summary_object : "tar_summary.rds"  
   show_details: TRUE
   show_toc: TRUE
   show_tables: TRUE
   fullplot_which_plot: "1:2"
-  fullplot_numvar_as: "bin" # 'bin', 'value'
+  fullplot_numvar_as: "bin" 
   metadata_var_field: "variable"
   metadata_var_label: "label"
 format:
-  pptx:
-    slide-level: 3
   html:
     theme: cosmo
     toc: true
@@ -42,6 +40,8 @@ format:
     header-includes:
       - \usepackage{array}
       - \usepackage{booktabs}
+  pptx:
+    slide-level: 3
 report_type: targeter
 ---
 
@@ -115,7 +115,7 @@ if (object$target_type == "binary"){
   txt <- paste0(
 "\n\n## Binary target analysis - overview\n\n",
 "This report contains a snapshot of the specific subpopulation **«",
-    label(object$target,metadata, var_field = params$metadata_var_field, label_field= params$metadata_var_label ),"» ==", object$target_reference_level, "**\n\n",
+    label(object$target,metadata, var_field = params$metadata_var_field, label_field= params$metadata_var_label ),"» == ", object$target_reference_level, "**\n\n",
 
 "This subpopulation is characterized by  performing bivariate analyses, crossing the variable of interest (target) with  potential explanatory variables. Only most relevant (highest discriminative power) may be retained.
 
