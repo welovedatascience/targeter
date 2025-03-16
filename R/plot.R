@@ -373,8 +373,9 @@ plot.crossvar_categorical <- function(
   numvar_as <- match.arg(numvar_as, c("bin", "value"), several.ok = FALSE)
   if (numvar_as == 'value' & x$variable_type != 'numeric') numvar_as <- 'bin'
 
-  if (show == 'woe' & is.null(x$woe))
+  if (show == 'woe' & is.null(x$woe)){
     stop("No WOE for this profile object, maybe it is a categorical target?")
+  }
   ## Definiton of a default association between the show and the type parameters.
   if (type == "auto") {
     type <- switch(
@@ -398,6 +399,7 @@ plot.crossvar_categorical <- function(
   ## selection of the appropriate tables
   df <- as.data.frame.matrix(x[[show]])
 
+  # df <- df[, which(!colnames(df) %in% c('variable'))]
   # ##reorder the table:
   # df <- df[x$orderlabel,, drop=FALSE]
 
@@ -450,7 +452,9 @@ plot.crossvar_categorical <- function(
   ##
   if (numvar_as == 'value') {
     # replace labels per bin center values
-    dfm[['level']] <- as.numeric(x$numcenters[dfm[['level']]])
+    numcenters <- x$numcenters
+    names(numcenters) <- x$orderlabel
+    dfm[['level']] <- as.numeric(numcenters[dfm[['level']]])
   }
 
   if (x$target_type == 'binary') {
@@ -1012,4 +1016,11 @@ quadrant_plot <- function(
 
   ## return graph
   return(p1)
+}
+
+
+#' @method plot targeter
+#' @export
+plot.targeter <- function(x, var = names(x$profiles)[1], ...) {
+  plot(x$profiles[[var]], ...)
 }

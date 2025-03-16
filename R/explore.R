@@ -72,7 +72,7 @@ explore <- function(
     pacman::p_load(deps, install = FALSE)
   }
   assertthat::assert_that(
-    pacman::p_load(deps),
+    all(pacman::p_load(char = deps)),
     msg = paste(
       'some of targeter following optional packages are not available:',
       paste(deps, collapse = ",")

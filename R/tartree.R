@@ -20,8 +20,6 @@ if (getRversion() >= "3.1.0")
   )
 
 
-
-
 #' @title tartree
 #' @description Build a decision tree model following/based on a targeter analysis
 #' @param data data.frame or data.table
@@ -33,9 +31,9 @@ if (getRversion() >= "3.1.0")
 #' @param decision_tree_sample numeric, proportion of data to be used for training -  to be betwwen 0 (not included) and 1 (not recommended) default: 0.8
 #' @param seed integer, seed for random number generation - default: 42
 #' @param predict_prob_cutpoint cutpoint to be used for binary decision - default 0.5
-#' @param predict_prob_cutpoint_quantile quantile of probabilities to be used for 
+#' @param predict_prob_cutpoint_quantile quantile of probabilities to be used for
 #' further additional preduction. Default 0.5. Could be used to see what if we
-#' want to create a group of x\% records. 
+#' want to create a group of x\% records.
 #' @param ... other parameters to be passed to targeter
 #' @details
 #' tartree is a function that builds a decision tree model based on a targeter analysis. It is recommended to have pre-computed targeter object and targeter summary object. If not, the function will compute them. The targeter object is used to define the target column and the target type. The targeter summary object is used to define the variables to be used in the decision tree model. The function will split the data into training and validation sets, build the decision tree model, and return it. The decision tree model is a rpart object with additional attributes: tar_object, tarsum_object, and target.
@@ -66,6 +64,17 @@ tartree <- function(
   predict_prob_cutpoint = 0.5,
   predict_prob_cutpoint_quantile = 0.5,
   seed = 42,
+  rpart.control = list(
+    minsplit = 20,
+    minbucket = 8,
+    cp = 0.01,
+    maxcompete = 4,
+    maxsurrogate = 5,
+    usesurrogate = 2,
+    xval = 10,
+    surrogatestyle = 0,
+    maxdepth = 30
+  ),
   ...
 ) {
   assertthat::assert_that(
@@ -76,7 +85,7 @@ tartree <- function(
   data <- data.table::setDT(data)
   if (is.null(tar_object)) {
     cat(
-      "\n- WARNING: it is recommanded to have pre-computed targeter object.\n"
+      "\nNOTE: it is recommanded to have pre-computed targeter object."
     )
     tar_object <- targeter(data, target = target, ...)
   }
@@ -84,7 +93,8 @@ tartree <- function(
     assertthat::assert_that(
       inherits(tar_object, "targeter"),
       msg = "tar_object must to be a targeter object when you don't provide a target"
-    ) } else {
+    )
+  } else {
     assertthat::assert_that(
       is.character(target),
       msg = "target must to be a character"
@@ -121,7 +131,7 @@ tartree <- function(
 
   if (is.null(tarsum_object)) {
     cat(
-      "\n- WARNING: it is recommanded to have pre-computed targeter summart object.\n"
+      "\nNOTE: it is recommanded to have pre-computed targeter summary object.\n"
     )
     tarsum_object <- summary(tar_object)
   }
@@ -131,15 +141,15 @@ tartree <- function(
   dt_vars_exp <- tarsum_object$varname
   # TODO: add a warning if some of the variables are not in data
   dt_vars_exp <- dt_vars_exp[which(dt_vars_exp %in% names(data))]
-    
-    vars_model <- c(dt_vars_exp, target)
+
+  vars_model <- c(dt_vars_exp, target)
   vars_model <- vars_model[vars_model %in% names(data)]
-  
-    assertthat::assert_that(
-      all(vars_model %in% names(data)),
-      msg = "some of required  variables are not in data"
-    )
-  
+
+  assertthat::assert_that(
+    all(vars_model %in% names(data)),
+    msg = "some of required  variables are not in data"
+  )
+
   data_model <- data[, ..vars_model]
   deps <- c("rpart", "dplyr", "pROC")
   if (getOption("targeter.auto_install_deps", FALSE)) {
@@ -173,20 +183,14 @@ tartree <- function(
     paste(dt_vars_exp, collapse = " + ")
   )) # Z_TARGET built after
 
-
-
-
-
-  
-  if (tar_object$target_type %in% c('binary')) {  
-    
+  if (tar_object$target_type %in% c('binary')) {
     data_model[,
       Z_TARGET := ifelse(get(target) == tar_object$target_reference_level, 1, 0)
     ]
     data_model_train <- slice_sample(
       data_model,
       prop = decision_tree_sample,
-      by ="Z_TARGET" # binary target: stratified sampling
+      by = "Z_TARGET" # binary target: stratified sampling
     )
     data_model_valid <- data_model[!data_model$ID %in% data_model_train$ID]
 
@@ -196,7 +200,7 @@ tartree <- function(
       data_model_train[, unique(c("Z_TARGET", dt_vars_exp)), with = FALSE],
       "Z_TARGET"
     )
-    minsplit <- sum(weights) / 10
+    #minsplit <- sum(weights) / 10
 
     n <- table(data_model[["Z_TARGET"]])
     prior <- n / sum(n)
@@ -204,29 +208,26 @@ tartree <- function(
     if (all(weights == 1)) {
       mod <- rpart(
         formula_txt,
-        data = data_model_train[, unique(c("Z_TARGET", dt_vars_exp)), with = FALSE],
+        data = data_model_train[,
+          unique(c("Z_TARGET", dt_vars_exp)),
+          with = FALSE
+        ],
         method = "class",
         model = TRUE,
         parms = list(prior = prior),
-        control = rpart.control(
-          maxdepth = decision_tree_maxdepth,
-          minsplit = minsplit,
-          cp = decision_tree_cp
-        )
+        control = rpart.control
       )
     } else {
-
       mod <- rpart(
         formula_txt,
-        data = data_model_train[, unique(c("Z_TARGET", dt_vars_exp)), with = FALSE],
+        data = data_model_train[,
+          unique(c("Z_TARGET", dt_vars_exp)),
+          with = FALSE
+        ],
         method = "class",
         weights = weights,
         model = TRUE,
-        control = rpart.control(
-          maxdepth = decision_tree_maxdepth,
-          minsplit = minsplit,
-          cp = decision_tree_cp
-        )
+        control = rpart.control
       )
     }
   } else {
@@ -235,22 +236,22 @@ tartree <- function(
     data[, Z_TARGET := get(target)]
     data_model_train <- slice_sample(
       data_model,
-      prop = decision_tree_sample)
+      prop = decision_tree_sample
+    )
 
     data_model_valid <- data_model[!data_model$ID %in% data_model_train$ID]
 
-    minsplit <- 30
+    # minsplit <- 30
 
     mod <- rpart(
       formula_txt,
       model = TRUE,
-      data = data_model_train[, unique(c("Z_TARGET", dt_vars_exp)), with = FALSE],
+      data = data_model_train[,
+        unique(c("Z_TARGET", dt_vars_exp)),
+        with = FALSE
+      ],
       method = "anova",
-      control = rpart.control(
-        maxdepth = decision_tree_maxdepth,
-        minsplit = minsplit,
-        cp = decision_tree_cp
-      )
+      control = rpart.control
     )
   }
 
@@ -288,7 +289,12 @@ tartree <- function(
   predictions[, .N, by = list(Z_TARGET, Z_TARGET_PREDICTION)]
   predictions[, .N, by = list(Z_TARGET, Z_TARGET_PREDICTION_CP_QUANTILE)]
 
-  pROC <- roc(predictions$Z_TARGET, predictions$N_TARGET_PROB)
+  pROC <- roc(
+    predictions$Z_TARGET,
+    predictions$N_TARGET_PROB,
+    levels = c(0, 1),
+    direction = "<"
+  )
 
   ## subset targeter object and targeter summary object
 
@@ -317,9 +323,11 @@ tartree <- function(
   )
 
   ## subset targeter object and targeter summary object
-  tar_object[["profiles"]] <- tar_object[["profiles"]][which(names(tar_object[["profiles"]]) %in% dt_vars)]
+  tar_object[["profiles"]] <- tar_object[["profiles"]][which(
+    names(tar_object[["profiles"]]) %in% dt_vars
+  )]
   # tar_object_model <- tar_object
-  
+
   # tar_object_model$profiles <- tar_object_model$profiles[dt_vars]
   attr(mod, "tar_object") <- tar_object
 

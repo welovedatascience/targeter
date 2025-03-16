@@ -102,9 +102,6 @@
 
 #' @keywords targeter report
 
-
-
-
 #' @export
 report <- function(object, ...) {
   UseMethod("report")
@@ -119,7 +116,9 @@ report.targeter <- function(
   metadata_vars = list(varname = "variable", varlabel = "label"),
   format = "html",
   nmax = 100,
-  template = NULL, # default QMD template for slides
+  # TODO: put a warning if tar contains more than nmax variables
+  template = NULL, 
+  # default wlds QMD template 
   quarto_root_dir = ".",
   quarto_targeters_project_dir = "targeter-reports",
   quarto_project_template = getOption(
@@ -162,7 +161,11 @@ report.targeter <- function(
     pacman::p_load("quarto"),
     msg = "quarto package and runtime are required."
   )
-
+  assertthat::assert_that(!is.null(quarto::quarto_path()),
+   msg = "quarto executable is not found in PATH. Please ensure quarto 
+   is correctly installed in system (not the R quarto package).")
+  
+# TODO fix quato folder creation
   # TODO cover all parameters  assert tests
   assertthat::assert_that(
     is.character(format),
@@ -258,7 +261,7 @@ report.targeter <- function(
 
   assertthat::assert_that(
     is.character(quarto_root_dir),
-    msg = "quarto_root_dir must be a charcter string giving path to a folder"
+    msg = "quarto_root_dir must be a character string giving path to a folder"
   )
   assertthat::assert_that(
     dir.exists(quarto_root_dir),
@@ -277,9 +280,8 @@ report.targeter <- function(
   if (!dir.exists(file.path(quarto_root_dir, quarto_targeters_project_dir))) {
     if (verbose)
       cat(
-        "\n- Creating quarto project folder:",
-        file.path(quarto_root_dir, quarto_targeters_project_dir),
-        "\n"
+        "\nCreating quarto project folder:",
+        file.path(quarto_root_dir, quarto_targeters_project_dir)
       )
     # we must create a quarto project to store targeters reports
     quarto::quarto_create_project(
@@ -325,16 +327,14 @@ report.targeter <- function(
         overwrite = TRUE
       )
     }
-    cat(" - Done.\n")
   } else {
     if (verbose)
       cat(
-        "\n- Using existing quarto project folder:",
+        "\nUsing existing quarto project folder:",
         file.path(
           quarto_root_dir,
           quarto_targeters_project_dir
-        ),
-        "\n"
+        )
       )
     assertthat::assert_that(
       quarto::is_using_quarto(file.path(
@@ -417,12 +417,14 @@ report.targeter <- function(
 
   custom_fields[["reference-doc"]] <- pptx_reference_doc
 
-
-  if (!is.null(report_categories) && is.character(report_categories) && 
-  length(report_categories)>0) {
+  if (
+    !is.null(report_categories) &&
+      is.character(report_categories) &&
+      length(report_categories) > 0
+  ) {
     custom_fields[["categories"]] <- c(
-      report_categories, 
-      paste("target",object$target_type, sep = ":")
+      report_categories,
+      paste("target", object$target_type, sep = ":")
     )
   }
 
@@ -716,7 +718,18 @@ report.tartree <- function(
     msg = "quarto_project_brandfile must be a charcter string giving path to a file or being empty (no brand file used)"
   )
 
-  if (!dir.exists(file.path(quarto_root_dir, quarto_targeters_project_dir))) {
+  if (
+    !dir.exists(
+      file.path(quarto_root_dir, quarto_targeters_project_dir)
+    ) ||
+      !quarto::is_using_quarto(
+        # not (yet) a quarto project
+        file.path(
+          quarto_root_dir,
+          quarto_targeters_project_dir
+        )
+      )
+  ) {
     if (verbose)
       cat(
         "\n- Creating quarto project folder:",
@@ -856,9 +869,7 @@ report.tartree <- function(
 
   yaml <- list(title = title, author = author, date = format(Sys.Date()))
 
-
-
-if (is.null(custom_fields)) {
+  if (is.null(custom_fields)) {
     custom_fields <- list()
   }
 
@@ -866,9 +877,14 @@ if (is.null(custom_fields)) {
 
   custom_fields[["reference-doc"]] <- pptx_reference_doc
 
-  if (!is.null(report_categories) && is.character(report_categories) && length(report_categories)>0) {
+  if (
+    !is.null(report_categories) &&
+      is.character(report_categories) &&
+      length(report_categories) > 0
+  ) {
     custom_fields[["categories"]] <- c(
-      report_categories,attr(object,"tar_object")$target_type
+      report_categories,
+      attr(object, "tar_object")$target_type
     )
   }
 

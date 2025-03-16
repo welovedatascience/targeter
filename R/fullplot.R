@@ -48,7 +48,7 @@
 fullplot <- function(
   x,
   var = NULL,
-  numvar_as = c("value", "bin"),
+  numvar_as = c("bin", "value"),
   metadata = NULL,
   print_NA = TRUE,
   only_target_ref_level = TRUE,
@@ -64,7 +64,7 @@ fullplot <- function(
 
   numvar_as <- match.arg(
     numvar_as,
-    choices = c("value", "bin"),
+    choices = c("bin", "value"),
     several.ok = FALSE
   )
 
@@ -112,7 +112,11 @@ fullplot <- function(
 
     g3 <- plot_woe(x, metadata = metadata, title = FALSE, do_plot = FALSE)
 
-    if (x$variable_type %in% c("character")) {
+    if (
+      x$variable_type %in%
+        c("character", "categorical", "nominal") &
+        (nrow(x$counts) <= 12)
+    ) {
       g4 <- quadrant_plot(x, metadata = metadata, title = FALSE)
       L_quad <- TRUE
     } else {
