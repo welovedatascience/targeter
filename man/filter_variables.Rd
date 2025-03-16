@@ -9,7 +9,7 @@ filter_variables(
   numeric_vars,
   ordinal_vars,
   categorical_vars,
-  vars_metadata,
+  vars,
   verbose = FALSE
 )
 
@@ -18,7 +18,7 @@ filter_variables(
   numeric_vars,
   ordinal_vars,
   categorical_vars,
-  vars_metadata,
+  vars,
   verbose = FALSE
 )
 }
@@ -31,7 +31,7 @@ filter_variables(
 
 \item{categorical_vars}{character - vector of categorical variables}
 
-\item{vars_metadata}{data.table - metadata about variables}
+\item{vars}{data.table - metadata about variables}
 
 \item{verbose}{logical - whether to print verbose output}
 }

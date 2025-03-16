@@ -45,13 +45,23 @@ The targeter package supports a precise naming convention where the first
  two characters of variable names (a letter followed by an underscore) 
  indicate the variable type:
 
-Prefix	Variable Type	Example
-N_, M_, F_, R_, P_, Y_, J_	Numeric variables	N_AGE
-D_, S_	Date variables	D_BIRTHDATE
-C_, T_, L_	Categorical variables	C_EDUCATION
-Z_	Target variables	Z_ABOVE50K
-O_	Ordinal variables	O_RISK_LEVEL
-E_, I_, A_, X_, K_, W_, Q_	Other special types	X_ID
++-------------------------------+---------------------------+-----------------+
+| Prefix                        |  Variable Type            |   Example       |
++-------------------------------+---------------------------+-----------------+
+| N_, M_, F_, R_, P_, Y_,   J_  |  Numeric variables        |     N_AGE       |
++-------------------------------+---------------------------+-----------------+
+| D_, S_                        |   Date variables          |   D_BIRTHDATE   |
++-------------------------------+---------------------------+-----------------+
+| C_, T_, L_                    |   Categorical variables   |   C_EDUCATION   |
++-------------------------------+---------------------------+-----------------+
+| Z_                            |   Target variables        |   Z_ABOVE50K    |
++-------------------------------+---------------------------+-----------------+
+| O_                            |   Ordinal variables       |   O_RISK_LEVEL  |
++-------------------------------+---------------------------+-----------------+
+| I_                            |   ID variables            |   I_CUSTOMER_ID |
++-------------------------------+---------------------------+-----------------+
+
+
 
 This convention provides several benefits:
 
@@ -123,8 +133,8 @@ adult_metadata <- data.frame(
     "Family relationship",
     "Race/ethnicity",
     "Gender",
-    "Capital gain ($)",
-    "Capital loss ($)",
+    "Capital gain  in $",
+    "Capital loss in $",
     "Hours worked per week",
     "Country of origin",
     "Income above $50K"
@@ -204,7 +214,7 @@ By setting naming_conventions = `TRUE`, the `targeter()` function:
 
 
 
-## Using Metadata for Enhanced Reporting
+## Using Metadata in Reports
 
 The metadata we created can be used to generate professional reports
 with descriptive labels.

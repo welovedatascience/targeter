@@ -1806,7 +1806,7 @@ analyze_variables <- function(
 #' @return list with statistics and metadata
 #'
 #' @importFrom data.table data.table setnames dcast
-#' @importFrom stats sd quantile prop.table
+#' @importFrom stats sd quantile 
 calculate_statistics <- function(
   data,
   variable,
@@ -2271,7 +2271,7 @@ targeter_internal <- function(
   # Combine messages from all steps
   all_messages <- c(target_messages, var_messages)
 
-  print(vars)
+  # print(vars)
   # Create final output object
   out <- list(
     dataname = dataname,
@@ -2682,7 +2682,7 @@ process_parameters <- function(
 #' @return list with statistics and metadata
 #'
 #' @importFrom data.table data.table setnames dcast
-#' @importFrom stats sd quantile prop.table
+#' @importFrom stats sd quantile 
 calculate_statistics <- function(
   data,
   variable,
