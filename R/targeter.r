@@ -1,7 +1,3 @@
-
-
-
-
 # save.image(file = "/hackdata/share/_tmp/targeter-refactored.RData")
 # targeter_internal
 # ├── validate_inputs
@@ -279,7 +275,9 @@ detect_variables_types <- function(
         substr(select_vars, 1, 2) %in%
           c("L_", "N_", "M_", "F_", "J_", "C_", "R_", "P_", "O_", "Z_")
       ]
-      vars[, respect_naming_convention := (variable %in% c(select_vars, target))]
+      vars[,
+        respect_naming_convention := (variable %in% c(select_vars, target))
+      ]
     }
   }
 
@@ -1130,7 +1128,9 @@ detect_variables_types <- function(
         substr(select_vars, 1, 2) %in%
           c("L_", "N_", "M_", "F_", "J_", "C_", "R_", "P_", "O_", "Z_")
       ]
-      vars[, respect_naming_convention := (variable %in% c(select_vars, target))]
+      vars[,
+        respect_naming_convention := (variable %in% c(select_vars, target))
+      ]
     }
   }
 
@@ -1317,8 +1317,8 @@ binning_factory <- function(
   verbose = FALSE
 ) {
   # Storage for cut points and centers
-  cutpoints_list <- list()
-  cutcenter_list <- list()
+  cutpoints_list <<- list()
+  cutcenter_list <<- list()
 
   # Binning function using quantiles
   binning_quantile <- function(x, variable) {
@@ -1806,7 +1806,7 @@ analyze_variables <- function(
 #' @return list with statistics and metadata
 #'
 #' @importFrom data.table data.table setnames dcast
-#' @importFrom stats sd quantile 
+#' @importFrom stats sd quantile
 calculate_statistics <- function(
   data,
   variable,
@@ -2059,102 +2059,33 @@ treat_tab_labels <- function(
 #' @importFrom assertthat assert_that
 targeter_internal <- function(
   data,
-  description_data = NULL,
+  dataname,
+  description_data,
   target,
-  target_type = c("autoguess", "binary", "categorical", "numeric"),
-  target_reference_level = NULL, # NULL: auto will check for 1, TRUE
-  description_target = NULL,
-  analysis_name = NULL,
-  select_vars = NULL,
-  exclude_vars = NULL,
-  nbins = 12,
-  binning_method = c("quantile", "clustering", "smart"),
-  naming_conventions = getOption(
-    "targeter.use_naming_conventions",
-    default = FALSE
-  ),
-  useNA = getOption("targeter.useNA", default = "ifany"),
-  verbose = FALSE,
-  dec = 2,
-  order_label = c("auto", "alpha", "count", "props", "means"),
-  cont_target_trim = 0.01,
-  bxp_factor = 1.5,
-  num_as_categorical_nval = 5,
-  autoguess_nrows = 1000, # 0: use all rows
-  woe_alternate_version = c("if_continuous", "always"),
-  woe_shift = 0.01,
-  woe_post_cluster = FALSE,
-  woe_post_cluster_n = 6,
-  smart_quantile_by = 0.01,
+  target_type,
+  target_reference_level, # NULL: auto will check for 1, TRUE
+  description_target ,
+  analysis_name ,
+  select_vars ,
+  exclude_vars ,
+  nbins,
+  binning_method ,
+  naming_conventions ,
+  useNA ,
+  verbose,
+  dec,
+  order_label ,
+  cont_target_trim ,
+  bxp_factor ,
+  num_as_categorical_nval ,
+  autoguess_nrows,
+  woe_alternate_version ,
+  woe_shift,
+  woe_post_cluster ,
+  woe_post_cluster_n ,
+  smart_quantile_by ,
   ...
 ) {
-  # Step 1: Validate inputs
-  if (verbose) cat("\nValidating inputs...")
-  validate_inputs(
-    data = data,
-    target = target,
-    select_vars = select_vars,
-    exclude_vars = exclude_vars,
-    description_data = description_data,
-    description_target = description_target,
-    analysis_name = analysis_name,
-    useNA = useNA,
-    order_label = order_label,
-    nbins = nbins
-  )
-
-  # Step 2: Process parameters
-  if (verbose) cat("\nProcessing parameters...")
-  params <- process_parameters(
-    binning_method = binning_method,
-    order_label = order_label,
-    target_type = target_type,
-    woe_alternate_version = woe_alternate_version,
-    useNA = useNA
-  )
-
-  binning_method <- params$binning_method
-  order_label <- params$order_label
-  target_type <- params$target_type
-  woe_alternate_version <- params$woe_alternate_version
-  useNA <- params$useNA
-
-  # Step 3: Check dependencies based on selected methods
-  if (verbose) cat("\nChecking dependencies...")
-  check_dependencies(binning_method, woe_post_cluster)
-
-  # Step 4: Prepare data
-  if (verbose) cat("\nPreparing data...")
-  dataname <- deparse(substitute(data))
-  data <- data.table::setDT(data)
-
-  # Step 5: Analyze target variable
-  if (verbose) cat("\nAnalyzing target variable...")
-  target_analysis <- analyze_target(
-    data = data,
-    target = target,
-    target_type = target_type,
-    target_reference_level = target_reference_level,
-    num_as_categorical_nval = num_as_categorical_nval,
-    autoguess_nrows = autoguess_nrows
-  )
-
-  # Check for errors in target analysis
-  if (target_analysis$status == "error") {
-    cat(paste(
-      names(target_analysis$messages),
-      target_analysis$messages,
-      sep = ":",
-      collapse = "\n"
-    ))
-    stop(target_analysis$messages$ERROR)
-  }
-
-  # Extract target properties
-  target_type <- target_analysis$type
-  target_reference_level <- target_analysis$reference_level
-  target_messages <- target_analysis$messages
-
   # Step 6: Analyze variables
   if (verbose) cat("\nAnalyzing explanatory variables...")
   var_analysis <- analyze_variables(
@@ -2196,13 +2127,14 @@ targeter_internal <- function(
     smart_quantile_by = smart_quantile_by,
     verbose = verbose
   )
-  # 
+  binning_foo <- binning$binning_function
+  #
   # Step 8: Create expression for binning data
   binning_expr <- create_binning_expression(
     target = target,
     num_vars = numeric_vars,
     other_vars = categorical_vars,
-    binning_function = binning$binning_function
+    binning_function = "binning_foo"
   )
 
   if (verbose) cat("\nApplying binning to variables...")
@@ -2229,7 +2161,8 @@ targeter_internal <- function(
     target_reference_level = target_reference_level,
     useNA = useNA,
     order_label = order_label,
-    binning = binning,
+    cutpoints_list = cutpoints_list,
+    center_list = center_list,
     dec = dec,
     verbose = verbose,
     cont_target_trim = cont_target_trim,
@@ -2262,11 +2195,6 @@ targeter_internal <- function(
 
   # Step 11: Format results
   if (verbose) cat("\nFormatting results...")
-
-  # Set analysis name if not provided
-  if (is.null(analysis_name)) {
-    analysis_name <- paste("Analysis of", target, "on data:", dataname)
-  }
 
   # Combine messages from all steps
   all_messages <- c(target_messages, var_messages)
@@ -2313,7 +2241,7 @@ targeter_internal <- function(
 #' @param target character - name of the target variable
 #' @param num_vars character vector - names of numeric variables
 #' @param other_vars character vector - names of other variables
-#' @param binning_function function - the binning function to use
+#' @param binning_function character - the name of binning function to use
 #'
 #' @return character string with the expression to evaluate
 create_binning_expression <- function(
@@ -2329,13 +2257,13 @@ create_binning_expression <- function(
   if (length(other_vars) > 0) {
     txt <- paste0(txt, ",", paste(other_vars, collapse = ","))
   }
-  binning_foo <<- binning_function
+  # binning_foo <<- binning_function
   # Add numeric variables with binning function
   if (length(num_vars) > 0) {
     txtQuickcut <- paste0(
       paste0(
         num_vars,
-        "=binning_foo(",
+        "=",binning_function,"(",
         num_vars,
         ", variable='",
         num_vars,
@@ -2663,6 +2591,31 @@ process_parameters <- function(
   )
 }
 
+
+analysis_description_default <- function(
+  target,
+  target_type,
+  description_target,
+  description_data,
+  analysis_name
+) {
+  if (is.null(description_data)) {
+    description_data <- "Data"
+  }
+  if (is.null(analysis_name)) {
+    analysis_name <- paste("Analysis of ", target, "on data:", description_data)
+  }
+  if (is.null(description_target)) {
+    description_target <- paste0("Target", target, " [", target_type, "]")
+  }
+  return(list(
+    description_data = description_data,
+    description_target = description_target,
+    analysis_name = analysis_name
+  ))
+}
+
+
 #' Calculate statistics for variable crossing with target
 #'
 #' This function computes appropriate statistics based on the target type and variable type
@@ -2682,7 +2635,7 @@ process_parameters <- function(
 #' @return list with statistics and metadata
 #'
 #' @importFrom data.table data.table setnames dcast
-#' @importFrom stats sd quantile 
+#' @importFrom stats sd quantile
 calculate_statistics <- function(
   data,
   variable,
@@ -2755,7 +2708,8 @@ calculate_statistics <- function(
     cutpoints_list,
     dec = dec
   )
-
+  setDT
+  tab <- tab[, which(!colnames(tab) %in% "variable"), drop = FALSE]
   # Set variable type in result
   cross$variable_type <- variable_type
 
@@ -2926,7 +2880,8 @@ process_crossings <- function(
   target_reference_level,
   useNA,
   order_label,
-  binning,
+  cutpoints_list,
+  center_list,
   dec,
   verbose,
   cont_target_trim,
@@ -2956,7 +2911,7 @@ process_crossings <- function(
       bxp_factor = bxp_factor,
       variable_type = variable_type,
       order_label = order_label,
-      cutpoints_list = binning$cutpoints_list,
+      cutpoints_list = cutpoints_list,
       dec = dec
     )
     cross$target_type <- target_type
@@ -2989,7 +2944,7 @@ process_crossings <- function(
         woe_post_cluster = woe_post_cluster,
         woe_post_cluster_n = woe_post_cluster_n,
         variable_type = variable_type,
-        cutpoints_list = binning$cutpoints_list
+        cutpoints_list = cutpoints_list
       )
       cross$woe <- woe_results$WOE
       cross$IV <- woe_results$IV
@@ -2997,8 +2952,8 @@ process_crossings <- function(
       cross$woe_cluster <- woe_results$has_clusters
     }
     if (variable %in% numeric_vars) {
-      cross$cutpoints <- binning$cutpoints_list[[variable]]
-      cross$numcenters <- binning$cutcenter_list[[variable]]
+      cross$cutpoints <- cutpoints_list[[variable]]
+      cross$numcenters <- cutcenter_list[[variable]]
     }
     class(cross) <- c(
       "crossvar",
@@ -3070,45 +3025,40 @@ compute_woe_iv <- function(
 }
 
 
-
-
-
-# dt_vartype_autoguess_onevar <- function (data, var, num_as_nominal_nval = 5, ...) 
+# dt_vartype_autoguess_onevar <- function (data, var, num_as_nominal_nval = 5, ...)
 # {
 #     assertthat::assert_that(inherits(data, "data.table"), msg = "data is not a data table")
-#     if (inherits(data[, get(var)], c("logical"))) 
+#     if (inherits(data[, get(var)], c("logical")))
 #         return("binary")
-#     if (inherits(data[, get(var)], c("ordered"))) 
+#     if (inherits(data[, get(var)], c("ordered")))
 #         return("ordinal")
 #     ncat <- data[, uniqueN(get(var))]
 #     if (inherits(data[, get(var)], c("factor", "character"))) {
-#         if (ncat == 2) 
+#         if (ncat == 2)
 #             return("binary")
-#         else if (ncat == 1) 
+#         else if (ncat == 1)
 #             return("unimode")
 #         else return("categorical")
 #     }
-#     if (inherits(data[, get(var)], c("numeric", "integer", "Date", 
+#     if (inherits(data[, get(var)], c("numeric", "integer", "Date",
 #         "POSIXct", "POSIXlt", "IDate"))) {
-#         if (ncat == 2) 
+#         if (ncat == 2)
 #             return("binary")
-#         else if (ncat == 1) 
+#         else if (ncat == 1)
 #             return("unimode")
-#         else if (ncat <= num_as_nominal_nval) 
+#         else if (ncat <= num_as_nominal_nval)
 #             return("categorical")
 #         else return("numeric")
 #     }
 #     return("unknown")
 # }
 
-
-# dt_vartype_autoguess <- function (data, num_as_nominal_nval = 5, ...) 
+# dt_vartype_autoguess <- function (data, num_as_nominal_nval = 5, ...)
 # {
 #     assertthat::assert_that(inherits(data, "data.table"), msg = "data is not a data table")
-#     sapply(names(data), function(var) dt_vartype_autoguess_onevar(data, 
+#     sapply(names(data), function(var) dt_vartype_autoguess_onevar(data,
 #         var, num_as_nominal_nval = num_as_nominal_nval, ...))
 # }
-
 
 #' Target Variable Profiling
 #'
@@ -3191,112 +3141,202 @@ targeter <- function(
   by_nvars = 200,
   ...
 ) {
+
+  dataname <- deparse(substitute(data))
+  if (verbose) {
+    cat("\nStarting targeter analysis")
+    tstart <- Sys.time()
+  }
   # Validate core inputs
   assertthat::assert_that(
     inherits(data, "data.frame") || inherits(data, "data.table"),
     msg = "data must be a data.frame or data.table"
   )
-  
+
   assertthat::assert_that(
     is.character(target) && length(target) == 1,
     msg = "target must be a single character string"
   )
-  
+
   assertthat::assert_that(
     target %in% colnames(data),
     msg = "target variable not found in data"
   )
-  
+
   assertthat::assert_that(
     length(unique(data[[target]])) > 1,
     msg = "target variable must have more than one unique value"
   )
-  
+
   # Validate batch processing parameter
   assertthat::assert_that(
     is.numeric(by_nvars) && by_nvars > 0 && by_nvars %% 1 == 0,
     msg = "by_nvars must be a positive integer"
   )
-  
+
   # Convert to data.table for efficient processing
   if (!inherits(data, "data.table")) {
     data <- data.table::setDT(copy(data))
   }
+  # Step 1: Validate inputs
+  if (verbose) cat("\nValidating inputs...")
+  validate_inputs(
+    data = data,
+    target = target,
+    select_vars = select_vars,
+    exclude_vars = exclude_vars,
+    description_data = description_data,
+    description_target = description_target,
+    analysis_name = analysis_name,
+    useNA = useNA,
+    order_label = order_label,
+    nbins = nbins
+  )
+
+  # Step 2: Process parameters
+  if (verbose) cat("\nProcessing parameters...")
+  params <- process_parameters(
+    binning_method = binning_method,
+    order_label = order_label,
+    target_type = target_type,
+    woe_alternate_version = woe_alternate_version,
+    useNA = useNA
+  )
+
+  binning_method <- params$binning_method
+  order_label <- params$order_label
+  target_type <- params$target_type
+  woe_alternate_version <- params$woe_alternate_version
+  useNA <- params$useNA
+
+  # Step 3: Check dependencies based on selected methods
+  if (verbose) cat("\nChecking dependencies...")
+  check_dependencies(binning_method, woe_post_cluster)
+
+  # Step 4: Prepare data
+  if (verbose) cat("\nPreparing data...")
   
-  # Match arguments
-  target_type <- match.arg(target_type)
-  binning_method <- match.arg(binning_method)
-  woe_alternate_version <- match.arg(woe_alternate_version)
-  order_label <- match.arg(order_label)
+  data <- data.table::setDT(data)
+
+  # Step 5: Analyze target variable
+  if (verbose) cat("\nAnalyzing target variable...")
+  target_analysis <- analyze_target(
+    data = data,
+    target = target,
+    target_type = target_type,
+    target_reference_level = target_reference_level,
+    num_as_categorical_nval = num_as_categorical_nval,
+    autoguess_nrows = autoguess_nrows
+  )
+
+  # Check for errors in target analysis
+  if (target_analysis$status == "error") {
+    cat(paste(
+      names(target_analysis$messages),
+      target_analysis$messages,
+      sep = ":",
+      collapse = "\n"
+    ))
+    stop(target_analysis$messages$ERROR)
+  }
+
+  # Extract target properties
+  target_type <- target_analysis$type
+  target_reference_level <- target_analysis$reference_level
+  target_messages <<- target_analysis$messages
+
   
+  analysis_description <- analysis_description_default(
+    target,
+    target_type,
+    description_target,
+    description_data = ifelse(is.null(description_data), dataname, description_data),
+    analysis_name
+  )
+  description_data <- analysis_description$description_data
+  description_target <- analysis_description$description_target
+  analysis_name <- analysis_description$analysis_name
+
+
+  if (verbose) {
+    cat("\nInput validated.")
+  }
   # Setup batch processing
   vars <- names(data)
   by_groups <- (1 + seq_along(vars) %/% by_nvars)
   groups <- unique(by_groups)
-  
+
   # Initialize progress tracking
   if (verbose) {
-    cat(sprintf("\nProcessing %d variables in %d groups (batch size: %d)\n", 
-                length(vars), length(groups), by_nvars))
+    cat(sprintf(
+      "\nProcessing %d variables in %d groups (batch size: %d)\n",
+      length(vars),
+      length(groups),
+      by_nvars
+    ))
   }
-  
+
   # Prepare result container
   out_tar <- vector(mode = 'list', length(groups))
   success_count <- 0
   error_count <- 0
-  
+
   # Process each batch
   for (igroup in groups) {
     if (verbose) {
       cat(sprintf('\nProcessing group: %d of %d', igroup, length(groups)))
     }
-    
+
     # Get variables for this batch
     ivars <- vars[by_groups == igroup]
     ivars <- unique(c(target, ivars))
     data_igroup <- data[, ..ivars]
-    
+
     # Process batch
     if (verbose) {
       cat(sprintf('\n  Variables in batch: %d', length(ivars)))
     }
-    
-    itar <- tryCatch({
-      targeter_internal(
-        data = data_igroup,
-        target = target,
-        description_data = description_data,
-        target_type = target_type,
-        target_reference_level = target_reference_level,
-        description_target = description_target,
-        analysis_name = analysis_name,
-        select_vars = select_vars,
-        exclude_vars = exclude_vars,
-        nbins = nbins,
-        binning_method = binning_method,
-        naming_conventions = naming_conventions,
-        useNA = useNA,
-        verbose = verbose,
-        dec = dec,
-        order_label = order_label,
-        cont_target_trim = cont_target_trim,
-        bxp_factor = bxp_factor,
-        num_as_categorical_nval = num_as_categorical_nval,
-        autoguess_nrows = autoguess_nrows,
-        woe_alternate_version = woe_alternate_version,
-        woe_shift = woe_shift,
-        woe_post_cluster = woe_post_cluster,
-        woe_post_cluster_n = woe_post_cluster_n,
-        smart_quantile_by = smart_quantile_by,
-        ...
-      )
-    }, error = function(e) {
-      if (verbose) {
-        cat(sprintf("\n  Error in group %d: %s", igroup, e$message))
+
+    itar <- tryCatch(
+      {
+        targeter_internal(
+          data = data_igroup,
+          dataname = dataname,
+          target = target,
+          description_data = description_data,
+          target_type = target_type,
+          target_reference_level = target_reference_level,
+          description_target = description_target,
+          analysis_name = analysis_name,
+          select_vars = select_vars,
+          exclude_vars = exclude_vars,
+          nbins = nbins,
+          binning_method = binning_method,
+          naming_conventions = naming_conventions,
+          useNA = useNA,
+          verbose = verbose,
+          dec = dec,
+          order_label = order_label,
+          cont_target_trim = cont_target_trim,
+          bxp_factor = bxp_factor,
+          num_as_categorical_nval = num_as_categorical_nval,
+          autoguess_nrows = autoguess_nrows,
+          woe_alternate_version = woe_alternate_version,
+          woe_shift = woe_shift,
+          woe_post_cluster = woe_post_cluster,
+          woe_post_cluster_n = woe_post_cluster_n,
+          smart_quantile_by = smart_quantile_by,
+          ...
+        )
+      },
+      error = function(e) {
+        if (verbose) {
+          cat(sprintf("\n  Error in group %d: %s", igroup, e$message))
+        }
+        return(NULL)
       }
-      return(NULL)
-    })
-    
+    )
+
     if (!is.null(itar)) {
       out_tar[[igroup]] <- itar
       success_count <- success_count + 1
@@ -3307,23 +3347,38 @@ targeter <- function(
       if (verbose) cat(' - Failed')
     }
   }
-  
+
   # Filter out NULL results
   out_tar <- out_tar[!sapply(out_tar, is.null)]
-  
+
   # Combine results if we have any
   if (length(out_tar) > 0) {
     if (verbose) {
-      cat(sprintf("\n\nCombining results from %d successful groups (errors: %d)\n", 
-                  success_count, error_count))
+      cat(sprintf(
+        "\nCombining results from %d successful groups (errors: %d)",
+        success_count,
+        error_count
+      ))
     }
     tar <- targeter:::tbind(out_tar)
-    
+
     if (verbose) {
-      cat(sprintf("\nProfiling complete: %d variables analyzed\n", 
-                  length(tar$profiles)))
+      cat(sprintf(
+        "\nProfiling complete: %d variables analyzed",
+        length(tar$profiles)
+      ))
+
+      ## https://stackoverflow.com/questions/6262203/measuring-function-execution-time-in-r
+      tstop <- Sys.time()
+      cat(
+        sprintf(
+          "\nTime took %.2f %s",
+          tstop - tstart,
+          units(difftime(tstop, tstart))
+        )
+      )
     }
-    
+
     return(tar)
   } else {
     stop("All processing groups failed - check input data and parameters")

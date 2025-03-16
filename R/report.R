@@ -102,9 +102,6 @@
 
 #' @keywords targeter report
 
-
-
-
 #' @export
 report <- function(object, ...) {
   UseMethod("report")
@@ -417,12 +414,14 @@ report.targeter <- function(
 
   custom_fields[["reference-doc"]] <- pptx_reference_doc
 
-
-  if (!is.null(report_categories) && is.character(report_categories) && 
-  length(report_categories)>0) {
+  if (
+    !is.null(report_categories) &&
+      is.character(report_categories) &&
+      length(report_categories) > 0
+  ) {
     custom_fields[["categories"]] <- c(
-      report_categories, 
-      paste("target",object$target_type, sep = ":")
+      report_categories,
+      paste("target", object$target_type, sep = ":")
     )
   }
 
@@ -716,7 +715,18 @@ report.tartree <- function(
     msg = "quarto_project_brandfile must be a charcter string giving path to a file or being empty (no brand file used)"
   )
 
-  if (!dir.exists(file.path(quarto_root_dir, quarto_targeters_project_dir))) {
+  if (
+    !dir.exists(
+      file.path(quarto_root_dir, quarto_targeters_project_dir)
+    ) ||
+      !quarto::is_using_quarto(
+        # not (yet) a quarto project
+        file.path(
+          quarto_root_dir,
+          quarto_targeters_project_dir
+        )
+      )
+  ) {
     if (verbose)
       cat(
         "\n- Creating quarto project folder:",
@@ -856,9 +866,7 @@ report.tartree <- function(
 
   yaml <- list(title = title, author = author, date = format(Sys.Date()))
 
-
-
-if (is.null(custom_fields)) {
+  if (is.null(custom_fields)) {
     custom_fields <- list()
   }
 
@@ -866,9 +874,14 @@ if (is.null(custom_fields)) {
 
   custom_fields[["reference-doc"]] <- pptx_reference_doc
 
-  if (!is.null(report_categories) && is.character(report_categories) && length(report_categories)>0) {
+  if (
+    !is.null(report_categories) &&
+      is.character(report_categories) &&
+      length(report_categories) > 0
+  ) {
     custom_fields[["categories"]] <- c(
-      report_categories,attr(object,"tar_object")$target_type
+      report_categories,
+      attr(object, "tar_object")$target_type
     )
   }
 
