@@ -17,7 +17,12 @@ This function allows to generate a quadrant graphic on an object of class "cross
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
-      <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+      <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../articles/targeter.html">Get started</a></li>
+<li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/naming-conventions-and-metadata.html">Naming Conventions and Metadata</a></li>
+  </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -86,14 +91,9 @@ The label will be used for the title and the x-axis of the graph.</p></dd>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">t</span> <span class="op">&lt;-</span> <span class="fu"><a href="crossvar.html">crossvar</a></span><span class="op">(</span><span class="va">adult</span>,<span class="st">"ABOVE50K"</span>,<span class="st">"WORKCLASS"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     ABOVE50K  WORKCLASS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;int&gt;     &lt;fctr&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  1:        0  State-gov</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---                    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  6:        0    Private</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  - Done.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO:target ABOVE50K detected as type: binary</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO:binary target contains number, automatic chosen level: 1; override using `target_reference_level`</span>
 <span class="r-in"><span><span class="fu">quadrant_plot</span><span class="op">(</span><span class="va">t</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="quadrant_plot-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="fu">quadrant_plot</span><span class="op">(</span><span class="va">t</span>, max_ncat<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span></span>

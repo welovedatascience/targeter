@@ -21,7 +21,12 @@ It also allows filtering on minimum number of values within
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
-      <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+      <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../articles/targeter.html">Get started</a></li>
+<li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/naming-conventions-and-metadata.html">Naming Conventions and Metadata</a></li>
+  </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -143,24 +148,9 @@ retained/forced per group? Default: 1</p></dd>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">adult</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">t</span> <span class="op">&lt;-</span> <span class="fu"><a href="targeter.html">targeter</a></span><span class="op">(</span><span class="va">adult</span>, target <span class="op">=</span> <span class="st">"ABOVE50K"</span>, analysis_name <span class="op">=</span> <span class="st">"Analyse"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     ABOVE50K   AGE  WORKCLASS FNLWGT  EDUCATION EDUCATIONNUM</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;int&gt; &lt;int&gt;     &lt;fctr&gt;  &lt;int&gt;     &lt;fctr&gt;        &lt;int&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  1:        0    39  State-gov  77516  Bachelors           13</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---                                                         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  6:        0    37    Private 284582    Masters           14</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           MARITALSTATUS       OCCUPATION   RELATIONSHIP   RACE     SEX</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                  &lt;fctr&gt;           &lt;fctr&gt;         &lt;fctr&gt; &lt;fctr&gt;  &lt;fctr&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  1:       Never-married     Adm-clerical  Not-in-family  White    Male</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---                                                                   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  6:  Married-civ-spouse  Exec-managerial           Wife  White  Female</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     CAPITALGAIN CAPITALLOSS HOURSPERWEEK  NATIVECOUNTRY</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           &lt;int&gt;       &lt;int&gt;        &lt;int&gt;         &lt;fctr&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  1:        2174           0           40  United-States</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---                                                    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  6:           0           0           40  United-States</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  - Done.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO:target ABOVE50K detected as type: binary</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO:binary target contains number, automatic chosen level: 1; override using `target_reference_level`</span>
 <span class="r-in"><span><span class="va">tf</span> <span class="op">&lt;-</span> <span class="fu">focus</span><span class="op">(</span><span class="va">t</span>, n <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">tf</span> <span class="op">&lt;-</span> <span class="fu">focus</span><span class="op">(</span><span class="va">t</span>, nmin <span class="op">=</span> <span class="fl">500</span>, criteria <span class="op">=</span> <span class="st">"index.max.index"</span>, min_criteria <span class="op">=</span> <span class="fl">1.2</span><span class="op">)</span></span></span>
 </code></pre></div>

@@ -15,7 +15,12 @@
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
-      <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+      <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../articles/targeter.html">Get started</a></li>
+<li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/naming-conventions-and-metadata.html">Naming Conventions and Metadata</a></li>
+  </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -50,6 +55,8 @@
 <span>  predict_prob_cutpoint <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>  predict_prob_cutpoint_quantile <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>  seed <span class="op">=</span> <span class="fl">42</span>,</span>
+<span>  rpart.control <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>minsplit <span class="op">=</span> <span class="fl">20</span>, minbucket <span class="op">=</span> <span class="fl">8</span>, cp <span class="op">=</span> <span class="fl">0.01</span>, maxcompete <span class="op">=</span> <span class="fl">4</span>,</span>
+<span>    maxsurrogate <span class="op">=</span> <span class="fl">5</span>, usesurrogate <span class="op">=</span> <span class="fl">2</span>, xval <span class="op">=</span> <span class="fl">10</span>, surrogatestyle <span class="op">=</span> <span class="fl">0</span>, maxdepth <span class="op">=</span> <span class="fl">30</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
