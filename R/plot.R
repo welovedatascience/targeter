@@ -453,7 +453,9 @@ plot.crossvar_categorical <- function(
   ##
   if (numvar_as == 'value') {
     # replace labels per bin center values
-    dfm[['level']] <- as.numeric(x$numcenters[dfm[['level']]])
+    numcenters <- x$numcenters
+    names(numcenters) <- x$orderlabel
+    dfm[['level']] <- as.numeric(numcenters[dfm[['level']]])
   }
 
   if (x$target_type == 'binary') {

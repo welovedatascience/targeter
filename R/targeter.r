@@ -2999,6 +2999,7 @@ compute_woe_iv <- function(
     is_numeric = (variable_type == "numeric"),
     cutpoints_list
   )
+  WOE <- WOE[ , which(!colnames(WOE) %in% "variable"), drop = FALSE]
   IV <- woe_iv$IV
   if (woe_post_cluster) {
     var_nvalues <- data[!is.na(get(variable)), uniqueN(get(variable))]
