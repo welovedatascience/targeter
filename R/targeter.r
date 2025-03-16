@@ -1542,30 +1542,29 @@ process_parameters <- function(
 #'
 #' @importFrom assertthat assert_that
 check_dependencies <- function(binning_method, woe_post_cluster) {
+  deps <- c()
+
   if (binning_method == "clustering") {
-    assertthat::assert_that(
-      requireNamespace("cluster", quietly = TRUE),
-      msg = "cluster package required for clustering binning method"
-    )
+      deps <- c(deps, "Ckmeans.1d.dp")
   }
 
   if (binning_method == "smart") {
-    assertthat::assert_that(
-      requireNamespace("smbinning", quietly = TRUE),
-      msg = "smbinning package required for smart binning method"
-    )
+    deps <- c(deps, "clustering.sc.dp")
   }
 
   if (woe_post_cluster) {
-    assertthat::assert_that(
-      requireNamespace('Ckmeans.1d.dp', quietly = TRUE),
-      msg = 'Ckmeans.1d.dp package required for WOE post clustering.'
-    )
-    assertthat::assert_that(
-      requireNamespace('clustering.sc.dp', quietly = TRUE),
-      msg = 'clustering.sc.dp package required for WOE post clustering.'
-    )
+    deps <- c(deps, "clustering.sc.dp","Ckmeans.1d.dp")
   }
+  if (getOption("targeter.auto_install_deps", FALSE)) {
+        pacman::p_load(char = deps)
+      }
+  assertthat::assert_that(
+    all(pacman::p_load(char = deps, install = FALSE)),
+    msg = paste(
+      'some of targeter following optional packages required for decision trees are not available:',
+      paste(deps, collapse = ","))
+  )
+    
 }
 
 #' Prepare data and select variables for analysis
