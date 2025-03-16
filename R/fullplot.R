@@ -48,7 +48,7 @@
 fullplot <- function(
   x,
   var = NULL,
-  numvar_as = c("value", "bin"),
+  numvar_as = c( "bin","value"),
   metadata = NULL,
   print_NA = TRUE,
   only_target_ref_level = TRUE,
@@ -64,7 +64,7 @@ fullplot <- function(
 
   numvar_as <- match.arg(
     numvar_as,
-    choices = c("value", "bin"),
+    choices = c("bin","value"),
     several.ok = FALSE
   )
 

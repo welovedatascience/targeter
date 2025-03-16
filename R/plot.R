@@ -1,3 +1,4 @@
+# TODO fix plot numvar_as value
 #' @title plot.crossvar
 #' @description plot method for crossvar object.
 #' plot is the main function that will automatically dispatch to plot.crossvar_binary, plot.crossvar_categorical or plot.crossvar_continuous,
