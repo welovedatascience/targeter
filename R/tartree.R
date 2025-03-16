@@ -85,7 +85,7 @@ tartree <- function(
   data <- data.table::setDT(data)
   if (is.null(tar_object)) {
     cat(
-      "\n- WARNING: it is recommanded to have pre-computed targeter object.\n"
+      "\nNOTE: it is recommanded to have pre-computed targeter object."
     )
     tar_object <- targeter(data, target = target, ...)
   }

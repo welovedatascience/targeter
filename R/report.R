@@ -116,7 +116,9 @@ report.targeter <- function(
   metadata_vars = list(varname = "variable", varlabel = "label"),
   format = "html",
   nmax = 100,
-  template = NULL, # default QMD template for slides
+  # TODO: put a warning if tar contains more than nmax variables
+  template = NULL, 
+  # default wlds QMD template 
   quarto_root_dir = ".",
   quarto_targeters_project_dir = "targeter-reports",
   quarto_project_template = getOption(
@@ -159,7 +161,10 @@ report.targeter <- function(
     pacman::p_load("quarto"),
     msg = "quarto package and runtime are required."
   )
-
+  assertthat::assert_that(!is.null(quarto::quarto_path()),
+   msg = "quarto executable is not found in PATH. Please ensure quarto 
+   is correctly installed in system (not the R quarto package).")
+  
 # TODO fix quato folder creation
   # TODO cover all parameters  assert tests
   assertthat::assert_that(
@@ -256,7 +261,7 @@ report.targeter <- function(
 
   assertthat::assert_that(
     is.character(quarto_root_dir),
-    msg = "quarto_root_dir must be a charcter string giving path to a folder"
+    msg = "quarto_root_dir must be a character string giving path to a folder"
   )
   assertthat::assert_that(
     dir.exists(quarto_root_dir),
@@ -275,9 +280,8 @@ report.targeter <- function(
   if (!dir.exists(file.path(quarto_root_dir, quarto_targeters_project_dir))) {
     if (verbose)
       cat(
-        "\n- Creating quarto project folder:",
-        file.path(quarto_root_dir, quarto_targeters_project_dir),
-        "\n"
+        "\nCreating quarto project folder:",
+        file.path(quarto_root_dir, quarto_targeters_project_dir)
       )
     # we must create a quarto project to store targeters reports
     quarto::quarto_create_project(
@@ -323,16 +327,14 @@ report.targeter <- function(
         overwrite = TRUE
       )
     }
-    cat(" - Done.\n")
   } else {
     if (verbose)
       cat(
-        "\n- Using existing quarto project folder:",
+        "\nUsing existing quarto project folder:",
         file.path(
           quarto_root_dir,
           quarto_targeters_project_dir
-        ),
-        "\n"
+        )
       )
     assertthat::assert_that(
       quarto::is_using_quarto(file.path(
