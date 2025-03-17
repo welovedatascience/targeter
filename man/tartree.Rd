@@ -37,7 +37,7 @@ tartree(
 
 \item{predict_prob_cutpoint}{cutpoint to be used for binary decision - default 0.5}
 
-\item{predict_prob_cutpoint_quantile}{quantile of probabilities to be used for 
+\item{predict_prob_cutpoint_quantile}{quantile of probabilities to be used for
 further additional preduction. Default 0.5. Could be used to see what if we
 want to create a group of x\% records.}
 

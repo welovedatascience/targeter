@@ -36,14 +36,14 @@ create_test_data <- function() {
   return(dt)
 }
 
-# Tests for dt_WOE_IV function
-test_that("dt_WOE_IV calculates correct Weight of Evidence and Information Value", {
+# Tests for dt_woe_iv function
+test_that("dt_woe_iv calculates correct Weight of Evidence and Information Value", {
   test_data <- data.table(
     target = c(1, 1, 0, 0, 1, 0, 1, 0, 0, 0),
     variable = c("A", "A", "A", "B", "B", "B", "C", "C", "C", "C")
   )
   
-  result <- dt_WOE_IV(
+  result <- dt_woe_iv(
     test_data, 
     var_interest = "target", 
     var_cross = "variable", 
@@ -64,7 +64,7 @@ test_that("dt_WOE_IV calculates correct Weight of Evidence and Information Value
   test_data_with_na <- copy(test_data)
   test_data_with_na$variable[1] <- NA
   
-  result_with_na <- dt_WOE_IV(
+  result_with_na <- dt_woe_iv(
     test_data_with_na,
     var_interest = "target",
     var_cross = "variable",
@@ -73,7 +73,7 @@ test_that("dt_WOE_IV calculates correct Weight of Evidence and Information Value
   
   expect_equal(nrow(result_with_na$WOE), 4) # A, B, C, NA
   
-  result_no_na <- dt_WOE_IV(
+  result_no_na <- dt_woe_iv(
     test_data_with_na,
     var_interest = "target",
     var_cross = "variable",

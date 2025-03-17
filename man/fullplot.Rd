@@ -7,7 +7,7 @@
 fullplot(
   x,
   var = NULL,
-  numvar_as = c("value", "bin"),
+  numvar_as = c("bin", "value"),
   metadata = NULL,
   print_NA = TRUE,
   only_target_ref_level = TRUE,
