@@ -1,26 +1,6 @@
 # save.image(file = "/hackdata/share/_tmp/targeter-refactored.RData")
-# targeter_internal
-# ├── validate_inputs
-# ├── process_parameters
-# ├── check_dependencies
-# ├── analyze_target
-# │   └── dt_vartype_autoguess_onevar (external)
-# ├── analyze_variables
-# │   ├── detect_variables_types
-# │   │   └── check_naming_conventions (external)
-# │   └── filter_variables
-# ├── binning_factory
-# │   ├── binning_quantile
-# │   ├── binning_clustering
-# │   └── binning_smart
-# ├── create_binning_expression
-# ├── compute_target_statistics
-# ├── process_crossings
-# │   ├── calculate_statistics
-# │   │   └── treat_tab_labels
-# │   └── compute_woe_iv
-# │       └── dt_WOE_IV
-# └── targeter_session_info (external)
+
+
 
 library(data.table)
 # to prevent checks of data.table used variables
@@ -31,7 +11,7 @@ if (getRversion() >= "3.1.0")
   )
 
 #' @importFrom data.table setnames
-dt_WOE_IV <- function(
+dt_woe_iv <- function(
   data,
   var_interest,
   var_cross,
@@ -934,25 +914,6 @@ analyze_variables <- function(
     data = data
   ))
 }
-
-
-# targeter_internal
-# ├── validate_inputs()
-# ├── analyze_variables()
-# │   ├── detect_variables_types()
-# │   └── filter_variables()
-# ├── analyze_target()
-# ├── binning_factory()
-# │   ├── binning_quantile()
-# │   ├── binning_clustering()
-# │   └── binning_smart()
-# ├── compute_target_statistics()
-# ├── process_crossings()
-# │   ├── cross_with_categorical_target()
-# │   ├── cross_with_numerical_target()
-# │   └── format_cross_tables()
-# ├── compute_woe_iv()
-# └── format_results()
 
 #' Analyze target variable properties
 #'
@@ -2149,7 +2110,7 @@ targeter_internal <- function(
   if (verbose) cat("\nApplying binning to variables...")
 
   # Execute binning on the data
-  
+
   # Instead of creating complex strings and using eval(parse()):
   # Use direct data.table operations:
   dataCut <- data[, c(target, categorical_vars), with = FALSE]
@@ -2684,7 +2645,6 @@ calculate_statistics <- function(
 
     # Reshape to have target values as columns
     tab <- data.table::dcast(x, get(variable) ~ get(target), value.var = "N")
-    
   } else if (target_type == "numeric") {
     # Compute statistics for numeric target
     # txt <- paste0(
@@ -2701,15 +2661,18 @@ calculate_statistics <- function(
     #   ")]"
     # )
     # tab <- eval(parse(text = txt))
-    tab <- data[, .(
-      count = .N,
-      varsum = sum(get(target), na.rm = TRUE),
-      avg = mean(get(target), na.rm = TRUE),
-      std = stats::sd(get(target), na.rm = TRUE),
-      q25 = stats::quantile(get(target), probs = 0.25, na.rm = TRUE),
-      median = stats::quantile(get(target), probs = 0.5, na.rm = TRUE),
-      q75 = stats::quantile(get(target), probs = 0.75, na.rm = TRUE)
-    ), by = variable]
+    tab <- data[,
+      .(
+        count = .N,
+        varsum = sum(get(target), na.rm = TRUE),
+        avg = mean(get(target), na.rm = TRUE),
+        std = stats::sd(get(target), na.rm = TRUE),
+        q25 = stats::quantile(get(target), probs = 0.25, na.rm = TRUE),
+        median = stats::quantile(get(target), probs = 0.5, na.rm = TRUE),
+        q75 = stats::quantile(get(target), probs = 0.75, na.rm = TRUE)
+      ),
+      by = variable
+    ]
     setnames(tab, variable, "variable")
   }
 
@@ -3013,7 +2976,7 @@ compute_woe_iv <- function(
   if (!(target_type %in% c("binary", "numeric"))) {
     return(list(WOE = NULL, IV = NULL))
   }
-  woe_iv <- dt_WOE_IV(
+  woe_iv <- dt_woe_iv(
     data,
     var_interest = target,
     var_cross = variable,
