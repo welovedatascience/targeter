@@ -40,7 +40,7 @@ binning, statistic calculation, and result formatting."></head><body>
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Core target profiling function</h1>
-      <small class="dont-index">Source: <a href="https://github.com/welovedatascience/targeter/blob/main/R/targeter.r" class="external-link"><code>R/targeter.r</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/welovedatascience/targeter/blob/main/R/targeter.R" class="external-link"><code>R/targeter.R</code></a></small>
       <div class="d-none name"><code>targeter_internal.Rd</code></div>
     </div>
 
@@ -55,30 +55,31 @@ binning, statistic calculation, and result formatting.</p>
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">targeter_internal</span><span class="op">(</span></span>
 <span>  <span class="va">data</span>,</span>
-<span>  description_data <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">dataname</span>,</span>
+<span>  <span class="va">description_data</span>,</span>
 <span>  <span class="va">target</span>,</span>
-<span>  target_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"autoguess"</span>, <span class="st">"binary"</span>, <span class="st">"categorical"</span>, <span class="st">"numeric"</span><span class="op">)</span>,</span>
-<span>  target_reference_level <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  description_target <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  analysis_name <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  select_vars <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  exclude_vars <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  nbins <span class="op">=</span> <span class="fl">12</span>,</span>
-<span>  binning_method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"quantile"</span>, <span class="st">"clustering"</span>, <span class="st">"smart"</span><span class="op">)</span>,</span>
-<span>  naming_conventions <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"targeter.use_naming_conventions"</span>, default <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>,</span>
-<span>  useNA <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"targeter.useNA"</span>, default <span class="op">=</span> <span class="st">"ifany"</span><span class="op">)</span>,</span>
-<span>  verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  dec <span class="op">=</span> <span class="fl">2</span>,</span>
-<span>  order_label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"auto"</span>, <span class="st">"alpha"</span>, <span class="st">"count"</span>, <span class="st">"props"</span>, <span class="st">"means"</span><span class="op">)</span>,</span>
-<span>  cont_target_trim <span class="op">=</span> <span class="fl">0.01</span>,</span>
-<span>  bxp_factor <span class="op">=</span> <span class="fl">1.5</span>,</span>
-<span>  num_as_categorical_nval <span class="op">=</span> <span class="fl">5</span>,</span>
-<span>  autoguess_nrows <span class="op">=</span> <span class="fl">1000</span>,</span>
-<span>  woe_alternate_version <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"if_continuous"</span>, <span class="st">"always"</span><span class="op">)</span>,</span>
-<span>  woe_shift <span class="op">=</span> <span class="fl">0.01</span>,</span>
-<span>  woe_post_cluster <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  woe_post_cluster_n <span class="op">=</span> <span class="fl">6</span>,</span>
-<span>  smart_quantile_by <span class="op">=</span> <span class="fl">0.01</span>,</span>
+<span>  <span class="va">target_type</span>,</span>
+<span>  <span class="va">target_reference_level</span>,</span>
+<span>  <span class="va">description_target</span>,</span>
+<span>  <span class="va">analysis_name</span>,</span>
+<span>  <span class="va">select_vars</span>,</span>
+<span>  <span class="va">exclude_vars</span>,</span>
+<span>  <span class="va">nbins</span>,</span>
+<span>  <span class="va">binning_method</span>,</span>
+<span>  <span class="va">naming_conventions</span>,</span>
+<span>  <span class="va">useNA</span>,</span>
+<span>  <span class="va">verbose</span>,</span>
+<span>  <span class="va">dec</span>,</span>
+<span>  <span class="va">order_label</span>,</span>
+<span>  <span class="va">cont_target_trim</span>,</span>
+<span>  <span class="va">bxp_factor</span>,</span>
+<span>  <span class="va">num_as_categorical_nval</span>,</span>
+<span>  <span class="va">autoguess_nrows</span>,</span>
+<span>  <span class="va">woe_alternate_version</span>,</span>
+<span>  <span class="va">woe_shift</span>,</span>
+<span>  <span class="va">woe_post_cluster</span>,</span>
+<span>  <span class="va">woe_post_cluster_n</span>,</span>
+<span>  <span class="va">smart_quantile_by</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
