@@ -915,25 +915,6 @@ analyze_variables <- function(
   ))
 }
 
-
-# targeter_internal
-# ├── validate_inputs()
-# ├── analyze_variables()
-# │   ├── detect_variables_types()
-# │   └── filter_variables()
-# ├── analyze_target()
-# ├── binning_factory()
-# │   ├── binning_quantile()
-# │   ├── binning_clustering()
-# │   └── binning_smart()
-# ├── compute_target_statistics()
-# ├── process_crossings()
-# │   ├── cross_with_categorical_target()
-# │   ├── cross_with_numerical_target()
-# │   └── format_cross_tables()
-# ├── compute_woe_iv()
-# └── format_results()
-
 #' Analyze target variable properties
 #'
 #' This function handles the detection and validation of target variable properties
