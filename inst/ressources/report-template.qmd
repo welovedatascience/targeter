@@ -254,7 +254,8 @@ if (object$target_type %in% c("binary","numeric")){
     DT::datatable(df2,
       rownames = FALSE, filter = "top",
       selection = "none", autoHideNavigation = TRUE,
-      escape = -ifelse(!is.null(metadata) & format=="html", 2, 1), # we use labels in HTML format
+      escape = -1,
+      # escape = -ifelse(!is.null(metadata) & format=="html", 2, 1), # we use labels in HTML format
       options = list(pageLength = ifelse(format=="html",20,10)) # adapt to revealjs only 10
     )
   } else if (format == "docx") {
@@ -279,6 +280,8 @@ if (object$target_type %in% c("binary","numeric")){
 #| label: variables
 #| output: asis
 
+
+
 ## sort by descending IV
 vars <- sort(sapply(object$profiles, function(x)x$IV), decreasing=TRUE)
 
@@ -292,12 +295,13 @@ for (ivar in names(vars)){
      var_field = params$metadata_var_field, label_field= params$metadata_var_label,
       include_varname = FALSE)
   title_text <- tolower(ivar)
-  title_text <- paste0(title_text, "[IV ", round(iprofile$IV, 3) ,"]")
+  title_text <- paste(title_text, paste(" IV:", round(iprofile$IV, 3), collapse = "\\"))
   if (tolower(ivar_label)!=tolower(ivar)){
-    title_text <- paste(title_text,  ivar_label, collapse = "\n")
+    title_text <- paste(title_text,  ivar_label, collapse = "\\") 
+    ## https://stackoverflow.com/questions/33266938/how-to-break-a-long-headed-line-in-markdown-pandoc
   }
   
-  cat("\n\n### ",title_text,"\n\n")
+  cat("\n\n### ",title_text," {#",tolower(ivar),"}\n\n")
     
 
   print(
