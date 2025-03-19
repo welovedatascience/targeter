@@ -14,7 +14,6 @@ params:
   show_tables: TRUE
   fullplot_which_plot: "1:2"
   fullplot_numvar_as: "bin" 
-  metadata_var_field: "variable"
   metadata_var_label: "label"
 format:
   html:
@@ -57,7 +56,7 @@ format <- knitr::pandoc_to()
 
 object <- readRDS(params$object)
 metadata <- attr(object, "metadata")
-metadata <- metadata[!duplicated(metadata[[params$metadata_var_field]])]
+#metadata <- metadata[!duplicated(metadata[[params$metadata_var_field]])]
 summary_object <- readRDS(params$summary_object)
 ```
 
@@ -115,7 +114,7 @@ if (object$target_type == "binary") {
   txt <- paste0(
     "\n\n## Binary target analysis - overview\n\n",
     "This report contains a snapshot of the specific subpopulation **«",
-    label(object$target, metadata, var_field = params$metadata_var_field, label_field = params$metadata_var_label), "» == ", object$target_reference_level, "**\n\n",
+    label(object$target, metadata, var_field = "variable", label_field = params$metadata_var_label), "» == ", object$target_reference_level, "**\n\n",
     "This subpopulation is characterized by  performing bivariate analyses, crossing the variable of interest (target) with  potential explanatory variables. Only most relevant (highest discriminative power) may be retained.
 
 Report contains:
@@ -192,7 +191,7 @@ if (!is.null(object$description_target)) {
   cat(object$description_target[[1]])
 } else {
   cat("\nNo description of the target has been provided during the analysis.")
-  cat("\n\nTarget used:", label(object$target, metadata, var_field = params$metadata_var_field, label_field = params$metadata_var_label, include_varname = TRUE), "\n\n")
+  cat("\n\nTarget used:", label(object$target, metadata, var_field = "variable", label_field = params$metadata_var_label, include_varname = TRUE), "\n\n")
 }
 ```
 
@@ -286,7 +285,7 @@ for (ivar in names(vars)) {
   iprofile <- object$profiles[[ivar]]
   ivar_label <- label(ivar,
     metadata = metadata,
-    var_field = params$metadata_var_field, label_field = params$metadata_var_label,
+    var_field = "variable", label_field = params$metadata_var_label,
     include_varname = FALSE
   )
 

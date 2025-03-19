@@ -8,10 +8,6 @@
 #' @param object - an object of class targeter
 #' @param summary_object an object of class "summary.targeter": pre-computed
 #' summary of object.
-#' @param metadata - data.frame - if metadata is  loaded in R environment,
-#' label of the variables can be used. Default value (NULL) corresponds to
-#' no metadata available.
-#' The label will be used for the title and the x-axis of the graph.
 #' @param format - Target output format (defaults to "html").
 #'  The option "all" will render all formats.
 #' @param nmax - integer: maximum number of variables to be used. Default 100.
@@ -53,9 +49,6 @@
 #' along the process
 #' @param fullplot_numvar_as - character, one of "bin" or "value"
 #' (cf `fullplot` documentation)
-#' @param metadata_vars - list of two character strings: varname and varlabel.
-#' Default to varname="variable", varlabel="label". Used to specify the columns in
-#' metadata that contains variable names and labels.
 #' @param logo - character: path to a logo file. If NULL (default), we will take
 #' package welovedatascience logo. If empty, no logo will be used. Only used
 #' by revealjs format.
@@ -112,8 +105,7 @@ report <- function(object, ...) {
 report.targeter <- function(
   object,
   summary_object = NULL,
-  metadata = NULL,
-  metadata_vars = list(varname = "variable", varlabel = "label"),
+  metadata_var_label = "label",
   format = "html",
   nmax = 100,
   # TODO: put a warning if tar contains more than nmax variables
@@ -371,7 +363,7 @@ report.targeter <- function(
     )
   }
 
-  attr(object, "metadata") <- metadata
+  # attr(object, "metadata") <- metadata
   if (is.null(summary_object)) summary_object <- summary(object)
   saveRDS(summary_object, file.path(target_path, "tar_summary.rds"))
 
@@ -466,8 +458,7 @@ report.targeter <- function(
     summary_object = "tar_summary.rds",
     fullplot_which_plot = fullplot_which_plot,
     fullplot_numvar_as = fullplot_numvar_as,
-    metadata_var_field = metadata_vars$varname,
-    metadata_var_label = metadata_vars$varlabel,
+    metadata_var_label = metadata_var_label,
     show_tables = as.character(show_tables),
     show_toc = as.character(show_toc),
     show_details = as.character(show_details)

@@ -1,7 +1,5 @@
 # save.image(file = "/hackdata/share/_tmp/targeter-refactored.RData")
 
-
-
 library(data.table)
 # to prevent checks of data.table used variables
 # see:  ?globalVariables
@@ -2434,7 +2432,9 @@ validate_inputs <- function(
   analysis_name,
   useNA,
   order_label,
-  nbins
+  nbins,
+  metadata,
+  metadata_vars
 ) {
   # Check data type
   assertthat::assert_that(
@@ -2505,6 +2505,31 @@ validate_inputs <- function(
     is.numeric(nbins) | is.integer(nbins),
     msg = "The parameter nbins must be numeric"
   )
+
+  assertthat::assert_that(
+    is.null(metadata) | inherits(metadata, "data.frame"),
+    msg = "metadata must be a data.frame or data.table"
+  )
+
+  if (!is.null(metadata)) {
+    # further checks specifics to metadata
+    assertthat::assert_that(
+      is.list(metadata_vars) &
+        length(metadata_vars) == 2 &
+        all(names(metadata_vars) == c("varname", "varlabel")) &
+        all(sapply(metadata_vars, is.character)),
+      msg = "metadata_vars must be a list of length 2 with named entries"
+    )
+
+    assertthat::assert_that(
+      metadata_vars$varname %in% colnames(metadata),
+      msg = "metadata_vars$varname must be a column in metadata"
+    )
+    assertthat::assert_that(
+      metadata_vars$varlabel %in% colnames(metadata),
+      msg = "metadata_vars$varlabel must be a column in metadata"
+    )
+  }
 
   # Return TRUE if all validations pass
   invisible(TRUE)
@@ -3120,6 +3145,11 @@ targeter <- function(
     default = FALSE
   ),
   useNA = getOption("targeter.useNA", default = "ifany"),
+  metadata = NULL,
+  metadata_vars = list(
+    "varname" = "variable",
+    "varlabel" = "label"
+  ),
   verbose = FALSE,
   dec = 2,
   order_label = c("auto", "alpha", "count", "props", "means"),
@@ -3183,7 +3213,9 @@ targeter <- function(
     analysis_name = analysis_name,
     useNA = useNA,
     order_label = order_label,
-    nbins = nbins
+    nbins = nbins,
+    metadata = metadata,
+    metadata_vars = metadata_vars
   )
 
   # Step 2: Process parameters
@@ -3373,7 +3405,15 @@ targeter <- function(
         )
       )
     }
-
+    # handles metadata
+    if (!is.null(metadata)) {
+      setnames(
+        metadata,
+        c(metadata_vars$varname, metadata$varlabel),
+        c("variable", "label")
+      )
+      tar$metadata <- metadata
+    }
     return(tar)
   } else {
     stop("All processing groups failed - check input data and parameters")
