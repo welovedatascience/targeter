@@ -18,6 +18,8 @@ targeter(
   binning_method = c("quantile", "clustering", "smart"),
   naming_conventions = getOption("targeter.use_naming_conventions", default = FALSE),
   useNA = getOption("targeter.useNA", default = "ifany"),
+  metadata = NULL,
+  metadata_vars = list(varname = "variable", varlabel = "label"),
   verbose = FALSE,
   dec = 2,
   order_label = c("auto", "alpha", "count", "props", "means"),

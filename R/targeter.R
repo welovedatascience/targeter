@@ -3407,12 +3407,13 @@ targeter <- function(
     }
     # handles metadata
     if (!is.null(metadata)) {
+      meta <- copy(metadata)
       setnames(
-        metadata,
-        c(metadata_vars$varname, metadata$varlabel),
+        meta,
+        c(metadata_vars$varname, metadata_vars$varlabel),
         c("variable", "label")
       )
-      tar$metadata <- metadata
+      tar$metadata <- meta
     }
     return(tar)
   } else {

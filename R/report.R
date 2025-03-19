@@ -169,10 +169,10 @@ report.targeter <- function(
     inherits(object, "targeter"),
     msg = "The class of object must to be 'targeter'."
   )
-  assertthat::assert_that(
-    inherits(metadata, "data.frame") | is.null(metadata),
-    msg = "The parameter metadata must be either NULL (no metadata) or a data.frame"
-  )
+  # assertthat::assert_that(
+  #   inherits(metadata, "data.frame") | is.null(metadata),
+  #   msg = "The parameter metadata must be either NULL (no metadata) or a data.frame"
+  # )
   if (("pptx" %in% format) && !is.null(pptx_reference_doc)) {
     assertthat::assert_that(
       is.character(pptx_reference_doc),

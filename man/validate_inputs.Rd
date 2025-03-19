@@ -14,7 +14,9 @@ validate_inputs(
   analysis_name,
   useNA,
   order_label,
-  nbins
+  nbins,
+  metadata,
+  metadata_vars
 )
 }
 \arguments{
