@@ -9,7 +9,7 @@ execute:
 params:
     model: "tar_mod.rds" # will have to be passed - will be a mandatory parameter  -> path 
     decision_tree_format: "static"
-    metadata_var_field: "variable"
+    # metadata_var_field: "variable"
     metadata_var_label: "label"
     profiles: TRUE
     show_toc: TRUE
@@ -47,8 +47,8 @@ suppressMessages(suppressPackageStartupMessages(library(targeter)))
 ```{r}
 #| label: import
 mod <- readRDS( file = 'tar_mod.rds')
+metadata <- attr(mod, "metadata")
 object <- attr(mod,"tar_object") # already filtered on tree variables
-metadata <- attr(object, "metadata")
 # metadata <- metadata[!duplicated(metadata[[params$metadata_var_field]])] 
 
 ```

@@ -649,6 +649,20 @@ report.tartree <- function(
     msg = "The parameter metadata must be either NULL (no metadata) or a data.frame"
   )
 
+
+
+  meta <- NULL 
+  if (!is.null(metadata)) {
+    assertthat::assert_that(
+      all(unlist(metadata_vars) %in% colnames(metadata)),
+      msg = "metadata must contain columns specified in metadata_vars"
+    )
+    assertthat::assert_that(
+      !(metadata_vars$varname != "variable" & "variable" %in% colnames(metadata)),
+      msg = "metadata has already a column named 'variable' and it is not the one specified in metadata_vars"
+    )
+
+
   if (("pptx" %in% format) && !is.null(pptx_reference_doc)) {
     assertthat::assert_that(
       is.character(pptx_reference_doc),
@@ -844,7 +858,7 @@ report.tartree <- function(
   }
 
   print(target_path)
-  attr(object, "metadata") <- metadata
+  attr(object, "metadata") <- meta
   saveRDS(object, file.path(target_path, "tar_mod.rds"))
 
   template_copied <- file.copy(
@@ -935,7 +949,6 @@ report.tartree <- function(
 
   meta_yml_params <- list(
     model = "tar_mod.rds",
-    metadata_var_field = metadata_vars$varname,
     metadata_var_label = metadata_vars$varlabel
   )
 
