@@ -110,8 +110,8 @@ report.targeter <- function(
   format = "html",
   nmax = 100,
   # TODO: put a warning if tar contains more than nmax variables
-  template = NULL,
-  # default wlds QMD template
+  template = NULL, 
+  # default wlds QMD template 
   quarto_root_dir = ".",
   quarto_targeters_project_dir = "targeter-reports",
   quarto_project_template = getOption(
@@ -154,13 +154,11 @@ report.targeter <- function(
     pacman::p_load("quarto"),
     msg = "quarto package and runtime are required."
   )
-  assertthat::assert_that(
-    !is.null(quarto::quarto_path()),
-    msg = "quarto executable is not found in PATH. Please ensure quarto 
-   is correctly installed in system (not the R quarto package)."
-  )
-
-  # TODO fix quato folder creation
+  assertthat::assert_that(!is.null(quarto::quarto_path()),
+   msg = "quarto executable is not found in PATH. Please ensure quarto 
+   is correctly installed in system (not the R quarto package).")
+  
+# TODO fix quato folder creation
   # TODO cover all parameters  assert tests
   assertthat::assert_that(
     is.character(format),
@@ -177,17 +175,17 @@ report.targeter <- function(
     msg = "The parameter metadata must be either NULL (no metadata) or a data.frame"
   )
 
-  meta <- NULL
+  meta <- NULL 
   if (!is.null(metadata)) {
     assertthat::assert_that(
       all(unlist(metadata_vars) %in% colnames(metadata)),
       msg = "metadata must contain columns specified in metadata_vars"
     )
     assertthat::assert_that(
-      !(metadata_vars$varname != "variable" &
-        "variable" %in% colnames(metadata)),
+      !(metadata_vars$varname != "variable" & "variable" %in% colnames(metadata)),
       msg = "metadata has already a column named 'variable' and it is not the one specified in metadata_vars"
     )
+
 
     meta <- copy(metadata)
     setnames(meta, metadata_vars$varname, "variable")
@@ -382,6 +380,7 @@ report.targeter <- function(
     )
   }
 
+  
   attr(object, "metadata") <- meta
   if (is.null(summary_object)) summary_object <- summary(object)
   saveRDS(summary_object, file.path(target_path, "tar_summary.rds"))
@@ -483,10 +482,7 @@ report.targeter <- function(
     show_details = as.character(show_details)
   )
 
-  yaml::write_yaml(
-    meta_yml_params,
-    file.path(file.path(target_path, paste0(output_file, "-params.yaml")))
-  )
+  yaml::write_yaml(meta_yml_params, file.path(file.path(target_path, paste0(output_file, "-params.yaml")))) 
   # pandoc_args <- c()
 
   if (render) {

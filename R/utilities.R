@@ -56,6 +56,7 @@ label <- function(
     inherits(var, "character"),
     msg = "var must be character"
   )
+
   # assertthat::assert_that(length(var)==1,msg="Only one var is admitted")
 
   assertthat::assert_that(
@@ -69,6 +70,7 @@ label <- function(
     msg = paste("label_field ", label_field, " not present in metadata")
   )
 
+  
   ##take the label in the metadata; if not label, keep var name
   var_hasLabel <- var %in% metadata[[var_field]]
   #labels <- sapply(var, function(var) metadata[which(metadata[[var_field]]==var),][[label_field]])
