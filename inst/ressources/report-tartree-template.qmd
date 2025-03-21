@@ -49,7 +49,7 @@ suppressMessages(suppressPackageStartupMessages(library(targeter)))
 mod <- readRDS( file = 'tar_mod.rds')
 object <- attr(mod,"tar_object") # already filtered on tree variables
 metadata <- attr(object, "metadata")
-metadata <- metadata[!duplicated(metadata[[params$metadata_var_field]])] 
+# metadata <- metadata[!duplicated(metadata[[params$metadata_var_field]])] 
 
 ```
 
@@ -122,47 +122,68 @@ if (params$profiles){
 
 
   ## sort by descending IV
-  vars <- sort(sapply(object$profiles, function(x)x$IV), decreasing=TRUE)
+  vars <- sort(sapply(object$profiles, function(x) x$IV), decreasing = TRUE)
 
-  for (ivar in names(vars)){
-
+  for (ivar in names(vars)) {
     cat("\n\n\\newpage\n\n") # for LaTeX
-  
+
     # ivar <- names(object$profiles)[i]
     iprofile <- object$profiles[[ivar]]
-    ivar_label <- label(ivar, metadata = metadata,
-      var_field = params$metadata_var_field, label_field= params$metadata_var_label,
-        include_varname = FALSE)
-    cat("\n\n### ",tolower(ivar),"\n\n")
-    if (tolower(ivar_label)!=tolower(ivar)){
-      cat("\n", ivar_label, "\n")
+    ivar_label <- label(ivar,
+      metadata = metadata,
+      var_field = "variable", label_field = params$metadata_var_label,
+      include_varname = FALSE
+    )
+
+
+
+    title_text <- tolower(ivar)
+    title_iv <- paste0(" IV ", round(iprofile$IV, 3))
+
+    if (tolower(ivar_label) != tolower(ivar)) {
+      title_text <- paste(
+        ivar_label, 
+        ifelse(format == "html", "<br/>", " \\ ["), 
+        title_iv, ifelse(format == "html", "<br/>", "]"),
+        title_text)
+    } else {
+      title_text <- paste(
+        title_text,
+        ifelse(format == "html", "<br/>", " \\ ["),
+        title_iv,
+        ifelse(format == "html", "", " ]")
+      )
     }
-    
-    cat("\n__IV:", round(iprofile$IV, 3), "__\n\n")
+
+
+    # https://quarto.org/docs/authoring/markdown-basics.html#headings
+    cat(paste0("\n\n::: {#", tolower(ivar), " }\n\n")) # anchor section
+    cat(paste0("\n\n### ", title_text, "\n\n"))
+    cat("\n:::\n\n")
+
+
 
     print(
       fullplot(
-        iprofile, 
+        iprofile,
         numvar_as = params$fullplot_numvar_as,
-        which_plot= eval(
+        which_plot = eval(
           parse(
-            text = params$fullplot_which_plot 
-            )
+            text = params$fullplot_which_plot
           )
         )
       )
+    )
 
-    if (as.logical(params$show_tables)){
+    if (as.logical(params$show_tables)) {
       cat("\n\n\\newpage\n\n") # for LaTeX
-        cat("\n\n### ",tolower(ivar)," [table]\n\n")
-        tab <- table_crossvar(iprofile)
+      cat("\n\n### ", tolower(ivar), " [table]\n\n")
+      tab <- table_crossvar(iprofile)
 
-        print(kableExtra::kable(tab, format = "simple"))
-        
+      print(kableExtra::kable(tab, format = "simple"))
+
       cat("\n\n")
-
     }
-    
   }
 
 }

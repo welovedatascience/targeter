@@ -105,12 +105,13 @@ report <- function(object, ...) {
 report.targeter <- function(
   object,
   summary_object = NULL,
-  metadata_var_label = "label",
+  metadata = NULL,
+  metadata_vars = list(varname = "variable", varlabel = "label"),
   format = "html",
   nmax = 100,
   # TODO: put a warning if tar contains more than nmax variables
-  template = NULL, 
-  # default wlds QMD template 
+  template = NULL,
+  # default wlds QMD template
   quarto_root_dir = ".",
   quarto_targeters_project_dir = "targeter-reports",
   quarto_project_template = getOption(
@@ -153,11 +154,13 @@ report.targeter <- function(
     pacman::p_load("quarto"),
     msg = "quarto package and runtime are required."
   )
-  assertthat::assert_that(!is.null(quarto::quarto_path()),
-   msg = "quarto executable is not found in PATH. Please ensure quarto 
-   is correctly installed in system (not the R quarto package).")
-  
-# TODO fix quato folder creation
+  assertthat::assert_that(
+    !is.null(quarto::quarto_path()),
+    msg = "quarto executable is not found in PATH. Please ensure quarto 
+   is correctly installed in system (not the R quarto package)."
+  )
+
+  # TODO fix quato folder creation
   # TODO cover all parameters  assert tests
   assertthat::assert_that(
     is.character(format),
@@ -169,10 +172,26 @@ report.targeter <- function(
     inherits(object, "targeter"),
     msg = "The class of object must to be 'targeter'."
   )
-  # assertthat::assert_that(
-  #   inherits(metadata, "data.frame") | is.null(metadata),
-  #   msg = "The parameter metadata must be either NULL (no metadata) or a data.frame"
-  # )
+  assertthat::assert_that(
+    inherits(metadata, "data.frame") | is.null(metadata),
+    msg = "The parameter metadata must be either NULL (no metadata) or a data.frame"
+  )
+
+  meta <- NULL
+  if (!is.null(metadata)) {
+    assertthat::assert_that(
+      all(unlist(metadata_vars) %in% colnames(metadata)),
+      msg = "metadata must contain columns specified in metadata_vars"
+    )
+    assertthat::assert_that(
+      !(metadata_vars$varname != "variable" &
+        "variable" %in% colnames(metadata)),
+      msg = "metadata has already a column named 'variable' and it is not the one specified in metadata_vars"
+    )
+
+    meta <- copy(metadata)
+    setnames(meta, metadata_vars$varname, "variable")
+  }
   if (("pptx" %in% format) && !is.null(pptx_reference_doc)) {
     assertthat::assert_that(
       is.character(pptx_reference_doc),
@@ -363,7 +382,7 @@ report.targeter <- function(
     )
   }
 
-  # attr(object, "metadata") <- metadata
+  attr(object, "metadata") <- meta
   if (is.null(summary_object)) summary_object <- summary(object)
   saveRDS(summary_object, file.path(target_path, "tar_summary.rds"))
 
@@ -458,10 +477,15 @@ report.targeter <- function(
     summary_object = "tar_summary.rds",
     fullplot_which_plot = fullplot_which_plot,
     fullplot_numvar_as = fullplot_numvar_as,
-    metadata_var_label = metadata_var_label,
+    metadata_var_label = metadata_vars$metadata_var_label,
     show_tables = as.character(show_tables),
     show_toc = as.character(show_toc),
     show_details = as.character(show_details)
+  )
+
+  yaml::write_yaml(
+    meta_yml_params,
+    file.path(file.path(target_path, paste0(output_file, "-params.yaml")))
   )
   # pandoc_args <- c()
 
@@ -594,12 +618,12 @@ report.tartree <- function(
   report_categories = c("tree"),
   ... # additional parameters to be passed to quarto
 ) {
-  cat("\n Yes report tartree\n")
+  # cat("\n Yes report tartree\n")
   assertthat::assert_that(
     pacman::p_load("quarto"),
     msg = "quarto package and runtime are required."
   )
-  deps <- c("explore", "rpart", "dplyr", "pROC")
+  deps <- c("rpart", "dplyr", "pROC")
   if (getOption("targeter.auto_install_deps", FALSE)) {
     pacman::p_load(char = deps)
   }

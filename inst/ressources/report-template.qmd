@@ -16,11 +16,11 @@ params:
   fullplot_numvar_as: "bin" 
   metadata_var_label: "label"
 format:
-  revealjs:
-    output-ext: -rjs.html # see https://github.com/quarto-dev/quarto-cli/discussions/1751
-    theme: default
-    slide-level: 3
-    embed-resources: true
+  # revealjs:
+  #   output-ext: -rjs.html # see https://github.com/quarto-dev/quarto-cli/discussions/1751
+  #   theme: default
+  #   slide-level: 3
+  #   embed-resources: false
   html:
     theme: cosmo
     toc: true

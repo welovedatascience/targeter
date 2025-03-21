@@ -69,7 +69,7 @@ explore <- function(
 ) {
   deps <- c("miniUI", "shiny", "DT", "shinybusy", "htmlwidgets")
   if (getOption("targeter.auto_install_deps", FALSE)) {
-    pacman::p_load(deps, install = FALSE)
+    pacman::p_load(char = deps, install = FALSE)
   }
   assertthat::assert_that(
     all(pacman::p_load(char = deps)),
