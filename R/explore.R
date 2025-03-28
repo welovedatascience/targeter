@@ -67,7 +67,7 @@ explore <- function(
   display = c("dialog", "browser"),
   ...
 ) {
-  deps <- c("miniUI", "shiny", "DT", "shinybusy", "htmlwidgets")
+  deps <- c("miniUI", "shiny", "DT", "htmlwidgets")
   if (getOption("targeter.auto_install_deps", FALSE)) {
     pacman::p_load(char = deps, install = FALSE)
   }
@@ -339,7 +339,7 @@ explore <- function(
       if (length(selvars) > 1) {
         summary_object <- summary_object[summary_object$varname %in% selvars, ]
         # S <<- summary_object
-        show_modal_spinner() # show the modal window
+        #show_modal_spinner() # show the modal window
         targeter::report(
           object = object,
           template = NULL,
@@ -350,7 +350,7 @@ explore <- function(
           force_vars = selvars,
           output_format = "html"
         )
-        remove_modal_spinner()
+       # remove_modal_spinner()
       } else {
         report_failure(
           title = "Problem",
@@ -365,7 +365,7 @@ explore <- function(
       ][["varname"]]
       if (length(selvars) > 1) {
         summary_object <- summary_object[summary_object$varname %in% selvars, ]
-        show_modal_spinner() # show the modal window
+      #  show_modal_spinner() # show the modal window
         targeter::report(
           object = object,
           template = NULL,
@@ -376,7 +376,7 @@ explore <- function(
           force_vars = selvars,
           output_format = "pdf"
         )
-        remove_modal_spinner()
+       # remove_modal_spinner()
       } else {
         report_failure(
           title = "Problem",
@@ -391,7 +391,7 @@ explore <- function(
       ][["varname"]]
       if (length(selvars) > 1) {
         summary_object <- summary_object[summary_object$varname %in% selvars, ]
-        show_modal_spinner() # show the modal window
+        #show_modal_spinner() # show the modal window
         targeter::report(
           object = object,
           template = NULL,
@@ -402,7 +402,7 @@ explore <- function(
           force_vars = selvars,
           output_format = "word"
         )
-        remove_modal_spinner()
+        #remove_modal_spinner()
       } else {
         report_failure(
           title = "Problem",

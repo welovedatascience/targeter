@@ -43,7 +43,6 @@ Suggest:
     DT,
     miniUI,
     shiny,
-    shinybusy,
     htmlwidgets,
     flextable,
     clustering.sc.dp,
