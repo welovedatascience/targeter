@@ -11,7 +11,8 @@ report(object, ...)
 \method{report}{targeter}(
   object,
   summary_object = NULL,
-  metadata_var_label = "label",
+  metadata = NULL,
+  metadata_vars = list(varname = "variable", varlabel = "label"),
   format = "html",
   nmax = 100,
   template = NULL,
@@ -80,6 +81,15 @@ allowing to pass/overwite any YAML set-up}
 
 \item{summary_object}{an object of class "summary.targeter": pre-computed
 summary of object.}
+
+\item{metadata}{- data.frame - if metadata is  loaded in R environment,
+label of the variables can be used. Default value (NULL) corresponds to
+no metadata available.
+The label will be used for the title and the x-axis of the graph.}
+
+\item{metadata_vars}{- list of two character strings: varname and varlabel.
+Default to varname="variable", varlabel="label". Used to specify the columns in
+metadata that contains variable names and labels.}
 
 \item{format}{- Target output format (defaults to "html").
 The option "all" will render all formats.}
@@ -167,15 +177,6 @@ could make use of categories (which is the case of default targeter template)}
 
 \item{profiles}{- logical: do we display targeter profiles's graph for
 variables associated to tree.}
-
-\item{metadata}{- data.frame - if metadata is  loaded in R environment,
-label of the variables can be used. Default value (NULL) corresponds to
-no metadata available.
-The label will be used for the title and the x-axis of the graph.}
-
-\item{metadata_vars}{- list of two character strings: varname and varlabel.
-Default to varname="variable", varlabel="label". Used to specify the columns in
-metadata that contains variable names and labels.}
 }
 \value{
 invisibly returns path to the generated specific file (unique format)

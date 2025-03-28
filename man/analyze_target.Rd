@@ -12,15 +12,6 @@ analyze_target(
   num_as_categorical_nval = 5,
   autoguess_nrows = 1000
 )
-
-analyze_target(
-  data,
-  target,
-  target_type = "autoguess",
-  target_reference_level = NULL,
-  num_as_categorical_nval = 5,
-  autoguess_nrows = 1000
-)
 }
 \arguments{
 \item{data}{data.table with the data to analyze}
@@ -35,13 +26,8 @@ analyze_target(
 }
 \value{
 list with target properties and messages
-
-list with target properties and messages
 }
 \description{
-This function handles the detection and validation of target variable properties
-including type detection and reference level determination.
-
 This function handles the detection and validation of target variable properties
 including type detection and reference level determination.
 }

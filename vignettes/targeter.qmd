@@ -10,7 +10,7 @@ output:
     highlight: tango
 vignette: >
   %\VignetteIndexEntry{Introduction to targeter}
-  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEngine{quarto::html}
   %\VignetteEncoding{UTF-8}
 ---
 

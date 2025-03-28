@@ -5,8 +5,6 @@
 \title{Compute statistics for target variable}
 \usage{
 compute_target_statistics(data, target, target_type)
-
-compute_target_statistics(data, target, target_type)
 }
 \arguments{
 \item{data}{data.table with the data}
@@ -17,11 +15,7 @@ compute_target_statistics(data, target, target_type)
 }
 \value{
 data.table with target statistics
-
-data.table with target statistics
 }
 \description{
-This function computes appropriate statistics based on the target type
-
 This function computes appropriate statistics based on the target type
 }

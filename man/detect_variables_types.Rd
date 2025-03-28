@@ -14,17 +14,6 @@ detect_variables_types(
   num_as_categorical_nval = 5,
   verbose = FALSE
 )
-
-detect_variables_types(
-  data,
-  target,
-  select_vars = NULL,
-  exclude_vars = NULL,
-  naming_conventions = FALSE,
-  autoguess_nrows = 1000,
-  num_as_categorical_nval = 5,
-  verbose = FALSE
-)
 }
 \arguments{
 \item{data}{data.table with data to analyze}
@@ -45,13 +34,8 @@ detect_variables_types(
 }
 \value{
 list with variable classification and messages
-
-list with variable classification and messages
 }
 \description{
-This function handles variable type detection and filtering based on
-naming conventions and other criteria.
-
 This function handles variable type detection and filtering based on
 naming conventions and other criteria.
 }

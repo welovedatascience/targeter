@@ -14,20 +14,8 @@ calculate_statistics(
   variable_type = "character",
   order_label = "auto",
   cutpoints_list = NULL,
-  dec = 2
-)
-
-calculate_statistics(
-  data,
-  variable,
-  target,
-  target_type,
-  useNA = "ifany",
-  bxp_factor = 1.5,
-  variable_type = "character",
-  order_label = "auto",
-  cutpoints_list = NULL,
-  dec = 2
+  dec = 2,
+  debug = FALSE
 )
 }
 \arguments{
@@ -46,20 +34,11 @@ calculate_statistics(
 \item{variable_type}{character - type of the variable ("numeric" or "character")}
 
 \item{order_label}{character - method for ordering labels}
-
-\item{cutpoints_list}{list - cutpoints for numeric variables (for creating intervals)}
-
-\item{dec}{integer - number of decimal places for numeric formatting}
 }
 \value{
 list with statistics and metadata
-
-list with statistics and metadata
 }
 \description{
-This function computes appropriate statistics based on the target type and variable type
-for analyzing relationships between explanatory variables and target variables.
-
 This function computes appropriate statistics based on the target type and variable type
 for analyzing relationships between explanatory variables and target variables.
 }

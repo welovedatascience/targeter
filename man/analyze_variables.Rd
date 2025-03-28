@@ -14,17 +14,6 @@ analyze_variables(
   num_as_categorical_nval = 5,
   verbose = FALSE
 )
-
-analyze_variables(
-  data,
-  target,
-  select_vars = NULL,
-  exclude_vars = NULL,
-  naming_conventions = FALSE,
-  autoguess_nrows = 1000,
-  num_as_categorical_nval = 5,
-  verbose = FALSE
-)
 }
 \arguments{
 \item{data}{data.table with data to analyze}
@@ -45,13 +34,8 @@ analyze_variables(
 }
 \value{
 list with variable classification and metadata
-
-list with variable classification and metadata
 }
 \description{
-This function handles the complete process of variable detection, filtering,
-and type assignment for the targeter analysis.
-
 This function handles the complete process of variable detection, filtering,
 and type assignment for the targeter analysis.
 }

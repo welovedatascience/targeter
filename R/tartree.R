@@ -5,6 +5,7 @@ if (getRversion() >= "3.1.0")
   utils::globalVariables(
     c(
       "..vars_model",
+      "Z_TARGET",
       "Z_TARGET_PREDICTION",
       "Z_TARGET_PREDICTION_CP",
       "Z_TARGET_PREDICTION_CP_QUANTILE",
@@ -50,7 +51,7 @@ if (getRversion() >= "3.1.0")
 #' @importFrom data.table setDT
 #' @importFrom assertthat assert_that
 #' @importFrom pacman p_load
-#' @importFrom stats predict
+#' @importFrom stats predict as.formula
 
 tartree <- function(
   data,
@@ -108,15 +109,6 @@ tartree <- function(
       )
     }
   }
-  assertthat::assert_that(
-    is.integer(decision_tree_maxdepth) && (decision_tree_maxdepth > 0),
-    msg = "decision_tree_maxdepth must to be a positive integer"
-  )
-  assertthat::assert_that(
-    is.numeric(decision_tree_cp),
-    msg = "decision_tree_cp must to be a numeric"
-  )
-
   assertthat::assert_that(
     is.numeric(decision_tree_sample),
     msg = "decision_tree_sample must to be a numeric"
@@ -313,8 +305,6 @@ tartree <- function(
   attr(mod, "pROC") <- pROC
   attr(mod, "model_varimp") <- setDT(vars_imp_df)
   attr(mod, "decision_tree_params") <- list(
-    decision_tree_maxdepth = decision_tree_maxdepth,
-    decision_tree_cp = decision_tree_cp,
     decision_tree_sample = decision_tree_sample,
     seed = seed
   )

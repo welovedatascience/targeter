@@ -5,8 +5,6 @@
 \title{Process table labels for display}
 \usage{
 treat_tab_labels(tab, variable, is_numeric, cutpoints_list, dec = 2)
-
-treat_tab_labels(tab, variable, is_numeric, cutpoints_list, dec = 2)
 }
 \arguments{
 \item{tab}{data.table - table to process}
@@ -21,11 +19,7 @@ treat_tab_labels(tab, variable, is_numeric, cutpoints_list, dec = 2)
 }
 \value{
 processed table with formatted row names
-
-processed table with formatted row names
 }
 \description{
-Helper function to format variable labels for display
-
 Helper function to format variable labels for display
 }

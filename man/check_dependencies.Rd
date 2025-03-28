@@ -5,8 +5,6 @@
 \title{Check for required packages based on selected methods}
 \usage{
 check_dependencies(binning_method, woe_post_cluster)
-
-check_dependencies(binning_method, woe_post_cluster)
 }
 \arguments{
 \item{binning_method}{character - binning method selected}
@@ -14,7 +12,5 @@ check_dependencies(binning_method, woe_post_cluster)
 \item{woe_post_cluster}{logical - whether post-clustering is used}
 }
 \description{
-Check for required packages based on selected methods
-
 Check for required packages based on selected methods
 }

@@ -12,15 +12,6 @@ filter_variables(
   vars,
   verbose = FALSE
 )
-
-filter_variables(
-  data,
-  numeric_vars,
-  ordinal_vars,
-  categorical_vars,
-  vars,
-  verbose = FALSE
-)
 }
 \arguments{
 \item{data}{data.table with the data}
@@ -31,19 +22,14 @@ filter_variables(
 
 \item{categorical_vars}{character - vector of categorical variables}
 
-\item{vars}{data.table - metadata about variables}
+\item{vars}{data.table - information on variables at analysis step}
 
 \item{verbose}{logical - whether to print verbose output}
 }
 \value{
 list with filtered variable lists and metadata
-
-list with filtered variable lists and metadata
 }
 \description{
-This function removes variables that have only a single unique value,
-as they provide no discriminatory power for analysis.
-
 This function removes variables that have only a single unique value,
 as they provide no discriminatory power for analysis.
 }

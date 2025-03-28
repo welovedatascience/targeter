@@ -19,14 +19,6 @@ process_parameters(
   woe_alternate_version,
   useNA
 )
-
-process_parameters(
-  binning_method,
-  order_label,
-  target_type,
-  woe_alternate_version,
-  useNA
-)
 }
 \arguments{
 \item{binning_method}{character - method for binning numeric variables}
@@ -36,20 +28,13 @@ process_parameters(
 \item{target_type}{character - type of the target variable}
 
 \item{woe_alternate_version}{character - when to use alternate WOE definition}
-
-\item{useNA}{character - how to handle NA values}
 }
 \value{
 list of processed parameters
 
 list of processed parameters
-
-list of processed parameters
 }
 \description{
-This function validates and processes key parameters by matching them against
-their allowed values.
-
 This function validates and processes key parameters by matching them against
 their allowed values.
 

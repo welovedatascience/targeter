@@ -9,14 +9,12 @@ tartree(
   tar_object = NULL,
   tarsum_object = NULL,
   target = NULL,
-  decision_tree_maxdepth = 3L,
-  decision_tree_cp = 0,
   decision_tree_sample = 0.8,
+  seed = 42,
   predict_prob_cutpoint = 0.5,
   predict_prob_cutpoint_quantile = 0.5,
-  seed = 42,
   rpart.control = list(minsplit = 20, minbucket = 8, cp = 0.01, maxcompete = 4,
-    maxsurrogate = 5, usesurrogate = 2, xval = 10, surrogatestyle = 0, maxdepth = 30),
+    maxsurrogate = 5, usesurrogate = 2, xval = 10, surrogatestyle = 0, maxdepth = 3L),
   ...
 )
 }
@@ -29,11 +27,9 @@ tartree(
 
 \item{target}{character, target column name  - default: NULL and if tar_object is provided, target is taken from it}
 
-\item{decision_tree_maxdepth}{integer, maximum depth of the tree - default: 3}
-
-\item{decision_tree_cp}{numeric, complexity parameter - default: 0}
-
 \item{decision_tree_sample}{numeric, proportion of data to be used for training -  to be betwwen 0 (not included) and 1 (not recommended) default: 0.8}
+
+\item{seed}{integer, seed for random number generation - default: 42}
 
 \item{predict_prob_cutpoint}{cutpoint to be used for binary decision - default 0.5}
 
@@ -41,7 +37,7 @@ tartree(
 further additional preduction. Default 0.5. Could be used to see what if we
 want to create a group of x\% records.}
 
-\item{seed}{integer, seed for random number generation - default: 42}
+\item{rpart.control}{list, control parameters for rpart function}
 
 \item{...}{other parameters to be passed to targeter}
 }

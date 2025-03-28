@@ -10,13 +10,6 @@ binning_factory(
   smart_quantile_by = 0.01,
   verbose = FALSE
 )
-
-binning_factory(
-  method = "quantile",
-  nbins = 12,
-  smart_quantile_by = 0.01,
-  verbose = FALSE
-)
 }
 \arguments{
 \item{method}{character - binning method: "quantile", "clustering", or "smart"}
@@ -29,11 +22,7 @@ binning_factory(
 }
 \value{
 list of binning functions and configuration
-
-list of binning functions and configuration
 }
 \description{
-This function creates appropriate binning functions based on the chosen method
-
 This function creates appropriate binning functions based on the chosen method
 }

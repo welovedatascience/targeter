@@ -1,7 +1,8 @@
 Package: targeter
 Type: Package
 Title: Efficient Visual Targets Exploration 
-Version: 1.5.1
+Version: 1.6.0
+Date: 2025-03-28
 Authors@R: c(
     person("Eric","Lecoutre", email = "eric.lecoutre@welovedatascience.com", 
     role = c("aut", "cre")),
@@ -31,8 +32,6 @@ Imports:
     gridExtra,
     scales,
     ggrepel,
-    knitr,
-    rmarkdown,
     patchwork,
     utils,
     kableExtra,
@@ -53,4 +52,4 @@ Suggest:
     visNetwork
 URL: https://github.com/welovedatascience/targeter, https://welovedatascience.github.io/targeter/
 BugReports: https://github.com/welovedatascience/targeter/issues
-VignetteBuilder: knitr
+VignetteBuilder: quarto

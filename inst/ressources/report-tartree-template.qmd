@@ -41,6 +41,7 @@ report_type: targeter-tree
 #| label: setup
 #| warning: false
 suppressMessages(suppressPackageStartupMessages(library(targeter)))
+format <- knitr::pandoc_to()
 ```
 
 

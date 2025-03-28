@@ -5,8 +5,6 @@
 \title{Prepare data and select variables for analysis}
 \usage{
 prepare_data(data, target, select_vars = NULL, exclude_vars = NULL)
-
-prepare_data(data, target, select_vars = NULL, exclude_vars = NULL)
 }
 \arguments{
 \item{data}{data.frame or data.table - the input data}
@@ -19,11 +17,7 @@ prepare_data(data, target, select_vars = NULL, exclude_vars = NULL)
 }
 \value{
 data.table - processed data
-
-data.table - processed data
 }
 \description{
-Prepare data and select variables for analysis
-
 Prepare data and select variables for analysis
 }
