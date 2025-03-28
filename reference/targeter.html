@@ -182,112 +182,13 @@ variable by calculating statistics, WOE, IV, and other metrics.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> INFO:target ABOVE50K detected as type: binary</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> INFO:binary target contains number, automatic chosen level: 1; override using `target_reference_level`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $dataname</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "adult"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $target</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "ABOVE50K"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $description_data</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "adult"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $description_target</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "TargetABOVE50K [binary]"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $target_type</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "binary"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $target_stats</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    value count   nNA percNA      perc</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    &lt;int&gt; &lt;int&gt; &lt;int&gt;  &lt;num&gt;     &lt;num&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:     0 24720     0      0 0.7591904</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:     1  7841     0      0 0.2408096</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $analysis_name</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Analysis of  ABOVE50K on data: adult"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $date</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "2025-03-28"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $profiles</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>               profiles   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> AGE           crossvar,17</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> FNLWGT        crossvar,17</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> EDUCATIONNUM  crossvar,17</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> HOURSPERWEEK  crossvar,17</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> WORKCLASS     crossvar,15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> EDUCATION     crossvar,15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> MARITALSTATUS crossvar,15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> OCCUPATION    crossvar,15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> RELATIONSHIP  crossvar,15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> RACE          crossvar,15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> SEX           crossvar,15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> NATIVECOUNTRY crossvar,15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"names")</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] "AGE"           "FNLWGT"        "EDUCATIONNUM"  "HOURSPERWEEK" </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [5] "WORKCLASS"     "EDUCATION"     "MARITALSTATUS" "OCCUPATION"   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [9] "RELATIONSHIP"  "RACE"          "SEX"           "NATIVECOUNTRY"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $variables</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          variable is_in_data is_target is_in_exclude    var_type</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            &lt;char&gt;     &lt;lgcl&gt;    &lt;lgcl&gt;        &lt;lgcl&gt;      &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  1:      ABOVE50K       TRUE      TRUE         FALSE            </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  2:           AGE       TRUE     FALSE         FALSE     numeric</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  3:   CAPITALGAIN       TRUE     FALSE         FALSE     numeric</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  4:   CAPITALLOSS       TRUE     FALSE         FALSE     numeric</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  5:     EDUCATION       TRUE     FALSE         FALSE categorical</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  6:  EDUCATIONNUM       TRUE     FALSE         FALSE     numeric</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  7:        FNLWGT       TRUE     FALSE         FALSE     numeric</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  8:  HOURSPERWEEK       TRUE     FALSE         FALSE     numeric</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  9: MARITALSTATUS       TRUE     FALSE         FALSE categorical</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10: NATIVECOUNTRY       TRUE     FALSE         FALSE categorical</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11:    OCCUPATION       TRUE     FALSE         FALSE categorical</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12:          RACE       TRUE     FALSE         FALSE categorical</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 13:  RELATIONSHIP       TRUE     FALSE         FALSE categorical</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 14:           SEX       TRUE     FALSE         FALSE categorical</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 15:     WORKCLASS       TRUE     FALSE         FALSE categorical</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     dropped_one_single_value has_profile</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                       &lt;lgcl&gt;      &lt;lgcl&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  1:                       NA       FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  2:                       NA        TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  3:                     TRUE       FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  4:                     TRUE       FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  5:                       NA        TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  6:                       NA        TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  7:                       NA        TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  8:                       NA        TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  9:                       NA        TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10:                       NA        TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11:                       NA        TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12:                       NA        TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 13:                       NA        TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 14:                       NA        TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 15:                       NA        TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $messages</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $messages$INFO</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "target ABOVE50K detected as type: binary"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $messages$INFO</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "binary target contains number, automatic chosen level: 1; override using `target_reference_level`"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $session</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $session$R_version</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "R version 4.4.3 (2025-02-28)"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $session$os</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Ubuntu 24.04.2 LTS"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $session$targeter_package_version</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] ‘1.6.0’</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $target_reference_level</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"class")</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "targeter" "list"    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Target profiling object with following properties:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 	Target: ABOVE50K  of type: binary  (target level:1 )</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 	Run on data: adult  the: 2025-03-28</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12 profiles available (AGE, FNLWGT, EDUCATIONNUM, HOURSPERWEEK, WORKCLASS...)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> You can access each crossing using slot $profiles[[__variable__]]. Then on it use `plot` or `summary`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> You can also directly invoke a global `summary` function on this object.</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
