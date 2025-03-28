@@ -1,5 +1,13 @@
 
 #' @method print targeter
+#' @export
+#' @title Print method for targeter objects
+#' @description Print method for targeter objects
+#' @param x A targeter object
+#' @param ... Additional arguments (not used)
+#' @return NULL
+#' @details This method prints a summary of the targeter object, 
+#' including the target variable, the data used, and the available profiles.
 #' @importFrom utils head
 print.targeter <- function(x, ...) {
   cat("\nTarget profiling object with following properties:")

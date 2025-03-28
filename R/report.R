@@ -426,7 +426,10 @@ report.targeter <- function(
   #   pptx_reference_doc <- tmp_pptx_reference_doc
   # }
 
-  yaml <- list(title = title, author = author, date = format(Sys.Date()))
+  yaml <- list(date = format(Sys.Date()))
+  yaml[["title"]] <- title
+  yaml[["author"]] <- author
+  
 
   if (is.null(custom_fields)) {
     custom_fields <- list()
