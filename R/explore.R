@@ -55,7 +55,7 @@ if (getRversion() >= "3.1.0")
 #' }
 #' }
 #' @seealso
-#'  \code{\link[targeter]{tar_report}}
+#'  \code{\link[targeter]{report}}
 #' @rdname explore
 #' @export
 
@@ -69,10 +69,10 @@ explore <- function(
 ) {
   deps <- c("miniUI", "shiny", "DT", "shinybusy", "htmlwidgets")
   if (getOption("targeter.auto_install_deps", FALSE)) {
-    pacman::p_load(deps, install = FALSE)
+    pacman::p_load(char = deps, install = FALSE)
   }
   assertthat::assert_that(
-    pacman::p_load(deps),
+    all(pacman::p_load(char = deps)),
     msg = paste(
       'some of targeter following optional packages are not available:',
       paste(deps, collapse = ",")
@@ -340,7 +340,7 @@ explore <- function(
         summary_object <- summary_object[summary_object$varname %in% selvars, ]
         # S <<- summary_object
         show_modal_spinner() # show the modal window
-        targeter::tar_report(
+        targeter::report(
           object = object,
           template = NULL,
           summary_object = summary_object,
@@ -366,7 +366,7 @@ explore <- function(
       if (length(selvars) > 1) {
         summary_object <- summary_object[summary_object$varname %in% selvars, ]
         show_modal_spinner() # show the modal window
-        targeter::tar_report(
+        targeter::report(
           object = object,
           template = NULL,
           summary_object = summary_object,
@@ -392,7 +392,7 @@ explore <- function(
       if (length(selvars) > 1) {
         summary_object <- summary_object[summary_object$varname %in% selvars, ]
         show_modal_spinner() # show the modal window
-        targeter::tar_report(
+        targeter::report(
           object = object,
           template = NULL,
           summary_object = summary_object,

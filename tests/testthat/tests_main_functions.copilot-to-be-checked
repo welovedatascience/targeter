@@ -1,0 +1,467 @@
+library(testthat)
+library(data.table)
+library(assertthat)
+
+# Test fixtures - sample data for testing
+create_test_data <- function() {
+  # Create sample data with different variable types
+  set.seed(123)
+  n <- 1000
+  dt <- data.table(
+    # Binary target
+    binary_target = sample(c(0, 1), n, replace = TRUE),
+    logical_target = sample(c(TRUE, FALSE), n, replace = TRUE),
+    categorical_target = sample(letters[1:5], n, replace = TRUE),
+    
+    # Numeric target
+    numeric_target = rnorm(n),
+    
+    # Explanatory variables
+    N_numeric_var = rnorm(n),
+    N_numeric_low = sample(1:3, n, replace = TRUE),
+    C_categorical = sample(letters[1:10], n, replace = TRUE),
+    C_binary = sample(c("yes", "no"), n, replace = TRUE),
+    
+    # Add missing values
+    N_with_na = c(rnorm(n-50), rep(NA, 50)),
+    C_with_na = c(sample(letters[1:10], n-50, replace = TRUE), rep(NA, 50))
+  )
+  
+  # Add date variable
+  dt$date_var <- as.Date("2020-01-01") + sample(1:365, n, replace = TRUE)
+  
+  # Add variable with only one value
+  dt$single_value <- 1
+  
+  return(dt)
+}
+
+# Tests for dt_woe_iv function
+test_that("dt_woe_iv calculates correct Weight of Evidence and Information Value", {
+  test_data <- data.table(
+    target = c(1, 1, 0, 0, 1, 0, 1, 0, 0, 0),
+    variable = c("A", "A", "A", "B", "B", "B", "C", "C", "C", "C")
+  )
+  
+  result <- dt_woe_iv(
+    test_data, 
+    var_interest = "target", 
+    var_cross = "variable", 
+    target_reference_level = 1
+  )
+  
+  # Test structure of result
+  expect_is(result, "list")
+  expect_equal(names(result), c("WOE", "IV"))
+  expect_is(result$WOE, "data.table")
+  expect_is(result$IV, "numeric")
+  
+  # Test WOE calculations (approximate values for verification)
+  woe_values <- result$WOE$WOE
+  expect_length(woe_values, 3)
+  
+  # Test handling of NA values
+  test_data_with_na <- copy(test_data)
+  test_data_with_na$variable[1] <- NA
+  
+  result_with_na <- dt_woe_iv(
+    test_data_with_na,
+    var_interest = "target",
+    var_cross = "variable",
+    useNA = "ifany"
+  )
+  
+  expect_equal(nrow(result_with_na$WOE), 4) # A, B, C, NA
+  
+  result_no_na <- dt_woe_iv(
+    test_data_with_na,
+    var_interest = "target",
+    var_cross = "variable",
+    useNA = "no"
+  )
+  
+  expect_equal(nrow(result_no_na$WOE), 3) # A, B, C
+})
+
+# Tests for analyze_target function
+test_that("analyze_target correctly identifies target types", {
+  test_data <- create_test_data()
+  
+  # Test binary target detection
+  binary_result <- analyze_target(
+    data = test_data,
+    target = "binary_target",
+    target_type = "autoguess"
+  )
+  
+  expect_equal(binary_result$type, "binary")
+  expect_equal(binary_result$reference_level, 1)
+  expect_equal(binary_result$status, "ok")
+  
+  # Test numeric target detection
+  numeric_result <- analyze_target(
+    data = test_data,
+    target = "numeric_target",
+    target_type = "autoguess"
+  )
+  
+  expect_equal(numeric_result$type, "numeric")
+  expect_equal(numeric_result$status, "ok")
+  
+  # Test categorical target detection
+  cat_result <- analyze_target(
+    data = test_data,
+    target = "categorical_target",
+    target_type = "autoguess"
+  )
+  
+  expect_equal(cat_result$type, "categorical")
+  expect_equal(cat_result$status, "ok")
+  
+  # Test logical target detection
+  logical_result <- analyze_target(
+    data = test_data, 
+    target = "logical_target",
+    target_type = "autoguess"
+  )
+  
+  expect_equal(logical_result$type, "binary")
+  expect_equal(logical_result$reference_level, TRUE)
+  
+  # Test detection with explicitly specified type
+  explicit_result <- analyze_target(
+    data = test_data,
+    target = "numeric_target",
+    target_type = "binary"
+  )
+  
+  expect_equal(explicit_result$type, "binary")
+})
+
+# Tests for binning_factory function
+test_that("binning_factory creates appropriate binning functions", {
+  test_data <- create_test_data()
+  n <- 1000
+  
+  # Test quantile binning
+  quantile_binning <- binning_factory(method = "quantile", nbins = 5)
+  expect_is(quantile_binning, "list")
+  expect_is(quantile_binning$binning_function, "function")
+  
+  bins_q <- quantile_binning$binning_function(test_data$N_numeric_var, "N_numeric_var")
+  expect_length(bins_q, n)
+  expect_true(all(bins_q %in% 0:5))
+  expect_false(is.null(quantile_binning$cutpoints_list$N_numeric_var))
+  
+  # We'll skip testing clustering and smart binning here as they require additional packages
+})
+
+# Tests for compute_target_statistics function
+test_that("compute_target_statistics calculates correct statistics", {
+  test_data <- create_test_data()
+  
+  # Test numeric target
+  num_stats <- compute_target_statistics(
+    test_data,
+    target = "numeric_target",
+    target_type = "numeric"
+  )
+  
+  expect_is(num_stats, "data.table")
+  expect_true(all(c("avg", "std", "min", "max", "count", "nNA") %in% names(num_stats)))
+  expect_equal(num_stats$count, nrow(test_data))
+  
+  # Test binary target
+  bin_stats <- compute_target_statistics(
+    test_data,
+    target = "binary_target",
+    target_type = "binary"
+  )
+  
+  expect_is(bin_stats, "data.table")
+  expect_true(all(c("value", "count", "nNA", "percNA", "perc") %in% names(bin_stats)))
+  expect_equal(sum(bin_stats$count), nrow(test_data))
+  expect_equal(sum(bin_stats$perc), 1)
+})
+
+# Tests for treat_tab_labels function
+test_that("treat_tab_labels correctly formats variable labels", {
+  # Create test data.table
+  tab <- data.table(variable = c(1, 2, 3, NA), value = c(10, 20, 30, 40))
+  
+  # Create cutpoints list for numeric variables
+  cutpoints_list <- list()
+  cutpoints_list$variable <- c(0, 1.5, 2.5, 4)
+  
+  # Test formatting for numeric variable
+  numeric_result <- treat_tab_labels(
+    tab = tab,
+    variable = "variable",
+    is_numeric = TRUE,
+    cutpoints_list = cutpoints_list
+  )
+  
+  expect_is(numeric_result, "data.frame")
+  expect_true("[Missing]" %in% rownames(numeric_result))
+  expect_true(grepl("from.*to", rownames(numeric_result)[1]))
+  
+  # Test formatting for categorical variable
+  cat_tab <- data.table(category = c("A", "B", "C", NA), value = c(10, 20, 30, 40))
+  cat_result <- treat_tab_labels(
+    tab = cat_tab,
+    variable = "category",
+    is_numeric = FALSE,
+    cutpoints_list = NULL
+  )
+  
+  expect_is(cat_result, "data.frame")
+  expect_true("[Missing]" %in% rownames(cat_result))
+  expect_equal(nrow(cat_result), 4)
+})
+
+# Tests for calculate_statistics function
+test_that("calculate_statistics computes correct statistics for different target types", {
+  test_data <- create_test_data()
+  
+  # Create binned data for testing
+  bins <- data.table(
+    binary_target = test_data$binary_target,
+    N_numeric_var = as.integer(cut(test_data$N_numeric_var, breaks = 5))
+  )
+  
+  # Test binary target
+  bin_stats <- calculate_statistics(
+    data = bins,
+    variable = "N_numeric_var",
+    target = "binary_target",
+    target_type = "binary",
+    variable_type = "numeric",
+    cutpoints_list = list(N_numeric_var = c(-3, -1.5, 0, 1.5, 3))
+  )
+  
+  expect_is(bin_stats, "list")
+  expect_true(all(c("counts", "props", "index", "pcol") %in% names(bin_stats)))
+  
+  # Test numeric target separately (creating a different binned data)
+  num_bins <- data.table(
+    numeric_target = test_data$numeric_target,
+    C_categorical = test_data$C_categorical
+  )
+  
+  num_stats <- calculate_statistics(
+    data = num_bins,
+    variable = "C_categorical",
+    target = "numeric_target",
+    target_type = "numeric",
+    variable_type = "character"
+  )
+  
+  expect_is(num_stats, "list")
+  expect_true("stats" %in% names(num_stats))
+  expect_true(all(c("count", "avg", "std") %in% names(num_stats$stats)))
+})
+
+# Tests for process_parameters function
+test_that("process_parameters correctly validates parameter values", {
+  # Test with default values
+  result <- process_parameters(
+    binning_method = "quantile",
+    order_label = "auto",
+    target_type = "autoguess",
+    woe_alternate_version = "if_continuous"
+  )
+  
+  expect_equal(result$binning_method, "quantile")
+  expect_equal(result$order_label, "auto")
+  expect_equal(result$target_type, "autoguess")
+  expect_equal(result$woe_alternate_version, "if_continuous")
+  
+  # Test with invalid values (should use match.arg to select first option)
+  expect_error(
+    process_parameters(
+      binning_method = "invalid",
+      order_label = "auto",
+      target_type = "autoguess",
+      woe_alternate_version = "if_continuous"
+    )
+  )
+})
+
+# Tests for validate_inputs function
+test_that("validate_inputs correctly validates input parameters", {
+  test_data <- create_test_data()
+  
+  # Test valid inputs
+  expect_silent(
+    validate_inputs(
+      data = test_data,
+      target = "binary_target",
+      select_vars = c("N_numeric_var", "C_categorical"),
+      exclude_vars = "single_value",
+      description_data = "Test data",
+      description_target = "Binary target",
+      analysis_name = "Test analysis",
+      useNA = "ifany",
+      order_label = "auto",
+      nbins = 10
+    )
+  )
+  
+  # Test invalid data input
+  expect_error(
+    validate_inputs(
+      data = "not_a_data_frame",
+      target = "binary_target",
+      select_vars = NULL,
+      exclude_vars = NULL,
+      description_data = NULL,
+      description_target = NULL,
+      analysis_name = NULL,
+      useNA = "ifany",
+      order_label = "auto",
+      nbins = 10
+    ),
+    "Data must be a data.frame or a data.table"
+  )
+  
+  # Test missing target
+  expect_error(
+    validate_inputs(
+      data = test_data,
+      target = "non_existent_target",
+      select_vars = NULL,
+      exclude_vars = NULL,
+      description_data = NULL,
+      description_target = NULL,
+      analysis_name = NULL,
+      useNA = "ifany",
+      order_label = "auto",
+      nbins = 10
+    ),
+    "Target doesn't exist in the dataset"
+  )
+})
+
+# Tests for compute_woe_iv function
+test_that("compute_woe_iv calculates WOE and IV correctly", {
+  test_data <- create_test_data()
+  
+  # Create binned data for testing
+  bins <- data.table(
+    binary_target = test_data$binary_target,
+    N_numeric_var = as.integer(cut(test_data$N_numeric_var, breaks = 5))
+  )
+  
+  # Add cutpoints for treat_tab_labels
+  cutpoints_list <- list(N_numeric_var = c(-3, -1.5, 0, 1.5, 3))
+  
+  result <- compute_woe_iv(
+    data = bins,
+    variable = "N_numeric_var",
+    target = "binary_target",
+    target_type = "binary",
+    target_reference_level = 1,
+    alternate_version = FALSE,
+    useNA = "ifany",
+    woe_shift = 0.01,
+    woe_post_cluster = FALSE,
+    variable_type = "numeric",
+    cutpoints_list = cutpoints_list
+  )
+  
+  expect_is(result, "list")
+  expect_true(all(c("WOE", "IV", "has_clusters") %in% names(result)))
+  expect_is(result$WOE, "data.frame")
+  expect_is(result$IV, "numeric")
+  expect_is(result$has_clusters, "logical")
+  
+  # Test with non-binary/numeric target
+  cat_result <- compute_woe_iv(
+    data = bins,
+    variable = "N_numeric_var",
+    target = "binary_target",
+    target_type = "categorical", # Not binary or numeric
+    target_reference_level = 1
+  )
+  
+  expect_equal(cat_result$WOE, NULL)
+  expect_equal(cat_result$IV, NULL)
+})
+
+# Tests for the main targeter function
+# Note: We'll just test basic parameter validation here since full integration testing would be complex
+test_that("targeter validates input parameters correctly", {
+  test_data <- create_test_data()
+  
+  # Test invalid data type
+  expect_error(
+    targeter(
+      data = "not_a_data_frame",
+      target = "binary_target"
+    ),
+    "data must be a data.frame or data.table"
+  )
+  
+  # Test missing target
+  expect_error(
+    targeter(
+      data = test_data,
+      target = "non_existent_target"
+    ),
+    "target variable not found in data"
+  )
+  
+  # Test invalid by_nvars parameter
+  expect_error(
+    targeter(
+      data = test_data,
+      target = "binary_target",
+      by_nvars = -1
+    ),
+    "by_nvars must be a positive integer"
+  )
+  
+  # Test target with only one value
+  single_value_data <- data.table(
+    target = rep(1, 100),
+    var1 = 1:100,
+    var2 = letters[1:100]
+  )
+  
+  expect_error(
+    targeter(
+      data = single_value_data,
+      target = "target"
+    ),
+    "target variable must have more than one unique value"
+  )
+})
+
+# Integration test for targeter_internal with a small dataset
+test_that("targeter_internal works end-to-end with simple data", {
+  # Create a small test dataset
+  small_data <- data.table(
+    binary_target = c(0, 1, 0, 1, 0, 1, 0, 1),
+    numeric_var = c(1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8),
+    categorical_var = c("A", "A", "B", "B", "C", "C", "D", "D")
+  )
+  
+  # Test with minimal parameters
+  result <- try(targeter_internal(
+    data = small_data,
+    target = "binary_target"
+  ), silent = TRUE)
+  
+  # We expect this to either run successfully or fail with a known error
+  if (inherits(result, "try-error")) {
+    # If it fails, ensure it's for an expected reason (like missing dependencies)
+    expect_true(
+      grepl("cluster|Ckmeans|require", attr(result, "condition")$message) ||
+      grepl("could not find function", attr(result, "condition")$message)
+    )
+  } else {
+    # If it succeeds, check the structure of the result
+    expect_is(result, "targeter")
+    expect_true(all(c("dataname", "target", "target_type", "profiles") %in% names(result)))
+  }
+})

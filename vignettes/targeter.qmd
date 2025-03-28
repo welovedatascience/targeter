@@ -1,0 +1,212 @@
+---
+title: "Introduction to the targeter Package"
+author: "welovedatascience"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    theme: united
+    highlight: tango
+vignette: >
+  %\VignetteIndexEntry{Introduction to targeter}
+  %\VignetteEngine{quarto::html}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  collapse = TRUE,
+  comment = "#>",
+  fig.align = "center",
+  warning = FALSE,
+  message = FALSE, 
+  fig.width = 9, 
+  fig.height = 6
+)
+```
+
+## Introduction to targeter
+
+The `targeter` package is designed for profiling and analyzing the relationship between a target variable (which you want to explain or predict) and potential explanatory variables (features). It provides tools for:
+
+* Automatic variable type detection and classification
+* Binning of numeric variables into interpretable categories
+* Calculating statistics that highlight relationships with the target
+* Computing Weight of Evidence (WOE) and Information Value (IV) for binary targets
+* Visualizing these relationships through various plots
+
+`targeter` is particularly useful for:
+
+* Exploratory data analysis prior to modeling
+* Understanding which variables are most predictive of a target
+* Investigating how different values of variables affect the target
+* Creating insightful visualizations of variable relationships
+
+This vignette demonstrates the basic functionality of `targeter` using the included `adult` dataset and exploring factors related to income levels.
+
+## Getting Started
+
+Let's start by loading the package and the adult dataset:
+
+```{r load}
+# Load required packages
+library(targeter)
+library(ggplot2)
+
+# Load the adult dataset that comes with the package
+data(adult)
+
+# Take a look at the dataset
+str(adult)
+```
+
+## Overview of the adult dataset
+
+The `adult` dataset contains census information with various demographic indicators and a binary target variable `ABOVE50K` that indicates whether a person's income exceeds $50,000 per year.
+
+```{r data_overview}
+# Basic summary of the dataset
+dim(adult)
+summary(adult$ABOVE50K)
+table(adult$ABOVE50K)
+```
+
+The target variable shows that approximately `r round(sum(adult$ABOVE50K)/length(adult$ABOVE50K)*100, 1)`% of individuals in the dataset have income above $50K.
+
+## Basic Usage: Profiling the Target Variable
+
+The core function of the package is `targeter()`, which creates a comprehensive 
+profile of the relationship between the target variable 
+and explanatory variables.
+
+Minimum call is to invoke `targeter()` with the dataset and the target variable
+as following:
+
+```{r basic_profile}
+# Run a basic profile of the ABOVE50K variable
+tar <- targeter(
+  data = adult,
+  target = "ABOVE50K"
+)
+
+# Look at the structure of the resulting object
+class(tar)
+names(tar)
+```
+
+The `targeter` function has created a comprehensive profile of our target variable. Let's explore some of the key insights we can extract.
+
+## Exploring Results: Summary Information
+
+We can use the `summary` function to get an overview of the most important variables:
+
+```{r summary}
+# Get a summary of the targeter profiles object
+tar_summary <- summary(tar)
+head(tar_summary, 10)
+```
+
+The summary table shows variables sorted by their Information Value (IV), a measure of their predictive power for the target variable. Higher IV values indicate stronger predictive ability.
+
+## Visualizing Relationships
+
+The `targeter` package provides several visualization functions to explore the relationships between variables and the target:
+
+### 1. Basic variable plots
+
+```{r basic_plot}
+# Plot the relationship between EDUCATION and income
+plot(tar$profiles$EDUCATION)
+```
+
+### 2. Full variable profile plots
+
+```{r fullplot}
+# Generate a comprehensive plot for one of the top variables
+fullplot(tar$profiles$RELATIONSHIP)
+```
+
+## Weight of Evidence (WOE) and Information Value (IV)
+
+For binary targets like our income variable, the Weight of Evidence (WOE) shows how different categories of a variable influence the target:
+
+```{r woe}
+# Look at WOE values for a variable
+head(tar$profiles$OCCUPATION$woe)
+
+# Display Information Value for key variables
+vars_with_iv <- sapply(tar$profiles, function(x) x$IV)
+sorted_iv <- sort(vars_with_iv, decreasing = TRUE)
+head(sorted_iv, 10)
+```
+
+WOE values tell us:
+* Positive values: that category is associated with higher probability of the target
+* Negative values: that category is associated with lower probability of the target
+* The magnitude indicates the strength of the relationship
+
+## Customizing the Analysis
+
+`targeter` offers many customization options:
+
+```{r custom_analysis}
+# Run a more customized analysis
+custom_tar <- targeter(
+  data = adult,
+  target = "ABOVE50K",
+  # Only select a few variables of interest
+  select_vars = c("AGE", "EDUCATION", "OCCUPATION", "HOURSPERWEEK", "SEX"),
+  # Customize the binning of numeric variables
+  nbins = 6,
+  description_data = "US Census data with demographic and income information",
+  description_target = "Binary indicator of income above $50k per year",
+  binning_method = "quantile",
+  # Control how results are displayed
+  order_label = "count"
+)
+
+# Look at the numeric variable binning
+plot(custom_tar$profiles$AGE)
+```
+
+## Using Batch Processing for Larger Datasets
+
+For larger datasets with many variables, you can use batch processing:
+
+```{r batch_processing}
+# Process variables in batches of 5
+batch_tar <- targeter(
+  data = adult,
+  target = "ABOVE50K",
+  by_nvars = 2,
+  verbose = TRUE
+)
+```
+
+## Creating a Report
+
+The `targeter` package also allows you to create comprehensive reports:
+
+```{r report, eval=FALSE}
+# Generate a report (not run in the vignette to keep it short)
+report(tar, output_file = "adult_income_profile.html")
+```
+
+## Summary
+
+The `targeter` package provides powerful tools for exploratory data analysis and understanding variable relationships. In this vignette, we've covered:
+
+1. Creating a basic profile of a target variable
+2. Exploring the most important variables through summary statistics
+3. Visualizing relationships between variables and the target
+4. Understanding Weight of Evidence and Information Value
+5. Customizing the analysis for specific needs
+
+These basic operations should get you started with u the package. For more advanced functionality, consult the package documentation and additional vignettes.
+
+```{r session_info}
+# Session information for reproducibility
+sessionInfo()
+```

@@ -55,7 +55,7 @@ plot.tartree <- function(
   if (getOption("targeter.auto_install_deps", FALSE)){
     pacman::p_load(char=deps, install = FALSE)
   }
-  assertthat::assert_that(all(pacman::p_load(deps)), 
+  assertthat::assert_that(all(pacman::p_load(char = deps)), 
   msg=paste('some of targeter following optional packages are not available:',
   paste(deps, collapse=",")))
   

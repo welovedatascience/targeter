@@ -1,3 +1,15 @@
+
+# to prevent checks of data.table used variables
+# see:  ?globalVariables
+if (getRversion() >= "3.1.0")
+  utils::globalVariables(
+    c(
+      "median"
+    )
+  )
+
+  
+
 #' @title plot.crossvar
 #' @description plot method for crossvar object.
 #' plot is the main function that will automatically dispatch to plot.crossvar_binary, plot.crossvar_categorical or plot.crossvar_continuous,
@@ -141,7 +153,7 @@ plot.crossvar_numeric <- function(
   existmissing_var <- any(dfm$level == "[Missing]")
 
   if (show == "boxplot") {
-    yrange <- c(min(df$bxp_min), max(df$bxp_max))
+    yrange <- range(c(df$bxp_min, df$bxp_max, df$avg))
   } else {
     if (show %in% c("median", "avg")) {
       yrange <- range(df[[show]])
@@ -229,6 +241,14 @@ plot.crossvar_numeric <- function(
           color = "darkorchid"
         )
     }
+   if (show %in% c('boxplot')) {
+
+      # display avg      #
+      p1 = p1 +
+        ggplot2::geom_point(data=dfm, aes(x = level, y = avg, color="darkred", group=1, size=2), show.legend = FALSE)
+    }
+
+
     ## add a label to the x axis : the variable name. If there is a metadata file, it puts the label of the variabe
     if (forNA) {
       p1 <- p1 + ggplot2::xlab(" \n  ")
@@ -373,8 +393,9 @@ plot.crossvar_categorical <- function(
   numvar_as <- match.arg(numvar_as, c("bin", "value"), several.ok = FALSE)
   if (numvar_as == 'value' & x$variable_type != 'numeric') numvar_as <- 'bin'
 
-  if (show == 'woe' & is.null(x$woe))
+  if (show == 'woe' & is.null(x$woe)){
     stop("No WOE for this profile object, maybe it is a categorical target?")
+  }
   ## Definiton of a default association between the show and the type parameters.
   if (type == "auto") {
     type <- switch(
@@ -398,6 +419,7 @@ plot.crossvar_categorical <- function(
   ## selection of the appropriate tables
   df <- as.data.frame.matrix(x[[show]])
 
+  # df <- df[, which(!colnames(df) %in% c('variable'))]
   # ##reorder the table:
   # df <- df[x$orderlabel,, drop=FALSE]
 
@@ -450,7 +472,9 @@ plot.crossvar_categorical <- function(
   ##
   if (numvar_as == 'value') {
     # replace labels per bin center values
-    dfm[['level']] <- as.numeric(x$numcenters[dfm[['level']]])
+    numcenters <- x$numcenters
+    names(numcenters) <- x$orderlabel
+    dfm[['level']] <- as.numeric(numcenters[dfm[['level']]])
   }
 
   if (x$target_type == 'binary') {
@@ -1012,4 +1036,11 @@ quadrant_plot <- function(
 
   ## return graph
   return(p1)
+}
+
+
+#' @method plot targeter
+#' @export
+plot.targeter <- function(x, var = names(x$profiles)[1], ...) {
+  plot(x$profiles[[var]], ...)
 }

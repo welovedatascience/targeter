@@ -6,7 +6,7 @@ if (getRversion() >= "3.1.0")
   )
 
 #' @importFrom data.table setnames
-dt_WOE_IV <- function(
+dt_woe_iv <- function(
   data,
   var_interest,
   var_cross,
