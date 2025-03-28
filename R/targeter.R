@@ -33,7 +33,6 @@ if (getRversion() >= "3.1.0")
       "count",
       "perc",
       "qrange",
-      "<<-",
       "X",
       "has_profile",
       "variable",
@@ -44,7 +43,6 @@ if (getRversion() >= "3.1.0")
       "copy",
       "cutpoints_list",
       "silently_renamed",
-      "target_messages",
       "..ivars",
       "center_list",
       "var_type",
@@ -55,10 +53,8 @@ if (getRversion() >= "3.1.0")
       "target_type",
       "Ckmeans.1d.dp",
       "clustering.sc.dp"
-
     )
   )
-
 
 
 #' @title Targeter: Target Variable Profiling
@@ -98,7 +94,7 @@ if (getRversion() >= "3.1.0")
 #' @return An object of class "targeter" with detailed profiling information
 #' @rdname targeter
 #' @name targeter
-#' 
+#'
 #' @seealso
 #' \itemize{
 #' \item \code{\link{summary.targeter}}
@@ -112,7 +108,15 @@ if (getRversion() >= "3.1.0")
 #' @importFrom data.table setDT data.table
 #' @importFrom assertthat assert_that
 #' @export
+#'
 #' 
+
+if (getRversion() >= "3.1.0")
+  utils::globalVariables(
+    c("target_messages"),
+    add = TRUE
+  )
+
 targeter <- function(
   data,
   target,
@@ -196,7 +200,7 @@ targeter <- function(
     order_label = order_label,
     nbins = nbins,
     debug = debug
-    )
+  )
 
   # Step 2: Process parameters
   if (verbose) cat("\nProcessing parameters...")
@@ -386,7 +390,7 @@ targeter <- function(
         )
       )
     }
-    
+
     return(tar)
   } else {
     stop("All processing groups failed - check input data and parameters")
@@ -394,19 +398,11 @@ targeter <- function(
 }
 
 
-#' Analyze target variable properties
-#'
-#' This function handles the detection and validation of target variable properties
-#' including type detection and reference level determination.
-#'
-#' @param data data.table with the data to analyze
-#' @param target character - name of the target variable
-#' @param target_type character - specified type or "autoguess"
-#' @param target_reference_level character or numeric - reference level for target
-#' @param num_as_categorical_nval numeric - threshold for considering numeric as categorical
-#'
-#' @return list with target properties and messages
-#'
+# Analyze target variable properties
+#
+# This function handles the detection and validation of target variable properties
+# including type detection and reference level determination.
+
 #' @importFrom data.table data.table
 analyze_target <- function(
   data,
@@ -515,22 +511,11 @@ analyze_target <- function(
   ))
 }
 
-#' Detect and filter variables for analysis
-#'
-#' This function handles variable type detection and filtering based on
-#' naming conventions and other criteria.
-#'
-#' @param data data.table with data to analyze
-#' @param target character - name of the target variable
-#' @param select_vars character - vector of variables to include
-#' @param exclude_vars character - vector of variables to exclude
-#' @param naming_conventions logical - whether to enforce naming conventions
-#' @param autoguess_nrows numeric - number of rows to use for type detection
-#' @param num_as_categorical_nval numeric - threshold for numeric as categorical
-#' @param verbose logical - whether to print verbose output
-#'
-#' @return list with variable classification and messages
-#'
+# Detect and filter variables for analysis
+#
+# This function handles variable type detection and filtering based on
+# naming conventions and other criteria.
+
 #' @importFrom data.table data.table
 #' @importFrom assertthat assert_that
 detect_variables_types <- function(
@@ -736,17 +721,9 @@ detect_variables_types <- function(
   ))
 }
 
-#' Create binning functions based on method
-#'
-#' This function creates appropriate binning functions based on the chosen method
-#'
-#' @param method character - binning method: "quantile", "clustering", or "smart"
-#' @param nbins numeric - number of bins to create
-#' @param smart_quantile_by numeric - quantile step for smart binning
-#' @param verbose logical - whether to print verbose output
-#'
-#' @return list of binning functions and configuration
-#'
+# Create binning functions based on method
+#
+# This function creates appropriate binning functions based on the chosen method
 #' @importFrom stats quantile
 #' @importFrom data.table data.table
 #' @importFrom data.table setnames
@@ -858,16 +835,10 @@ binning_factory <- function(
   ))
 }
 
-#' Compute statistics for target variable
-#'
-#' This function computes appropriate statistics based on the target type
-#'
-#' @param data data.table with the data
-#' @param target character - name of the target variable
-#' @param target_type character - type of the target variable
-#'
-#' @return data.table with target statistics
-#'
+# Compute statistics for target variable
+#
+# This function computes appropriate statistics based on the target type
+
 #' @importFrom data.table data.table
 #' @importFrom stats quantile sd
 compute_target_statistics <- function(data, target, target_type) {
@@ -924,17 +895,10 @@ compute_target_statistics <- function(data, target, target_type) {
   return(target_stats)
 }
 
-#' Process and match function parameters
-#'
-#' This function validates and processes key parameters by matching them against
-#' their allowed values.
-#'
-#' @param binning_method character - method for binning numeric variables
-#' @param order_label character - order method for labels in output
-#' @param target_type character - type of the target variable
-#' @param woe_alternate_version character - when to use alternate WOE definition
-#'
-#' @return list of processed parameters
+# Process and match function parameters
+#
+# This function validates and processes key parameters by matching them against
+# their allowed values.
 process_parameters <- function(
   binning_method,
   order_label,
@@ -975,12 +939,7 @@ process_parameters <- function(
   ))
 }
 
-#' Check for required packages based on selected methods
-#'
-#' @param binning_method character - binning method selected
-#' @param woe_post_cluster logical - whether post-clustering is used
-#'
-#' @importFrom assertthat assert_that
+# Check for required packages based on selected methods
 check_dependencies <- function(binning_method, woe_post_cluster) {
   if (binning_method == "clustering") {
     assertthat::assert_that(
@@ -1008,16 +967,9 @@ check_dependencies <- function(binning_method, woe_post_cluster) {
   }
 }
 
-#' Prepare data and select variables for analysis
-#'
-#' @param data data.frame or data.table - the input data
-#' @param target character - name of target variable
-#' @param select_vars character vector - variables to select
-#' @param exclude_vars character vector - variables to exclude
-#'
-#' @return data.table - processed data
-#'
+# Prepare data and select variables for analysis
 #' @importFrom data.table as.data.table
+
 prepare_data <- function(
   data,
   target,
@@ -1047,21 +999,13 @@ prepare_data <- function(
   return(data)
 }
 
-#' Filter variables with insufficient variance
-#'
-#' This function removes variables that have only a single unique value,
-#' as they provide no discriminatory power for analysis.
-#'
-#' @param data data.table with the data
-#' @param numeric_vars character - vector of numeric variables
-#' @param ordinal_vars character - vector of ordinal variables
-#' @param categorical_vars character - vector of categorical variables
-#' @param vars data.table - information on variables at analysis step
-#' @param verbose logical - whether to print verbose output
-#'
-#' @return list with filtered variable lists and metadata
-#'
+# Filter variables with insufficient variance
+#
+# This function removes variables that have only a single unique value,
+# as they provide no discriminatory power for analysis.
+
 #' @importFrom data.table data.table uniqueN
+
 filter_variables <- function(
   data,
   numeric_vars,
@@ -1120,24 +1064,14 @@ filter_variables <- function(
   ))
 }
 
-#' Analyze variables for profiling
-#'
-#' This function handles the complete process of variable detection, filtering,
-#' and type assignment for the targeter analysis.
-#'
-#' @param data data.table with data to analyze
-#' @param target character - name of the target variable
-#' @param select_vars character - vector of variables to include
-#' @param exclude_vars character - vector of variables to exclude
-#' @param naming_conventions logical - whether to enforce naming conventions
-#' @param autoguess_nrows numeric - number of rows to use for type detection
-#' @param num_as_categorical_nval numeric - threshold for numeric as categorical
-#' @param verbose logical - whether to print verbose output
-#'
-#' @return list with variable classification and metadata
-#'
+# Analyze variables for profiling
+#
+# This function handles the complete process of variable detection, filtering,
+# and type assignment for the targeter analysis.
+
 #' @importFrom data.table data.table setnames
 #' @importFrom assertthat assert_that
+
 analyze_variables <- function(
   data,
   target,
@@ -1229,7 +1163,7 @@ analyze_variables <- function(
 }
 
 #  Analyze target variable properties
-# 
+#
 #  This function handles the detection and validation of target variable properties
 #  including type detection and reference level determination.
 
@@ -1557,6 +1491,14 @@ detect_variables_types <- function(
 # This function creates appropriate binning functions based on the chosen method
 
 
+if(getRversion() >= "3.1.0") {
+  utils::globalVariables(c("cutpoints_list", "cutcenter_list", "target_messages"))
+
+  utils::suppressForeignCheck( c("cutpoints_list", "cutcenter_list", "target_messages"))
+
+}
+
+
 #' @importFrom stats quantile
 #' @importFrom data.table data.table
 #' @importFrom data.table setnames
@@ -1728,17 +1670,11 @@ compute_target_statistics <- function(data, target, target_type) {
   return(target_stats)
 }
 
-#' Process and match function parameters
-#'
-#' This function validates and processes key parameters by matching them against
-#' their allowed values.
-#'
-#' @param binning_method character - method for binning numeric variables
-#' @param order_label character - order method for labels in output
-#' @param target_type character - type of the target variable
-#' @param woe_alternate_version character - when to use alternate WOE definition
-#'
-#' @return list of processed parameters
+# Process and match function parameters
+#
+# This function validates and processes key parameters by matching them against
+# their allowed values.
+
 process_parameters <- function(
   binning_method,
   order_label,
@@ -2003,24 +1939,14 @@ analyze_variables <- function(
 }
 
 
-#' Calculate statistics for variable crossing with target
-#'
-#' This function computes appropriate statistics based on the target type and variable type
-#' for analyzing relationships between explanatory variables and target variables.
-#'
-#' @param data data.table with the binned data
-#' @param variable character - name of the variable to analyze
-#' @param target character - name of the target variable
-#' @param target_type character - type of the target variable (binary, categorical, numeric)
-#' @param useNA character - how to handle NA values ("ifany" or "no")
-#' @param bxp_factor numeric - factor for boxplot whiskers calculation
-#' @param variable_type character - type of the variable ("numeric" or "character")
-#' @param order_label character - method for ordering labels
-#'
-#' @return list with statistics and metadata
-#'
+# Calculate statistics for variable crossing with target
+#
+# This function computes appropriate statistics based on the target type and variable type
+# for analyzing relationships between explanatory variables and target variables.
+
 #' @importFrom data.table data.table setnames dcast
 #' @importFrom stats sd quantile
+
 calculate_statistics <- function(
   data,
   variable,
@@ -2173,19 +2099,13 @@ calculate_statistics <- function(
   return(cross)
 }
 
-#' Process table labels for display
-#'
-#' Helper function to format variable labels for display
-#'
-#' @param tab data.table - table to process
-#' @param variable character - variable name
-#' @param is_numeric logical - whether variable is numeric
-#' @param cutpoints_list list - cutpoints for numeric variables
-#' @param dec integer - decimals to show
-#'
-#' @return processed table with formatted row names
-#'
+# Process table labels for display
+#
+# Helper function to format variable labels for display
+#
+
 #' @importFrom data.table data.table rbindlist setnames
+
 treat_tab_labels <- function(
   tab,
   variable,
@@ -2429,7 +2349,6 @@ targeter_internal <- function(
 
   return(out)
 }
-
 
 
 # Process all variable crossings
@@ -2739,7 +2658,6 @@ analysis_description_default <- function(
 # This function computes appropriate statistics based on the target type and variable type
 # for analyzing relationships between explanatory variables and target variables.
 
-
 #' @importFrom data.table data.table setnames dcast
 #' @importFrom stats sd quantile
 calculate_statistics <- function(
@@ -2765,7 +2683,7 @@ calculate_statistics <- function(
     # Compute counts by variable and target
 
     # txt <- paste0("data[,.(N=.N),by=.(", variable, ",", target, ")]")
-    # x <- eval(parse(text = txt))
+    # x <- eval(parse(text = tx))
     by_cols <- c(variable, target)
     x <- data[, .(N = .N), by = by_cols]
     # Rename columns
@@ -3125,5 +3043,3 @@ compute_woe_iv <- function(
     has_clusters = (length(unique(WOE$cluster)) > 1)
   ))
 }
-
-

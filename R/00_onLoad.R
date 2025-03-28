@@ -1,6 +1,7 @@
 
 # for quarto/rmd
 #' @importFrom kableExtra kable
+#' @importFrom knitr opts_chunk pandoc_to
 
 .onLoad <- function(libname, pkgname) {
   op <- options()

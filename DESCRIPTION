@@ -37,7 +37,8 @@ Imports:
     kableExtra,
     quarto,
     pacman,
-    yaml
+    yaml,
+    knitr
 Suggest:
     DT,
     miniUI,

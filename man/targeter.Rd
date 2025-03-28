@@ -3,38 +3,6 @@
 \name{targeter}
 \alias{targeter}
 \title{Targeter: Target Variable Profiling}
-\usage{
-targeter(
-  data,
-  target,
-  description_data = NULL,
-  target_type = c("autoguess", "binary", "categorical", "numeric"),
-  target_reference_level = NULL,
-  description_target = NULL,
-  analysis_name = NULL,
-  select_vars = NULL,
-  exclude_vars = NULL,
-  nbins = 12,
-  binning_method = c("quantile", "clustering", "smart"),
-  naming_conventions = getOption("targeter.use_naming_conventions", default = FALSE),
-  useNA = getOption("targeter.useNA", default = "ifany"),
-  verbose = FALSE,
-  dec = 2,
-  order_label = c("auto", "alpha", "count", "props", "means"),
-  cont_target_trim = 0.01,
-  bxp_factor = 1.5,
-  num_as_categorical_nval = 5,
-  autoguess_nrows = 1000,
-  woe_alternate_version = c("if_continuous", "always"),
-  woe_shift = 0.01,
-  woe_post_cluster = FALSE,
-  woe_post_cluster_n = 6,
-  smart_quantile_by = 0.01,
-  by_nvars = 200,
-  debug = FALSE,
-  ...
-)
-}
 \arguments{
 \item{data}{data.frame or data.table - Data to analyze}
 
