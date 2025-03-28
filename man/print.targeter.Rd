@@ -2,7 +2,7 @@
 % Please edit documentation in R/print.R
 \name{print.targeter}
 \alias{print.targeter}
-\title{Print method for targeter objects}
+\title{print.targeter}
 \usage{
 \method{print}{targeter}(x, ...)
 }

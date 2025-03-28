@@ -1,13 +1,18 @@
 
-#' @method print targeter
-#' @export
-#' @title Print method for targeter objects
+#' @title print.targeter
 #' @description Print method for targeter objects
+
 #' @param x targeter object
 #' @param ... additional arguments
 #' @return NULL
 #' @details This method prints the targeter object, including the target, data name, date, and number of profiles available.
+
 #' @importFrom utils head
+
+
+#' @method print targeter
+#' @rdname print.targeter
+#' @export
 print.targeter <- function(x, ...) {
   cat("\nTarget profiling object with following properties:")
   cat(paste0("\n\tTarget:"), x$target, " of type:", x$target_type)
