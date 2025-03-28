@@ -8,10 +8,6 @@
 #' @param object - an object of class targeter
 #' @param summary_object an object of class "summary.targeter": pre-computed
 #' summary of object.
-#' @param metadata - data.frame - if metadata is  loaded in R environment,
-#' label of the variables can be used. Default value (NULL) corresponds to
-#' no metadata available.
-#' The label will be used for the title and the x-axis of the graph.
 #' @param format - Target output format (defaults to "html").
 #'  The option "all" will render all formats.
 #' @param nmax - integer: maximum number of variables to be used. Default 100.
@@ -53,9 +49,6 @@
 #' along the process
 #' @param fullplot_numvar_as - character, one of "bin" or "value"
 #' (cf `fullplot` documentation)
-#' @param metadata_vars - list of two character strings: varname and varlabel.
-#' Default to varname="variable", varlabel="label". Used to specify the columns in
-#' metadata that contains variable names and labels.
 #' @param logo - character: path to a logo file. If NULL (default), we will take
 #' package welovedatascience logo. If empty, no logo will be used. Only used
 #' by revealjs format.
@@ -117,8 +110,8 @@ report.targeter <- function(
   format = "html",
   nmax = 100,
   # TODO: put a warning if tar contains more than nmax variables
-  template = NULL, 
-  # default wlds QMD template 
+  template = NULL,
+  # default wlds QMD template
   quarto_root_dir = ".",
   quarto_targeters_project_dir = "targeter-reports",
   quarto_project_template = getOption(
@@ -161,11 +154,13 @@ report.targeter <- function(
     pacman::p_load("quarto"),
     msg = "quarto package and runtime are required."
   )
-  assertthat::assert_that(!is.null(quarto::quarto_path()),
-   msg = "quarto executable is not found in PATH. Please ensure quarto 
-   is correctly installed in system (not the R quarto package).")
-  
-# TODO fix quato folder creation
+  assertthat::assert_that(
+    !is.null(quarto::quarto_path()),
+    msg = "quarto executable is not found in PATH. Please ensure quarto 
+   is correctly installed in system (not the R quarto package)."
+  )
+
+  # TODO fix quato folder creation
   # TODO cover all parameters  assert tests
   assertthat::assert_that(
     is.character(format),
@@ -181,6 +176,30 @@ report.targeter <- function(
     inherits(metadata, "data.frame") | is.null(metadata),
     msg = "The parameter metadata must be either NULL (no metadata) or a data.frame"
   )
+
+  meta <- NULL
+  if (!is.null(metadata)) {
+    assertthat::assert_that(
+      all(unlist(metadata_vars) %in% colnames(metadata)),
+      msg = "metadata must contain columns specified in metadata_vars"
+    )
+    assertthat::assert_that(
+      !(metadata_vars$varname != "variable" &
+        "variable" %in% colnames(metadata)),
+      msg = "metadata has already a column named 'variable' and it is not the one specified in metadata_vars"
+    )
+    assertthat::assert_that(
+      !(metadata_vars$varlabel != "label" & "label" %in% colnames(metadata)),
+      msg = "metadata has already a column named 'variablelabel' and it is not the one specified in metadata_vars"
+    )
+
+    meta <- copy(metadata)
+    setnames(
+      meta,
+      c(metadata_vars$varname, metadata_vars$varlabel),
+      c("variable", "label")
+    )
+  }
   if (("pptx" %in% format) && !is.null(pptx_reference_doc)) {
     assertthat::assert_that(
       is.character(pptx_reference_doc),
@@ -371,7 +390,7 @@ report.targeter <- function(
     )
   }
 
-  attr(object, "metadata") <- metadata
+  attr(object, "metadata") <- meta
   if (is.null(summary_object)) summary_object <- summary(object)
   saveRDS(summary_object, file.path(target_path, "tar_summary.rds"))
 
@@ -466,11 +485,15 @@ report.targeter <- function(
     summary_object = "tar_summary.rds",
     fullplot_which_plot = fullplot_which_plot,
     fullplot_numvar_as = fullplot_numvar_as,
-    metadata_var_field = metadata_vars$varname,
-    metadata_var_label = metadata_vars$varlabel,
+    metadata_var_label = "label",
     show_tables = as.character(show_tables),
     show_toc = as.character(show_toc),
     show_details = as.character(show_details)
+  )
+
+  yaml::write_yaml(
+    meta_yml_params,
+    file.path(file.path(target_path, paste0(output_file, "-params.yaml")))
   )
   # pandoc_args <- c()
 
@@ -559,6 +582,9 @@ report.targeter <- function(
 
 #' @rdname report
 #' @export
+#' 
+#' @importFrom data.table copy
+
 
 report.tartree <- function(
   object,
@@ -603,12 +629,12 @@ report.tartree <- function(
   report_categories = c("tree"),
   ... # additional parameters to be passed to quarto
 ) {
-  cat("\n Yes report tartree\n")
+  # cat("\n Yes report tartree\n")
   assertthat::assert_that(
     pacman::p_load("quarto"),
     msg = "quarto package and runtime are required."
   )
-  deps <- c("explore", "rpart", "dplyr", "pROC")
+  deps <- c("rpart", "dplyr", "pROC")
   if (getOption("targeter.auto_install_deps", FALSE)) {
     pacman::p_load(char = deps)
   }
@@ -637,6 +663,22 @@ report.tartree <- function(
     inherits(metadata, "data.frame") | is.null(metadata),
     msg = "The parameter metadata must be either NULL (no metadata) or a data.frame"
   )
+
+  meta <- NULL
+  if (!is.null(metadata)) {
+    assertthat::assert_that(
+      all(unlist(metadata_vars) %in% colnames(metadata)),
+      msg = "metadata must contain columns specified in metadata_vars"
+    )
+    assertthat::assert_that(
+      !(metadata_vars$varname != "variable" &
+        "variable" %in% colnames(metadata)),
+      msg = "metadata has already a column named 'variable' and it is not the one specified in metadata_vars"
+    )
+
+    meta <- data.table::copy(metadata)
+    setnames(meta, metadata_vars$varname, "variable")
+  }
 
   if (("pptx" %in% format) && !is.null(pptx_reference_doc)) {
     assertthat::assert_that(
@@ -833,7 +875,7 @@ report.tartree <- function(
   }
 
   print(target_path)
-  attr(object, "metadata") <- metadata
+  attr(object, "metadata") <- meta
   saveRDS(object, file.path(target_path, "tar_mod.rds"))
 
   template_copied <- file.copy(
@@ -924,7 +966,6 @@ report.tartree <- function(
 
   meta_yml_params <- list(
     model = "tar_mod.rds",
-    metadata_var_field = metadata_vars$varname,
     metadata_var_label = metadata_vars$varlabel
   )
 

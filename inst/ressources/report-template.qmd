@@ -14,9 +14,13 @@ params:
   show_tables: TRUE
   fullplot_which_plot: "1:2"
   fullplot_numvar_as: "bin" 
-  metadata_var_field: "variable"
   metadata_var_label: "label"
 format:
+  # revealjs:
+  #   output-ext: -rjs.html # see https://github.com/quarto-dev/quarto-cli/discussions/1751
+  #   theme: default
+  #   slide-level: 3
+  #   embed-resources: false
   html:
     theme: cosmo
     toc: true
@@ -28,11 +32,6 @@ format:
     anchor-sections: true
     search: true
     embed-resources: false
-  revealjs:
-    output-ext: -rjs.html # see https://github.com/quarto-dev/quarto-cli/discussions/1751
-    theme: default
-    slide-level: 3
-    embed-resources: true
   docx:
     toc: true
   pdf:
@@ -57,7 +56,7 @@ format <- knitr::pandoc_to()
 
 object <- readRDS(params$object)
 metadata <- attr(object, "metadata")
-metadata <- metadata[!duplicated(metadata[[params$metadata_var_field]])] 
+#metadata <- metadata[!duplicated(metadata[[params$metadata_var_field]])]
 summary_object <- readRDS(params$summary_object)
 ```
 
@@ -68,19 +67,19 @@ summary_object <- readRDS(params$summary_object)
 #| label: target-stats-prepare
 stats <- setDT(object$profiles[[1]]$target_stats)
 Ntot <- stats[, sum(count)]
-if (object$target_type == "binary"){
+if (object$target_type == "binary") {
   stats[, reference_level := ifelse(as.character(value) == as.character(object$target_reference_level), "*", "")]
 }
 ```
 
 ```{r}
-slideTitle <- function(title){
+slideTitle <- function(title) {
   levels <- ifelse(
-    format %in% c("revealjs","beamer","pptx"),
+    format %in% c("revealjs", "beamer", "pptx"),
     "###",
     "##"
-    )
-  paste0("\n\n", levels, " ", title,"\n\n")
+  )
+  paste0("\n\n", levels, " ", title, "\n\n")
 }
 ```
 
@@ -111,43 +110,39 @@ cat(slideTitle("Analysis parameters"))
 #| label: intro
 #| output: asis
 
-if (object$target_type == "binary"){
+if (object$target_type == "binary") {
   txt <- paste0(
-"\n\n## Binary target analysis - overview\n\n",
-"This report contains a snapshot of the specific subpopulation **«",
-    label(object$target,metadata, var_field = params$metadata_var_field, label_field= params$metadata_var_label ),"» == ", object$target_reference_level, "**\n\n",
-
-"This subpopulation is characterized by  performing bivariate analyses, crossing the variable of interest (target) with  potential explanatory variables. Only most relevant (highest discriminative power) may be retained.
+    "\n\n## Binary target analysis - overview\n\n",
+    "This report contains a snapshot of the specific subpopulation **«",
+    label(object$target, metadata, var_field = "variable", label_field = params$metadata_var_label), "» == ", object$target_reference_level, "**\n\n",
+    "This subpopulation is characterized by  performing bivariate analyses, crossing the variable of interest (target) with  potential explanatory variables. Only most relevant (highest discriminative power) may be retained.
 
 Report contains:
 
 *   A summary overview table with selected retained criteria with some available information such as one statistic called information value (IV) that provides an idea of the explanatory power of the criteria.
 *   Detailed analyses per criteria with graphics that highlight the reation between one of the candidate criteria and the _target_.
 
-It can happen that one criteria contains some missing values. If such, we will introduce value *'[Missing]'* in the report, eventually with a cross **[x]**. Also, if two few data are available, we would use a minus **[-]** instead of reporting value. 
+It can happen that one criteria contains some missing values. If such, we will introduce value *'[Missing]'* in the report, eventually with a cross **[x]**. Also, if two few data are available, we would use a minus **[-]** instead of reporting value.
 
 \\newpage
 
 "
   )
-} else if (object$target_type == "numeric"){
+} else if (object$target_type == "numeric") {
   txt <- paste0(
-"\n\n## Continuous target analysis - overview\n\n",
-
-"Numeric variable of interest ",object$target, " is characterized by  performing bivariate analyses, bycrossing it with  potential explanatory variables. Only most relevant (highest discriminative power) may be retained.
+    "\n\n## Continuous target analysis - overview\n\n",
+    "Numeric variable of interest ", object$target, " is characterized by  performing bivariate analyses, bycrossing it with  potential explanatory variables. Only most relevant (highest discriminative power) may be retained.
 
 Report contains:
 
 *   A summary overview table with a statistic called information value (IV) that provides an idea of the explanatory power of the criteria. Note that this is a generaliation of IV for binary target (cf. targeter package vignette).
 *   Detailed analyses per criteria with graphics that highlight the reation between one of the candidate criteria and the continuous variable.
 
-It can happen that one criteria contains some missing values. If such, we will introduce value *'[Missing]'* in the report, eventually with a cross **[x]**. Also, if two few data are available, we would use a minus **[-]** instead of reporting value. 
+It can happen that one criteria contains some missing values. If such, we will introduce value *'[Missing]'* in the report, eventually with a cross **[x]**. Also, if two few data are available, we would use a minus **[-]** instead of reporting value.
 
 \\newpage
 "
-)
-
-
+  )
 } else {
   txt <- ""
 }
@@ -196,8 +191,8 @@ if (!is.null(object$description_target)) {
   cat(object$description_target[[1]])
 } else {
   cat("\nNo description of the target has been provided during the analysis.")
-  cat("\n\nTarget used:",label(object$target,metadata, var_field = params$metadata_var_field, label_field= params$metadata_var_label, include_varname = TRUE),"\n\n")
-} 
+  cat("\n\nTarget used:", label(object$target, metadata, var_field = "variable", label_field = params$metadata_var_label, include_varname = TRUE), "\n\n")
+}
 ```
 
 
@@ -219,7 +214,7 @@ cat(slideTitle("Summary"))
 ```{r}
 #| label: summary table
 
-if (object$target_type == "binary"){
+if (object$target_type == "binary") {
   ## filter df columns; remove varname (we have rownames) keep only: index.max.index, index.max.level, index.max.count,
   df2 <- as.data.frame(summary_object[
     ,
@@ -232,39 +227,38 @@ if (object$target_type == "binary"){
   df2$index.max.props <- round(df2$index.max.props * 100, 2)
   colnames(df2) <- c("variable", "type", "IV", "Level", "#Records", "%Records", "Index")
   df2$IV <- round(df2$IV, 3)
-} else if (object$target_type == "numeric"){
-
+} else if (object$target_type == "numeric") {
   df2 <- as.data.frame(summary_object)
-  df2 <- df2[,-2] # remove target name column
+  df2 <- df2[, -2] # remove target name column
   colnames(df2)[1] <- c("variable")
-  if ('F' %in% colnames(df2)){
-    df2$F <- round(df2$F,0)
+  if ("F" %in% colnames(df2)) {
+    df2$F <- round(df2$F, 0)
     df2$pval <- formatC(df2$pval)
   }
 }
 
-if (object$target_type %in% c("binary","numeric")){
-  df2$IV <- round(df2$IV,3)
+if (object$target_type %in% c("binary", "numeric")) {
+  df2$IV <- round(df2$IV, 3)
 
   if (format == "pdf") {
     knitr::kable(df2, format = "latex", booktabs = TRUE)
-  } else if (format %in% c("html","revealjs")) {
-    df2$variable <- paste0("<a href='#",ifelse(format=="revealjs","/",""), tolower(df2$variable), "'>", df2$variable, "</a>")
+  } else if (format %in% c("html", "revealjs")) {
+    df2$variable <- paste0("<a href='#", ifelse(format == "revealjs", "/", ""), tolower(df2$variable), "'>", df2$variable, "</a>")
     # kableExtra::kable_styling(knitr::kable(df2, format=format_tables))
     DT::datatable(df2,
       rownames = FALSE, filter = "top",
       selection = "none", autoHideNavigation = TRUE,
-      escape = -ifelse(!is.null(metadata) & format=="html", 2, 1), # we use labels in HTML format
-      options = list(pageLength = ifelse(format=="html",20,10)) # adapt to revealjs only 10
+      escape = -1,
+      # escape = -ifelse(!is.null(metadata) & format=="html", 2, 1), # we use labels in HTML format
+      options = list(pageLength = ifelse(format == "html", 20, 10)) # adapt to revealjs only 10
     )
   } else if (format == "docx") {
     # word
     flextable::qflextable(df2)
-  }  else if (format == "pptx") {
+  } else if (format == "pptx") {
     # PPTX
-    flextable::qflextable(head(df2,10))
+    flextable::qflextable(head(df2, 10))
   }
-
 } else {
   cat("\n\nNot yet supported\n\n")
 }
@@ -279,50 +273,71 @@ if (object$target_type %in% c("binary","numeric")){
 #| label: variables
 #| output: asis
 
+
+
 ## sort by descending IV
-vars <- sort(sapply(object$profiles, function(x)x$IV), decreasing=TRUE)
+vars <- sort(sapply(object$profiles, function(x) x$IV), decreasing = TRUE)
 
-for (ivar in names(vars)){
-
+for (ivar in names(vars)) {
   cat("\n\n\\newpage\n\n") # for LaTeX
- 
+
   # ivar <- names(object$profiles)[i]
   iprofile <- object$profiles[[ivar]]
-  ivar_label <- label(ivar, metadata = metadata,
-     var_field = params$metadata_var_field, label_field= params$metadata_var_label,
-      include_varname = FALSE)
+  ivar_label <- label(ivar,
+    metadata = metadata,
+    var_field = "variable", label_field = params$metadata_var_label,
+    include_varname = FALSE
+  )
+
+
+
   title_text <- tolower(ivar)
-  title_text <- paste0(title_text, "[IV ", round(iprofile$IV, 3) ,"]")
-  if (tolower(ivar_label)!=tolower(ivar)){
-    title_text <- paste(title_text,  ivar_label, collapse = "\n")
+  title_iv <- paste0(" IV ", round(iprofile$IV, 3))
+
+  if (tolower(ivar_label) != tolower(ivar)) {
+    title_text <- paste(
+      ivar_label, 
+      ifelse(format == "html", "<br/>", " \\ ["), 
+      title_iv, ifelse(format == "html", "<br/>", "]"),
+      title_text)
+  } else {
+    title_text <- paste(
+      title_text,
+      ifelse(format == "html", "<br/>", " \\ ["),
+      title_iv,
+      ifelse(format == "html", "", " ]")
+    )
   }
-  
-  cat("\n\n### ",title_text,"\n\n")
-    
+
+
+  # https://quarto.org/docs/authoring/markdown-basics.html#headings
+  cat(paste0("\n\n::: {#", tolower(ivar), " }\n\n")) # anchor section
+  cat(paste0("\n\n### ", title_text, "\n\n"))
+  cat("\n:::\n\n")
+
+
 
   print(
     fullplot(
-      iprofile, 
+      iprofile,
       numvar_as = params$fullplot_numvar_as,
-      which_plot= eval(
+      which_plot = eval(
         parse(
-          text = params$fullplot_which_plot 
-          )
+          text = params$fullplot_which_plot
         )
       )
     )
+  )
 
-  if (as.logical(params$show_tables)){
+  if (as.logical(params$show_tables)) {
     cat("\n\n\\newpage\n\n") # for LaTeX
-      cat("\n\n### ",tolower(ivar)," [table]\n\n")
-      tab <- table_crossvar(iprofile)
+    cat("\n\n### ", tolower(ivar), " [table]\n\n")
+    tab <- table_crossvar(iprofile)
 
-      print(kableExtra::kable(tab, format = "simple"))
-      
+    print(kableExtra::kable(tab, format = "simple"))
+
     cat("\n\n")
-
   }
-  
 }
 ```
 

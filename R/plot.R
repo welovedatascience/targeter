@@ -1,3 +1,15 @@
+
+# to prevent checks of data.table used variables
+# see:  ?globalVariables
+if (getRversion() >= "3.1.0")
+  utils::globalVariables(
+    c(
+      "median"
+    )
+  )
+
+  
+
 #' @title plot.crossvar
 #' @description plot method for crossvar object.
 #' plot is the main function that will automatically dispatch to plot.crossvar_binary, plot.crossvar_categorical or plot.crossvar_continuous,
@@ -141,7 +153,7 @@ plot.crossvar_numeric <- function(
   existmissing_var <- any(dfm$level == "[Missing]")
 
   if (show == "boxplot") {
-    yrange <- c(min(df$bxp_min), max(df$bxp_max))
+    yrange <- range(c(df$bxp_min, df$bxp_max, df$avg))
   } else {
     if (show %in% c("median", "avg")) {
       yrange <- range(df[[show]])
@@ -229,6 +241,14 @@ plot.crossvar_numeric <- function(
           color = "darkorchid"
         )
     }
+   if (show %in% c('boxplot')) {
+
+      # display avg      #
+      p1 = p1 +
+        ggplot2::geom_point(data=dfm, aes(x = level, y = avg, color="darkred", group=1, size=2), show.legend = FALSE)
+    }
+
+
     ## add a label to the x axis : the variable name. If there is a metadata file, it puts the label of the variabe
     if (forNA) {
       p1 <- p1 + ggplot2::xlab(" \n  ")

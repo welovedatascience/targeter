@@ -1,4 +1,15 @@
 
+# targeter 1.6.0
+
+* 20250328
+* Nnow relies only on quarto for reporting, removed all
+  dependencies to rmarkdown. This is a breaking change, as the previous
+  templates are not compatible with quarto. The new templates are in the
+  `inst/templates` directory and are based on the new `quarto` package.
+* Internal refactoring of main compuation functions based on Claude Sonnet 3.7 
+  suggestions. In addition to clarity for users who want to understand the code,
+  this also provides some speed improvements.
+
 
 # targeter 1.5.1
 

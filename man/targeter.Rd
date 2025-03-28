@@ -2,38 +2,7 @@
 % Please edit documentation in R/targeter.R
 \name{targeter}
 \alias{targeter}
-\title{Target Variable Profiling}
-\usage{
-targeter(
-  data,
-  target,
-  description_data = NULL,
-  target_type = c("autoguess", "binary", "categorical", "numeric"),
-  target_reference_level = NULL,
-  description_target = NULL,
-  analysis_name = NULL,
-  select_vars = NULL,
-  exclude_vars = NULL,
-  nbins = 12,
-  binning_method = c("quantile", "clustering", "smart"),
-  naming_conventions = getOption("targeter.use_naming_conventions", default = FALSE),
-  useNA = getOption("targeter.useNA", default = "ifany"),
-  verbose = FALSE,
-  dec = 2,
-  order_label = c("auto", "alpha", "count", "props", "means"),
-  cont_target_trim = 0.01,
-  bxp_factor = 1.5,
-  num_as_categorical_nval = 5,
-  autoguess_nrows = 1000,
-  woe_alternate_version = c("if_continuous", "always"),
-  woe_shift = 0.01,
-  woe_post_cluster = FALSE,
-  woe_post_cluster_n = 6,
-  smart_quantile_by = 0.01,
-  by_nvars = 200,
-  ...
-)
-}
+\title{Targeter: Target Variable Profiling}
 \arguments{
 \item{data}{data.frame or data.table - Data to analyze}
 
@@ -77,7 +46,7 @@ targeter(
 
 \item{woe_alternate_version}{character - When to use alternate WOE definition: "if_continuous" (default) or "always"}
 
-\item{woe_shift}{numeric - Shift value for WOE calculation to prevent issues with 0% or 100% classes (default: 0.01)}
+\item{woe_shift}{numeric - Shift value for WOE calculation to prevent issues with 0\% or 100\% classes (default: 0.01)}
 
 \item{woe_post_cluster}{logical - Whether to cluster WOE values (default: FALSE)}
 
@@ -87,6 +56,8 @@ targeter(
 
 \item{by_nvars}{integer - Number of variables to process in each batch (default: 200)}
 
+\item{debug}{logical - Whether to print debug information (default: FALSE)}
+
 \item{...}{Additional parameters passed to targeter_internal}
 }
 \value{
@@ -95,13 +66,16 @@ An object of class "targeter" with detailed profiling information
 \description{
 For each explanatory variable, this function analyzes its relationship with a target
 variable by calculating statistics, WOE, IV, and other metrics.
+}
+\examples{
+targeter(adult,target ="ABOVE50K")
 
-The analysis includes:
+}
+\seealso{
 \itemize{
-  \item Automatic or custom binning of numeric variables
-  \item Contingency tables with counts of each variable class vs. target values
-  \item Proportions (count per class/target divided by sum of class counts)
-  \item Index values showing over/under-representation
-  \item Weight of Evidence and Information Value for binary and numeric targets
+\item \code{\link{summary.targeter}}
+\item \code{\link{plot.crossvar}}
+\item \code{\link{summary.crossvar}}
+\item \code{\link{report}}
 }
 }

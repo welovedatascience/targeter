@@ -42,5 +42,5 @@ if (interactive()) {
 }
 }
 \seealso{
-\code{\link[targeter]{tar_report}}
+\code{\link[targeter]{report}}
 }
