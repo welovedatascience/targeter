@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">targeter</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.5.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.6.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -49,14 +49,12 @@
 <span>  tar_object <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  tarsum_object <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  target <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  decision_tree_maxdepth <span class="op">=</span> <span class="fl">3L</span>,</span>
-<span>  decision_tree_cp <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  decision_tree_sample <span class="op">=</span> <span class="fl">0.8</span>,</span>
+<span>  seed <span class="op">=</span> <span class="fl">42</span>,</span>
 <span>  predict_prob_cutpoint <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>  predict_prob_cutpoint_quantile <span class="op">=</span> <span class="fl">0.5</span>,</span>
-<span>  seed <span class="op">=</span> <span class="fl">42</span>,</span>
 <span>  rpart.control <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>minsplit <span class="op">=</span> <span class="fl">20</span>, minbucket <span class="op">=</span> <span class="fl">8</span>, cp <span class="op">=</span> <span class="fl">0.01</span>, maxcompete <span class="op">=</span> <span class="fl">4</span>,</span>
-<span>    maxsurrogate <span class="op">=</span> <span class="fl">5</span>, usesurrogate <span class="op">=</span> <span class="fl">2</span>, xval <span class="op">=</span> <span class="fl">10</span>, surrogatestyle <span class="op">=</span> <span class="fl">0</span>, maxdepth <span class="op">=</span> <span class="fl">30</span><span class="op">)</span>,</span>
+<span>    maxsurrogate <span class="op">=</span> <span class="fl">5</span>, usesurrogate <span class="op">=</span> <span class="fl">2</span>, xval <span class="op">=</span> <span class="fl">10</span>, surrogatestyle <span class="op">=</span> <span class="fl">0</span>, maxdepth <span class="op">=</span> <span class="fl">3L</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -81,16 +79,12 @@
 <dd><p>character, target column name  - default: NULL and if tar_object is provided, target is taken from it</p></dd>
 
 
-<dt id="arg-decision-tree-maxdepth">decision_tree_maxdepth<a class="anchor" aria-label="anchor" href="#arg-decision-tree-maxdepth"></a></dt>
-<dd><p>integer, maximum depth of the tree - default: 3</p></dd>
-
-
-<dt id="arg-decision-tree-cp">decision_tree_cp<a class="anchor" aria-label="anchor" href="#arg-decision-tree-cp"></a></dt>
-<dd><p>numeric, complexity parameter - default: 0</p></dd>
-
-
 <dt id="arg-decision-tree-sample">decision_tree_sample<a class="anchor" aria-label="anchor" href="#arg-decision-tree-sample"></a></dt>
 <dd><p>numeric, proportion of data to be used for training -  to be betwwen 0 (not included) and 1 (not recommended) default: 0.8</p></dd>
+
+
+<dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
+<dd><p>integer, seed for random number generation - default: 42</p></dd>
 
 
 <dt id="arg-predict-prob-cutpoint">predict_prob_cutpoint<a class="anchor" aria-label="anchor" href="#arg-predict-prob-cutpoint"></a></dt>
@@ -103,8 +97,8 @@ further additional preduction. Default 0.5. Could be used to see what if we
 want to create a group of x% records.</p></dd>
 
 
-<dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
-<dd><p>integer, seed for random number generation - default: 42</p></dd>
+<dt id="arg-rpart-control">rpart.control<a class="anchor" aria-label="anchor" href="#arg-rpart-control"></a></dt>
+<dd><p>list, control parameters for rpart function</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>

@@ -10,7 +10,9 @@
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Naming Conventions and Metadata">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><script src="naming-conventions-and-metadata_files/libs/quarto-html/popper.min.js"></script><script src="naming-conventions-and-metadata_files/libs/quarto-html/tippy.umd.min.js"></script><link href="naming-conventions-and-metadata_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="naming-conventions-and-metadata_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Naming Conventions and Metadata">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -20,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">targeter</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.5.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.6.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -49,52 +51,40 @@
 
 
   </div>
-</nav><div class="container template-article">
-
-
-
-
+</nav><div class="container template-quarto">
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Naming Conventions and Metadata</h1>
-                        <h4 data-toc-skip class="author">welovedatascience</h4>
-            
-            <h4 data-toc-skip class="date">2025-03-18</h4>
-      
-      <small class="dont-index">Source: <a href="https://github.com/welovedatascience/targeter/blob/main/vignettes/naming-conventions-and-metadata.rmd" class="external-link"><code>vignettes/naming-conventions-and-metadata.rmd</code></a></small>
-      <div class="d-none name"><code>naming-conventions-and-metadata.rmd</code></div>
+
+      <p class="author">welovedatascience</p>
+      <p class="date">2025-03-28</p>
+
+      <small class="dont-index">Source: <a href="https://github.com/welovedatascience/targeter/blob/main/vignettes/naming-conventions-and-metadata.qmd" class="external-link"><code>vignettes/naming-conventions-and-metadata.qmd</code></a></small>
+      <div class="d-none name"><code></code></div>
     </div>
 
-    
-    
-<!-- devtools::build_rmd("vignettes/naming-conventions-and-metadata.rmd") -->
-<div class="section level2">
-<h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
+
+
+
+
+
+    <!-- devtools::build_rmd("vignettes/naming-conventions-and-metadata.rmd") --><section class="level2"><h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p>This vignette demonstrates two powerful features of the targeter
-package that enhance standardization and professional reporting:</p>
-<ol style="list-style-type: decimal">
-<li><p>Variable Naming Conventions Using standardized prefixes to
-indicate variable types</p></li>
-<li><p>Metadata Integration - Using descriptive labels for variables in
-reports</p></li>
+<p>This vignette demonstrates two powerful features of the targeter package that enhance standardization and professional reporting:</p>
+<ol type="1">
+<li><p>Variable Naming Conventions Using standardized prefixes to indicate variable types</p></li>
+<li><p>Metadata Integration - Using descriptive labels for variables in reports</p></li>
 </ol>
-<p>These features are particularly valuable in enterprise environments
-where consistency and professional presentation are essential.</p>
-</div>
-<div class="section level2">
-<h2 id="variable-naming-conventions">Variable Naming Conventions<a class="anchor" aria-label="anchor" href="#variable-naming-conventions"></a>
+<p>These features are particularly valuable in enterprise environments where consistency and professional presentation are essential.</p>
+</section><section class="level2"><h2 id="variable-naming-conventions">Variable Naming Conventions<a class="anchor" aria-label="anchor" href="#variable-naming-conventions"></a>
 </h2>
-<p>###The Naming Convention System The targeter package supports a
-precise naming convention where the first two characters of variable
-names (a letter followed by an underscore) indicate the variable
-type:</p>
-<table style="width:99%;" class="table">
+<p>###The Naming Convention System The targeter package supports a precise naming convention where the first two characters of variable names (a letter followed by an underscore) indicate the variable type:</p>
+<table class="table caption-top" style="width:99%;">
 <colgroup>
-<col width="40%">
-<col width="35%">
-<col width="22%">
+<col style="width: 40%">
+<col style="width: 35%">
+<col style="width: 22%">
 </colgroup>
 <tbody>
 <tr class="odd">
@@ -141,16 +131,17 @@ type:</p>
 <li>Clearer communication in team settings</li>
 <li>Optimized statistical processing</li>
 </ul>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/welovedatascience/targeter" class="external-link">targeter</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; Loading required package: data.table</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-datatable.com" class="external-link">data.table</a></span><span class="op">)</span></span></code></pre></div>
-<div class="section level3">
-<h3 id="exploring-the-adult-dataset">Exploring the Adult Dataset<a class="anchor" aria-label="anchor" href="#exploring-the-adult-dataset"></a>
+</div>
+<section class="level3"><h3 id="exploring-the-adult-dataset">Exploring the Adult Dataset<a class="anchor" aria-label="anchor" href="#exploring-the-adult-dataset"></a>
 </h3>
-<p>Let’s examine the standard adult dataset included with the
-package:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<p>Let’s examine the standard adult dataset included with the package:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Load the adult dataset</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">adult</span><span class="op">)</span></span>
 <span></span>
@@ -164,22 +155,17 @@ package:</p>
 <span><span class="co">#&gt;  $ EDUCATIONNUM : int  13 13 9 7 13 14 5 9 14 13 ...</span></span>
 <span><span class="co">#&gt;  $ MARITALSTATUS: Factor w/ 7 levels " Divorced"," Married-AF-spouse",..: 5 3 1 3 3 3 4 3 5 3 ...</span></span></code></pre></div>
 </div>
-<div class="section level3">
-<h3 id="creating-metadata-for-the-adult-dataset">Creating Metadata for the Adult Dataset<a class="anchor" aria-label="anchor" href="#creating-metadata-for-the-adult-dataset"></a>
+</section><section class="level3"><h3 id="creating-metadata-for-the-adult-dataset">Creating Metadata for the Adult Dataset<a class="anchor" aria-label="anchor" href="#creating-metadata-for-the-adult-dataset"></a>
 </h3>
-<p>For effective reporting, we’ll create a metadata table
-containing:</p>
+<p>For effective reporting, we’ll create a metadata table containing:</p>
 <ul>
 <li>Original variable names</li>
 <li>Appropriate naming convention prefixes</li>
 <li>Human-readable labels for reporting</li>
 </ul>
-<p>On concrete cases, user will have at disposal such metadata, stored
-in a database or a file, and will be able to load it into its R
-environment. It is also possible to programatically generate similar
-metadata when you create variables, for instance when performing feafure
-engineering in a modeling pipeline.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<p>On concrete cases, user will have at disposal such metadata, stored in a database or a file, and will be able to load it into its R environment. It is also possible to programatically generate similar metadata when you create variables, for instance when performing feafure engineering in a modeling pipeline.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create metadata table</span></span>
 <span><span class="va">adult_metadata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  variable <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">adult</span><span class="op">)</span>,</span>
@@ -221,97 +207,98 @@ engineering in a modeling pipeline.</p>
 <span></span>
 <span><span class="co"># Display metadata</span></span>
 <span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">adult_metadata</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
+<div class="cell-output-display">
+<table class="table caption-top">
 <thead><tr class="header">
-<th align="left">variable</th>
-<th align="left">prefix</th>
-<th align="left">label</th>
+<th style="text-align: left;">variable</th>
+<th style="text-align: left;">prefix</th>
+<th style="text-align: left;">label</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left">AGE</td>
-<td align="left">N</td>
-<td align="left">Age (years)</td>
+<td style="text-align: left;">AGE</td>
+<td style="text-align: left;">N</td>
+<td style="text-align: left;">Age (years)</td>
 </tr>
 <tr class="even">
-<td align="left">WORKCLASS</td>
-<td align="left">C</td>
-<td align="left">Employment sector</td>
+<td style="text-align: left;">WORKCLASS</td>
+<td style="text-align: left;">C</td>
+<td style="text-align: left;">Employment sector</td>
 </tr>
 <tr class="odd">
-<td align="left">FNLWGT</td>
-<td align="left">N</td>
-<td align="left">Final sampling weight</td>
+<td style="text-align: left;">FNLWGT</td>
+<td style="text-align: left;">N</td>
+<td style="text-align: left;">Final sampling weight</td>
 </tr>
 <tr class="even">
-<td align="left">EDUCATION</td>
-<td align="left">C</td>
-<td align="left">Educational attainment</td>
+<td style="text-align: left;">EDUCATION</td>
+<td style="text-align: left;">C</td>
+<td style="text-align: left;">Educational attainment</td>
 </tr>
 <tr class="odd">
-<td align="left">EDUCATIONNUM</td>
-<td align="left">N</td>
-<td align="left">Years of education</td>
+<td style="text-align: left;">EDUCATIONNUM</td>
+<td style="text-align: left;">N</td>
+<td style="text-align: left;">Years of education</td>
 </tr>
 <tr class="even">
-<td align="left">MARITALSTATUS</td>
-<td align="left">C</td>
-<td align="left">Marital status</td>
+<td style="text-align: left;">MARITALSTATUS</td>
+<td style="text-align: left;">C</td>
+<td style="text-align: left;">Marital status</td>
 </tr>
 <tr class="odd">
-<td align="left">OCCUPATION</td>
-<td align="left">C</td>
-<td align="left">Professional occupation</td>
+<td style="text-align: left;">OCCUPATION</td>
+<td style="text-align: left;">C</td>
+<td style="text-align: left;">Professional occupation</td>
 </tr>
 <tr class="even">
-<td align="left">RELATIONSHIP</td>
-<td align="left">C</td>
-<td align="left">Family relationship</td>
+<td style="text-align: left;">RELATIONSHIP</td>
+<td style="text-align: left;">C</td>
+<td style="text-align: left;">Family relationship</td>
 </tr>
 <tr class="odd">
-<td align="left">RACE</td>
-<td align="left">C</td>
-<td align="left">Race/ethnicity</td>
+<td style="text-align: left;">RACE</td>
+<td style="text-align: left;">C</td>
+<td style="text-align: left;">Race/ethnicity</td>
 </tr>
 <tr class="even">
-<td align="left">SEX</td>
-<td align="left">C</td>
-<td align="left">Gender</td>
+<td style="text-align: left;">SEX</td>
+<td style="text-align: left;">C</td>
+<td style="text-align: left;">Gender</td>
 </tr>
 <tr class="odd">
-<td align="left">CAPITALGAIN</td>
-<td align="left">N</td>
-<td align="left">Capital gain in $</td>
+<td style="text-align: left;">CAPITALGAIN</td>
+<td style="text-align: left;">N</td>
+<td style="text-align: left;">Capital gain in $</td>
 </tr>
 <tr class="even">
-<td align="left">CAPITALLOSS</td>
-<td align="left">N</td>
-<td align="left">Capital loss in $</td>
+<td style="text-align: left;">CAPITALLOSS</td>
+<td style="text-align: left;">N</td>
+<td style="text-align: left;">Capital loss in $</td>
 </tr>
 <tr class="odd">
-<td align="left">HOURSPERWEEK</td>
-<td align="left">N</td>
-<td align="left">Hours worked per week</td>
+<td style="text-align: left;">HOURSPERWEEK</td>
+<td style="text-align: left;">N</td>
+<td style="text-align: left;">Hours worked per week</td>
 </tr>
 <tr class="even">
-<td align="left">NATIVECOUNTRY</td>
-<td align="left">C</td>
-<td align="left">Country of origin</td>
+<td style="text-align: left;">NATIVECOUNTRY</td>
+<td style="text-align: left;">C</td>
+<td style="text-align: left;">Country of origin</td>
 </tr>
 <tr class="odd">
-<td align="left">ABOVE50K</td>
-<td align="left">Z</td>
-<td align="left">Income above $50K</td>
+<td style="text-align: left;">ABOVE50K</td>
+<td style="text-align: left;">Z</td>
+<td style="text-align: left;">Income above $50K</td>
 </tr>
 </tbody>
 </table>
 </div>
-<div class="section level3">
-<h3 id="applying-the-naming-convention">Applying the Naming Convention<a class="anchor" aria-label="anchor" href="#applying-the-naming-convention"></a>
+</div>
+</section><section class="level3"><h3 id="applying-the-naming-convention">Applying the Naming Convention<a class="anchor" aria-label="anchor" href="#applying-the-naming-convention"></a>
 </h3>
-<p>Now we’ll programmatically rename the variables according to our
-naming conventions:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<p>Now we’ll programmatically rename the variables according to our naming conventions:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Rename variables</span></span>
 <span><span class="co"># Create a renamed copy of the adult dataset</span></span>
 <span><span class="va">adult_renamed</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/as.data.table.html" class="external-link">as.data.table</a></span><span class="op">(</span><span class="va">adult</span><span class="op">)</span></span>
@@ -333,12 +320,11 @@ naming conventions:</p>
 <span><span class="co">#&gt; [1] "N_AGE"           "C_WORKCLASS"     "N_FNLWGT"        "C_EDUCATION"    </span></span>
 <span><span class="co">#&gt; [5] "N_EDUCATIONNUM"  "C_MARITALSTATUS"</span></span></code></pre></div>
 </div>
-<div class="section level3">
-<h3 id="validating-naming-conventions">Validating Naming Conventions<a class="anchor" aria-label="anchor" href="#validating-naming-conventions"></a>
+</section><section class="level3"><h3 id="validating-naming-conventions">Validating Naming Conventions<a class="anchor" aria-label="anchor" href="#validating-naming-conventions"></a>
 </h3>
-<p>The check_naming_conventions() function validates that variable
-prefixes match their actual data types:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<p>The check_naming_conventions() function validates that variable prefixes match their actual data types:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Check naming conventions</span></span>
 <span><span class="co"># Check if our naming conventions are correctly applied</span></span>
 <span><span class="va">naming_check</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/check_naming_conventions.html">check_naming_conventions</a></span><span class="op">(</span><span class="va">adult_renamed</span><span class="op">)</span></span>
@@ -354,15 +340,13 @@ prefixes match their actual data types:</p>
 <span><span class="co"># Count any errors in naming</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">naming_check</span><span class="op">$</span><span class="va">ErrorType</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 0</span></span></code></pre></div>
-<p>A value of <code>FALSE</code> for <code>ErrorType</code> means the
-naming convention is correctly followed for that variable.</p>
 </div>
-<div class="section level3">
-<h3 id="using-naming-conventions-with-targeter">Using Naming Conventions with targeter<a class="anchor" aria-label="anchor" href="#using-naming-conventions-with-targeter"></a>
+<p>A value of <code>FALSE</code> for <code>ErrorType</code> means the naming convention is correctly followed for that variable.</p>
+</section><section class="level3"><h3 id="using-naming-conventions-with-targeter">Using Naming Conventions with targeter<a class="anchor" aria-label="anchor" href="#using-naming-conventions-with-targeter"></a>
 </h3>
-<p>Let’s run a target analysis using our conventionally named
-variables:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<p>Let’s run a target analysis using our conventionally named variables:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Run targeter with naming conventions enabled</span></span>
 <span><span class="va">tar_with_naming</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/targeter.html">targeter</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">adult_renamed</span>,</span>
@@ -384,24 +368,19 @@ variables:</p>
 <span><span class="co">#&gt; 4:    C_OCCUPATION categorical                      TRUE</span></span>
 <span><span class="co">#&gt; 5:          C_RACE categorical                      TRUE</span></span>
 <span><span class="co">#&gt; 6:  C_RELATIONSHIP categorical                      TRUE</span></span></code></pre></div>
-<p>By setting naming_conventions = <code>TRUE</code>, the
-<code><a href="../reference/targeter.html">targeter()</a></code> function:</p>
-<ol style="list-style-type: decimal">
+</div>
+<p>By setting naming_conventions = <code>TRUE</code>, the <code><a href="../reference/targeter.html">targeter()</a></code> function:</p>
+<ol type="1">
 <li>Automatically detects variable types based on prefixes</li>
 <li>Validates that prefixes match actual data types</li>
 <li>Optimizes processing for each variable type</li>
 <li>Provides a more consistent analysis output</li>
-</ol>
-</div>
-</div>
-<div class="section level2">
-<h2 id="using-metadata-in-reports">Using Metadata in Reports<a class="anchor" aria-label="anchor" href="#using-metadata-in-reports"></a>
+</ol></section></section><section class="level2"><h2 id="using-metadata-in-reports">Using Metadata in Reports<a class="anchor" aria-label="anchor" href="#using-metadata-in-reports"></a>
 </h2>
-<p>The metadata we created can be used to generate professional reports
-with descriptive labels.</p>
-<p>This is as simple as passing as parameter the metadata we just
-created to the <code><a href="../reference/targeter.html">targeter()</a></code> function.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<p>The metadata we created can be used to generate professional reports with descriptive labels.</p>
+<p>This is as simple as passing as parameter the metadata we just created to the <code><a href="../reference/targeter.html">targeter()</a></code> function.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Generate a report with metadata</span></span>
 <span><span class="fu"><a href="../reference/report.html">report</a></span><span class="op">(</span></span>
 <span>  <span class="va">tar_with_naming</span>,</span>
@@ -410,10 +389,110 @@ created to the <code><a href="../reference/targeter.html">targeter()</a></code> 
 <span>  author <span class="op">=</span> <span class="st">"Data Science Team"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
-  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+</section><script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'light-border',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config);
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script></main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
 </div>
-
 
 
     <footer><div class="pkgdown-footer-left">
