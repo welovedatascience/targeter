@@ -4,7 +4,7 @@ pkgdown_sha: ~
 articles:
   naming-conventions-and-metadata: naming-conventions-and-metadata.html
   targeter: targeter.html
-last_built: 2025-03-28T11:02Z
+last_built: 2025-03-28T11:18Z
 urls:
   reference: https://welovedatascience.github.io/targeter/reference
   article: https://welovedatascience.github.io/targeter/articles
