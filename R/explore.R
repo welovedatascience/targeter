@@ -1,6 +1,7 @@
 # to prevent checks of data.table used variables
 # see:  ?globalVariables
 
+# test
 if (getRversion() >= "3.1.0")
   utils::globalVariables(
     c(
